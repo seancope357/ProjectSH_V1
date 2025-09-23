@@ -115,7 +115,7 @@ export function Navigation() {
             ) : (
               <Link
                 href="/auth/signin"
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors inline-block"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-base font-medium transition-colors inline-flex items-center h-10"
               >
                 Sign In
               </Link>
@@ -204,7 +204,7 @@ export function Navigation() {
             ) : (
               <Link
                 href="/auth/signin"
-                className="bg-blue-600 hover:bg-blue-700 text-white block px-3 py-2 text-base font-medium w-full text-left rounded-md transition-colors"
+                className="bg-blue-600 hover:bg-blue-700 text-white block px-4 py-2 rounded-md text-base font-medium w-full text-center transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Sign In
