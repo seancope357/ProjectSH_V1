@@ -115,7 +115,7 @@ export function Navigation() {
             ) : (
               <Link
                 href="/auth/signin"
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-base font-medium transition-colors inline-flex items-center h-10"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors inline-flex items-center"
               >
                 Sign In
               </Link>
