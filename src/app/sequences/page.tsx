@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { Navigation } from '@/components/ui/navigation'
-import { Grid, List, Eye, Heart, Star, Download } from 'lucide-react'
+import { Grid, List, Eye, Heart, Star, Download, Filter, Settings, Zap } from 'lucide-react'
+import { useSession } from 'next-auth/react'
 
 interface Sequence {
   id: string
@@ -20,20 +21,40 @@ interface Sequence {
   seller: {
     name: string
   }
+  compatibilityScore?: number
+  isCompatible?: boolean
+}
+
+interface UserSetupProfile {
+  ledCount: number
+  controllerType: string
+  voltage: string
+  maxCurrent: number
+  protocol: string
+  refreshRate: number
 }
 
 export default function SequencesPage() {
   const router = useRouter()
+  const { data: session } = useSession()
   const [sequences, setSequences] = useState<Sequence[]>([])
   const [loading, setLoading] = useState(true)
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [sortBy, setSortBy] = useState('newest')
-  const [category, setCategory] = useState('all')
+  const [selectedCategory, setSelectedCategory] = useState('all')
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
+  const [compatibilityFilter, setCompatibilityFilter] = useState(false)
+  const [userSetup, setUserSetup] = useState<UserSetupProfile | null>(null)
+  const [showSetupModal, setShowSetupModal] = useState(false)
 
   const categories = [
-    'all', 'christmas', 'halloween', 'music', 'abstract', 'nature', 'geometric', 'other'
+    { value: 'all', label: 'All Categories' },
+    { value: 'christmas', label: 'Christmas' },
+    { value: 'halloween', label: 'Halloween' },
+    { value: 'music', label: 'Music Sync' },
+    { value: 'effects', label: 'Effects' },
+    { value: 'patterns', label: 'Patterns' },
   ]
 
   const sortOptions = [
@@ -42,47 +63,93 @@ export default function SequencesPage() {
     { value: 'price-low', label: 'Price: Low to High' },
     { value: 'price-high', label: 'Price: High to Low' },
     { value: 'rating', label: 'Highest Rated' },
-    { value: 'downloads', label: 'Most Downloaded' }
+    { value: 'downloads', label: 'Most Downloaded' },
+    { value: 'compatibility', label: 'Best Compatibility' },
   ]
+
+  // Fetch user setup profile
+  const fetchUserSetup = async () => {
+    if (!session?.user?.id) return
+    
+    try {
+      const response = await fetch('/api/user/setup-profile')
+      if (response.ok) {
+        const data = await response.json()
+        setUserSetup(data)
+      }
+    } catch (error) {
+      console.error('Failed to fetch user setup:', error)
+    }
+  }
 
   const fetchSequences = async () => {
     setLoading(true)
     try {
-      const params = new URLSearchParams({
-        category: category === 'all' ? '' : category,
-        sort: sortBy,
-        page: currentPage.toString(),
-        limit: '12'
-      })
-
-      const response = await fetch(`/api/sequences?${params}`)
-      if (response.ok) {
-        const data = await response.json()
-        setSequences(data.sequences || [])
-        setTotalPages(Math.ceil((data.total || 0) / 12))
+      let url = '/api/sequences'
+      
+      // Use compatibility API if filter is enabled and user has setup
+      if (compatibilityFilter && userSetup) {
+        url = '/api/sequences/compatible'
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            category: selectedCategory === 'all' ? undefined : selectedCategory,
+            sortBy,
+            page: currentPage,
+            limit: 12,
+          }),
+        })
+        
+        if (response.ok) {
+          const data = await response.json()
+          setSequences(data.sequences)
+          setTotalPages(Math.ceil(data.total / 12))
+        } else {
+          throw new Error('Failed to fetch compatible sequences')
+        }
       } else {
-        // Fallback with mock data for now
-        setSequences([
-          {
-            id: '1',
-            title: 'Christmas Sparkle',
-            description: 'Beautiful twinkling Christmas lights sequence',
-            price: 9.99,
-            category: 'christmas',
-            tags: ['christmas', 'sparkle', 'festive'],
-            rating: 4.8,
-            downloads: 1250,
-            createdAt: '2024-01-15',
-            seller: {
-              name: 'LightMaster'
-            }
-          }
-        ])
-        setTotalPages(1)
+        // Regular API call
+        const params = new URLSearchParams({
+          category: selectedCategory === 'all' ? '' : selectedCategory,
+          sort: sortBy,
+          page: currentPage.toString(),
+          limit: '12',
+        })
+        
+        const response = await fetch(`${url}?${params}`)
+        
+        if (response.ok) {
+          const data = await response.json()
+          setSequences(data.sequences || [])
+          setTotalPages(Math.ceil((data.total || 0) / 12))
+        } else {
+          throw new Error('Failed to fetch sequences')
+        }
       }
     } catch (error) {
-      console.error('Failed to fetch sequences:', error)
-      setSequences([])
+      console.error('Error fetching sequences:', error)
+      // Fallback to mock data
+      const mockSequences: Sequence[] = [
+        {
+          id: '1',
+          title: 'Christmas Wonderland',
+          description: 'A magical Christmas light sequence with twinkling effects and smooth transitions.',
+          price: 12.99,
+          previewUrl: '/api/placeholder/400/300',
+          category: 'christmas',
+          tags: ['christmas', 'twinkling', 'festive'],
+          rating: 4.8,
+          downloads: 1250,
+          createdAt: '2024-01-15',
+          seller: { name: 'LightMaster Pro' },
+          compatibilityScore: compatibilityFilter ? 95 : undefined,
+          isCompatible: compatibilityFilter ? true : undefined,
+        },
+      ]
+      setSequences(mockSequences)
       setTotalPages(1)
     } finally {
       setLoading(false)
@@ -91,7 +158,22 @@ export default function SequencesPage() {
 
   useEffect(() => {
     fetchSequences()
-  }, [sortBy, category, currentPage]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [selectedCategory, sortBy, currentPage, compatibilityFilter])
+
+  useEffect(() => {
+    if (session) {
+      fetchUserSetup()
+    }
+  }, [session])
+
+  const handleCompatibilityToggle = () => {
+    if (!userSetup && !compatibilityFilter) {
+      setShowSetupModal(true)
+    } else {
+      setCompatibilityFilter(!compatibilityFilter)
+      setCurrentPage(1) // Reset to first page when toggling
+    }
+  }
 
   const handleSequenceClick = (sequenceId: string) => {
     router.push(`/sequence/${sequenceId}`)
@@ -117,19 +199,45 @@ export default function SequencesPage() {
           <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
             {/* Left side filters */}
             <div className="flex flex-wrap gap-4 items-center">
+              {/* Compatibility Filter Toggle */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleCompatibilityToggle}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors ${
+                    compatibilityFilter
+                      ? 'bg-green-50 border-green-200 text-green-700'
+                      : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
+                  }`}
+                >
+                  <Zap className="w-4 h-4" />
+                  <span className="text-sm font-medium">
+                    {compatibilityFilter ? 'Compatible Only' : 'Show All'}
+                  </span>
+                </button>
+                {!userSetup && (
+                  <button
+                    onClick={() => setShowSetupModal(true)}
+                    className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700"
+                  >
+                    <Settings className="w-4 h-4" />
+                    Setup Profile
+                  </button>
+                )}
+              </div>
+
               {/* Category Filter */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Category
                 </label>
                 <select
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
                   className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   {categories.map((cat) => (
-                    <option key={cat} value={cat}>
-                      {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                    <option key={cat.value} value={cat.value}>
+                      {cat.label}
                     </option>
                   ))}
                 </select>
@@ -201,7 +309,7 @@ export default function SequencesPage() {
                   }`}
                 >
                   {/* Preview Image */}
-                  <div className={viewMode === 'list' ? 'w-48 flex-shrink-0' : 'aspect-video'}>
+                  <div className={`${viewMode === 'list' ? 'w-48 flex-shrink-0' : 'aspect-video'} relative`}>
                     {sequence.previewUrl ? (
                       <Image
                         src={sequence.previewUrl}
@@ -213,6 +321,21 @@ export default function SequencesPage() {
                     ) : (
                       <div className="w-full h-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
                         <Eye className="w-8 h-8 text-white" />
+                      </div>
+                    )}
+                    
+                    {/* Compatibility Badge */}
+                    {compatibilityFilter && sequence.compatibilityScore !== undefined && (
+                      <div className="absolute top-2 right-2">
+                        <div className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          sequence.compatibilityScore >= 90
+                            ? 'bg-green-100 text-green-800'
+                            : sequence.compatibilityScore >= 70
+                            ? 'bg-yellow-100 text-yellow-800'
+                            : 'bg-red-100 text-red-800'
+                        }`}>
+                          {sequence.compatibilityScore}% Match
+                        </div>
                       </div>
                     )}
                   </div>
@@ -341,6 +464,75 @@ export default function SequencesPage() {
           </>
         )}
       </div>
+
+      {/* Setup Profile Modal */}
+      {showSetupModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-md w-full p-6">
+            <h2 className="text-xl font-semibold mb-4">Setup Your LED Profile</h2>
+            <p className="text-gray-600 mb-6">
+              Configure your LED setup to get personalized compatibility recommendations.
+            </p>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Number of LEDs
+                </label>
+                <input
+                  type="number"
+                  placeholder="e.g., 300"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Controller Type
+                </label>
+                <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                  <option value="">Select controller</option>
+                  <option value="esp32">ESP32</option>
+                  <option value="arduino">Arduino</option>
+                  <option value="raspberry-pi">Raspberry Pi</option>
+                  <option value="fadecandy">Fadecandy</option>
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Voltage
+                </label>
+                <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                  <option value="">Select voltage</option>
+                  <option value="5V">5V</option>
+                  <option value="12V">12V</option>
+                  <option value="24V">24V</option>
+                </select>
+              </div>
+            </div>
+            
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => setShowSetupModal(false)}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+              >
+                Skip for Now
+              </button>
+              <button
+                onClick={() => {
+                  // TODO: Save setup profile
+                  setShowSetupModal(false)
+                  router.push('/compatibility')
+                }}
+                className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+              >
+                Complete Setup
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -60,6 +60,7 @@ model User {
   
   // Relations
   sellerProfile SellerProfile?
+  setupProfile  UserSetupProfile?
   orders        Order[]
   reviews       Review[]
   disputes      Dispute[]
@@ -344,4 +345,25 @@ model CompatibilityProfile {
   sequence    Sequence  @relation(fields: [sequenceId], references: [id], onDelete: Cascade)
   
   @@map("compatibility_profiles")
+}
+
+model UserSetupProfile {
+  id              String    @id @default(cuid())
+  userId          String    @unique
+  ledCount        Int?
+  controllerType  String?
+  voltage         String?
+  maxCurrent      Float?
+  protocol        String?
+  refreshRate     Int?
+  difficulty      String?   // beginner, intermediate, advanced
+  props           Json?     // Array of prop objects: [{name: string, count: number}]
+  preferences     Json?     // Additional user preferences
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  // Relations
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("user_setup_profiles")
 }

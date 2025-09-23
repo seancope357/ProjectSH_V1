@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import { Navigation } from '@/components/ui/navigation'
-import { Search, Grid, List, Star, Download, Eye } from 'lucide-react'
+import { Search, Grid, List, Star, Download, Eye, Zap } from 'lucide-react'
 
 interface Sequence {
   id: string
@@ -20,6 +20,8 @@ interface Sequence {
     username: string
   }
   createdAt: string
+  compatibilityScore?: number
+  isCompatible?: boolean
 }
 
 function SearchPageContent() {
@@ -188,7 +190,7 @@ function SearchPageContent() {
                   }`}
                 >
                   {/* Preview Image */}
-                  <div className={viewMode === 'list' ? 'w-48 flex-shrink-0' : 'aspect-video'}>
+                  <div className={`${viewMode === 'list' ? 'w-48 flex-shrink-0' : 'aspect-video'} relative`}>
                     {sequence.previewUrl ? (
                       <Image
                         src={sequence.previewUrl}
@@ -200,6 +202,22 @@ function SearchPageContent() {
                     ) : (
                       <div className="w-full h-full bg-gray-200 flex items-center justify-center">
                         <Eye className="w-8 h-8 text-gray-400" />
+                      </div>
+                    )}
+                    
+                    {/* Compatibility Badge */}
+                    {sequence.compatibilityScore !== undefined && (
+                      <div className="absolute top-2 right-2">
+                        <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
+                          sequence.compatibilityScore >= 90
+                            ? 'bg-green-100 text-green-800'
+                            : sequence.compatibilityScore >= 70
+                            ? 'bg-yellow-100 text-yellow-800'
+                            : 'bg-red-100 text-red-800'
+                        }`}>
+                          <Zap className="w-3 h-3" />
+                          {sequence.compatibilityScore}%
+                        </div>
                       </div>
                     )}
                   </div>
