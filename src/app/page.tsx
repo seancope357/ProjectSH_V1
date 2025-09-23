@@ -43,6 +43,143 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Featured Sequences Section */}
+      <section className="py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Featured Sequences
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Discover our most popular and highest-rated LED sequences from talented creators.
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Featured Sequence 1 */}
+            <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+              <div className="aspect-video bg-gradient-to-br from-purple-500 to-pink-500 relative">
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="text-white text-center">
+                    <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-2">
+                      <Zap className="h-8 w-8" />
+                    </div>
+                    <p className="text-sm font-medium">Preview</p>
+                  </div>
+                </div>
+              </div>
+              <div className="p-6">
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">Neon Dreams</h3>
+                <p className="text-gray-600 mb-4">A vibrant cyberpunk-inspired sequence with flowing neon effects perfect for modern displays.</p>
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-2xl font-bold text-blue-600">$12.99</span>
+                  <div className="flex items-center">
+                    <div className="flex text-yellow-400">
+                      ★★★★★
+                    </div>
+                    <span className="text-gray-500 text-sm ml-1">(127)</span>
+                  </div>
+                </div>
+                <div className="flex gap-2 mb-4">
+                  <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">1920x1080</span>
+                  <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">60fps</span>
+                </div>
+                <Link
+                  href="/sequence/1"
+                  className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors text-center block"
+                >
+                  View Details
+                </Link>
+              </div>
+            </div>
+
+            {/* Featured Sequence 2 */}
+            <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+              <div className="aspect-video bg-gradient-to-br from-blue-500 to-teal-500 relative">
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="text-white text-center">
+                    <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-2">
+                      <Zap className="h-8 w-8" />
+                    </div>
+                    <p className="text-sm font-medium">Preview</p>
+                  </div>
+                </div>
+              </div>
+              <div className="p-6">
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">Ocean Waves</h3>
+                <p className="text-gray-600 mb-4">Calming blue waves that flow across your display with realistic water movement patterns.</p>
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-2xl font-bold text-blue-600">$9.99</span>
+                  <div className="flex items-center">
+                    <div className="flex text-yellow-400">
+                      ★★★★★
+                    </div>
+                    <span className="text-gray-500 text-sm ml-1">(89)</span>
+                  </div>
+                </div>
+                <div className="flex gap-2 mb-4">
+                  <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">2560x1440</span>
+                  <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">30fps</span>
+                </div>
+                <Link
+                  href="/sequence/2"
+                  className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors text-center block"
+                >
+                  View Details
+                </Link>
+              </div>
+            </div>
+
+            {/* Featured Sequence 3 */}
+            <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+              <div className="aspect-video bg-gradient-to-br from-orange-500 to-red-500 relative">
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="text-white text-center">
+                    <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-2">
+                      <Zap className="h-8 w-8" />
+                    </div>
+                    <p className="text-sm font-medium">Preview</p>
+                  </div>
+                </div>
+              </div>
+              <div className="p-6">
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">Fire Storm</h3>
+                <p className="text-gray-600 mb-4">Intense fire effects with realistic flames and ember particles for dramatic displays.</p>
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-2xl font-bold text-blue-600">$15.99</span>
+                  <div className="flex items-center">
+                    <div className="flex text-yellow-400">
+                      ★★★★☆
+                    </div>
+                    <span className="text-gray-500 text-sm ml-1">(203)</span>
+                  </div>
+                </div>
+                <div className="flex gap-2 mb-4">
+                  <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">3840x2160</span>
+                  <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">60fps</span>
+                </div>
+                <Link
+                  href="/sequence/3"
+                  className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors text-center block"
+                >
+                  View Details
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          <div className="text-center mt-12">
+            <Link
+              href="/sequences"
+              className="bg-blue-600 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-colors inline-flex items-center"
+            >
+              View All Sequences
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Features Section */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
