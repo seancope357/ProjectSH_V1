@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { Navigation } from '@/components/ui/navigation'
 import { Search, Filter, Grid, List, Star, Download, Zap, Monitor, Settings, Save, User } from 'lucide-react'
 import { useSession } from 'next-auth/react'
@@ -43,11 +44,31 @@ interface FilterState {
 
 export default function CompatibilityDiscoveryPage() {
   const { data: session } = useSession()
+  const router = useRouter()
   const [sequences, setSequences] = useState<Sequence[]>([])
   const [loading, setLoading] = useState(false)
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [showFilters, setShowFilters] = useState(false)
   const [showSetupModal, setShowSetupModal] = useState(false)
+
+  // Local Storage utility functions
+  const saveToLocalStorage = (key: string, data: any) => {
+    try {
+      localStorage.setItem(key, JSON.stringify(data))
+    } catch (error) {
+      console.error('Failed to save to localStorage:', error)
+    }
+  }
+
+  const getFromLocalStorage = (key: string) => {
+    try {
+      const item = localStorage.getItem(key)
+      return item ? JSON.parse(item) : null
+    } catch (error) {
+      console.error('Failed to read from localStorage:', error)
+      return null
+    }
+  }
   const [userSetup, setUserSetup] = useState<UserSetupProfile>({
     ledCount: 300,
     controllerType: 'ESP32',
@@ -86,36 +107,63 @@ export default function CompatibilityDiscoveryPage() {
   }, [userSetup, filters, currentPage, hasSetup])
 
   const loadUserSetup = async () => {
-    try {
-      const response = await fetch('/api/user/setup-profile')
-      if (response.ok) {
-        const data = await response.json()
-        if (data.setupProfile) {
-          setUserSetup(data.setupProfile)
-          setHasSetup(true)
-        } else {
-          setShowSetupModal(true)
+    // First try to load from localStorage
+    const localSetup = getFromLocalStorage('userSetupProfile')
+    if (localSetup) {
+      setUserSetup(localSetup)
+      setHasSetup(true)
+      return
+    }
+
+    // If not in localStorage and user is logged in, try to load from server
+    if (session?.user) {
+      try {
+        const response = await fetch('/api/user/setup-profile')
+        if (response.ok) {
+          const data = await response.json()
+          if (data.setupProfile) {
+            setUserSetup(data.setupProfile)
+            setHasSetup(true)
+            // Save to localStorage for future use
+            saveToLocalStorage('userSetupProfile', data.setupProfile)
+          } else {
+            setShowSetupModal(true)
+          }
         }
+      } catch (error) {
+        console.error('Failed to load user setup:', error)
+        setShowSetupModal(true)
       }
-    } catch (error) {
-      console.error('Failed to load user setup:', error)
+    } else {
+      // If no session, show setup modal
       setShowSetupModal(true)
     }
   }
 
   const saveUserSetup = async () => {
     try {
-      const response = await fetch('/api/user/setup-profile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(userSetup)
-      })
+      // Always save to localStorage first
+      saveToLocalStorage('userSetupProfile', userSetup)
       
-      if (response.ok) {
-        setHasSetup(true)
-        setShowSetupModal(false)
-        searchCompatibleSequences()
+      // If user is logged in, also save to server
+      if (session?.user) {
+        const response = await fetch('/api/user/setup-profile', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(userSetup)
+        })
+        
+        if (!response.ok) {
+          console.error('Failed to save to server, but saved locally')
+        }
       }
+      
+      setHasSetup(true)
+      setShowSetupModal(false)
+      
+      // Redirect to sequences page with compatibility filter enabled
+      router.push('/sequences?compatibility=true')
+      
     } catch (error) {
       console.error('Failed to save user setup:', error)
     }

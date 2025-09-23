@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import { Navigation } from '@/components/ui/navigation'
 import { Grid, List, Eye, Heart, Star, Download, Filter, Settings, Zap } from 'lucide-react'
@@ -36,6 +36,7 @@ interface UserSetupProfile {
 
 export default function SequencesPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { data: session } = useSession()
   const [sequences, setSequences] = useState<Sequence[]>([])
   const [loading, setLoading] = useState(true)
@@ -47,6 +48,25 @@ export default function SequencesPage() {
   const [compatibilityFilter, setCompatibilityFilter] = useState(false)
   const [userSetup, setUserSetup] = useState<UserSetupProfile | null>(null)
   const [showSetupModal, setShowSetupModal] = useState(false)
+
+  // Local Storage utility functions
+  const saveToLocalStorage = (key: string, data: any) => {
+    try {
+      localStorage.setItem(key, JSON.stringify(data))
+    } catch (error) {
+      console.error('Failed to save to localStorage:', error)
+    }
+  }
+
+  const getFromLocalStorage = (key: string) => {
+    try {
+      const item = localStorage.getItem(key)
+      return item ? JSON.parse(item) : null
+    } catch (error) {
+      console.error('Failed to read from localStorage:', error)
+      return null
+    }
+  }
 
   const categories = [
     { value: 'all', label: 'All Categories' },
@@ -69,6 +89,14 @@ export default function SequencesPage() {
 
   // Fetch user setup profile
   const fetchUserSetup = async () => {
+    // First try to load from local storage
+    const localSetup = getFromLocalStorage('userSetup')
+    if (localSetup) {
+      setUserSetup(localSetup)
+      return
+    }
+    
+    // If not in local storage and user is logged in, fetch from server
     if (!session?.user?.id) return
     
     try {
@@ -76,6 +104,8 @@ export default function SequencesPage() {
       if (response.ok) {
         const data = await response.json()
         setUserSetup(data)
+        // Save to local storage for future use
+        saveToLocalStorage('userSetup', data)
       }
     } catch (error) {
       console.error('Failed to fetch user setup:', error)
@@ -165,6 +195,14 @@ export default function SequencesPage() {
       fetchUserSetup()
     }
   }, [session])
+
+  // Check URL parameters for compatibility filter on page load
+  useEffect(() => {
+    const compatibilityParam = searchParams.get('compatibility')
+    if (compatibilityParam === 'true') {
+      setCompatibilityFilter(true)
+    }
+  }, [searchParams])
 
   const handleCompatibilityToggle = () => {
     if (!userSetup && !compatibilityFilter) {
