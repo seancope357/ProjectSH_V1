@@ -126,7 +126,7 @@ export async function POST(request: NextRequest) {
     )
 
     // Sort sequences
-    let sortedSequences = [...compatibleSequences]
+    const sortedSequences = [...compatibleSequences]
     
     switch (sort) {
       case 'compatibility':
