@@ -5,10 +5,10 @@ import { prisma } from '@/lib/prisma'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params
+    const { id } = await params
 
     const sequence = await prisma.sequence.findUnique({
       where: { 
@@ -22,7 +22,6 @@ export async function GET(
             sellerProfile: {
               select: {
                 displayName: true,
-                avatar: true,
               },
             },
           },
@@ -67,9 +66,7 @@ export async function GET(
       previewUrl: sequence.previewUrl,
       seller: {
         name: sequence.storefront.sellerProfile?.displayName || 
-              sequence.storefront.sellerProfile?.displayName || 
               'Unknown Seller',
-        avatar: sequence.storefront.sellerProfile?.avatar,
       },
       reviews: sequence.reviews.map((review: any) => ({
         id: review.id,
@@ -97,16 +94,16 @@ export async function GET(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
     
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
     }
 
-    const { id } = params
+    const { id } = await params
     const body = await request.json()
 
     // Check if user owns this sequence or is admin
@@ -153,16 +150,16 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
     
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
     }
 
-    const { id } = params
+    const { id } = await params
 
     // Check if user owns this sequence or is admin
     const sequence = await prisma.sequence.findUnique({

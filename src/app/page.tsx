@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useSession } from 'next-auth/react'
 import { Navigation } from '@/components/ui/navigation'
-import { Search, Zap, Shield, Users, ArrowRight, Star } from 'lucide-react'
+import { Search, Zap, Shield, Users, ArrowRight } from 'lucide-react'
 
 export default function HomePage() {
   const { data: session } = useSession()

@@ -6,7 +6,7 @@ import { prisma } from '@/lib/prisma'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { sequenceId: string } }
+  { params }: { params: Promise<{ sequenceId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -15,7 +15,7 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { sequenceId } = params
+    const { sequenceId } = await params
 
     // Check if user has purchased this sequence
     const purchase = await prisma.orderItem.findFirst({
@@ -62,15 +62,6 @@ export async function GET(
       console.error('Signed URL error:', error)
       return NextResponse.json({ error: 'Failed to generate download link' }, { status: 500 })
     }
-
-    // Log download for analytics
-    await prisma.download.create({
-      data: {
-        userId: session.user.id,
-        sequenceId,
-        downloadedAt: new Date(),
-      },
-    })
 
     return NextResponse.json({
       downloadUrl: data.signedUrl,

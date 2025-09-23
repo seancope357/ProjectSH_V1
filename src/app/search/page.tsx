@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import { Navigation } from '@/components/ui/navigation'
-import { Search, Filter, Grid, List, Star, Download, Eye } from 'lucide-react'
+import { Search, Grid, List, Star, Download, Eye } from 'lucide-react'
 
 interface Sequence {
   id: string

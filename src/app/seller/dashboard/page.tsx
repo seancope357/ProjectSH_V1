@@ -13,12 +13,9 @@ import {
   Download, 
   DollarSign, 
   TrendingUp, 
-  Users, 
   Star,
   Upload,
-  BarChart3,
-  Calendar,
-  Filter
+  BarChart3
 } from 'lucide-react'
 
 interface SellerStats {

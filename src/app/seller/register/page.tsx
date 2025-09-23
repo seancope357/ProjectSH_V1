@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { User, Mail, Phone, MapPin, Building, CreditCard, Upload, Check, AlertCircle } from 'lucide-react'
+import { User, Building, CreditCard, Check, AlertCircle } from 'lucide-react'
 
 export default function SellerRegisterPage() {
   const [currentStep, setCurrentStep] = useState(1)

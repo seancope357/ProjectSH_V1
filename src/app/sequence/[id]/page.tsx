@@ -16,8 +16,6 @@ import {
   Pause,
   User,
   Calendar,
-  Tag,
-  FileText,
   Shield
 } from 'lucide-react'
 

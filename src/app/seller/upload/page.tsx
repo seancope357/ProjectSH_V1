@@ -158,7 +158,7 @@ export default function SellerUploadPage() {
         const data = await response.json();
         setError(data.message || 'Failed to upload sequence');
       }
-    } catch (error) {
+    } catch {
       setError('An error occurred while uploading the sequence');
     } finally {
       setLoading(false);

@@ -38,7 +38,6 @@ export async function POST(request: NextRequest) {
       // Check for orphaned sequence files using SequenceVersion
       const sequenceVersions = await prisma.sequenceVersion.findMany({
         select: { fileUrl: true },
-        where: { fileUrl: { not: null } },
       })
 
       const validPaths = new Set(sequenceVersions.map((sv: { fileUrl: string | null }) => sv.fileUrl).filter(Boolean))
