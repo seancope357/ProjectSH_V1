@@ -1,0 +1,345 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum UserRole {
+  USER
+  SELLER
+  ADMIN
+}
+
+enum OrderStatus {
+  PENDING
+  COMPLETED
+  CANCELLED
+  REFUNDED
+}
+
+enum LicenseType {
+  PERSONAL
+  COMMERCIAL
+  EXTENDED
+}
+
+enum DisputeStatus {
+  OPEN
+  IN_REVIEW
+  RESOLVED
+  CLOSED
+}
+
+enum TakedownStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum PayoutStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  image         String?
+  role          UserRole  @default(USER)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  // Relations
+  sellerProfile SellerProfile?
+  orders        Order[]
+  reviews       Review[]
+  disputes      Dispute[]
+  takedowns     Takedown[]
+  
+  @@map("users")
+}
+
+model SellerProfile {
+  id                String    @id @default(cuid())
+  userId            String    @unique
+  displayName       String
+  bio               String?
+  website           String?
+  stripeAccountId   String?   @unique
+  stripeOnboarded   Boolean   @default(false)
+  isActive          Boolean   @default(true)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  
+  // Relations
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  storefronts       Storefront[]
+  payouts           Payout[]
+  
+  @@map("seller_profiles")
+}
+
+model Storefront {
+  id              String    @id @default(cuid())
+  sellerProfileId String
+  name            String
+  slug            String    @unique
+  description     String?
+  bannerImage     String?
+  isActive        Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  // Relations
+  sellerProfile   SellerProfile @relation(fields: [sellerProfileId], references: [id], onDelete: Cascade)
+  sequences       Sequence[]
+  
+  @@map("storefronts")
+}
+
+model Sequence {
+  id              String    @id @default(cuid())
+  storefrontId    String
+  title           String
+  slug            String    @unique
+  description     String?
+  price           Int       // Price in cents
+  previewUrl      String?
+  thumbnailUrl    String?
+  demoVideoUrl    String?
+  difficulty      String?   // beginner, intermediate, advanced
+  duration        Int?      // Duration in seconds
+  tags            String[]  @default([])
+  isActive        Boolean   @default(true)
+  isApproved      Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  // Relations
+  storefront      Storefront @relation(fields: [storefrontId], references: [id], onDelete: Cascade)
+  versions        SequenceVersion[]
+  orderItems      OrderItem[]
+  reviews         Review[]
+  assets          Asset[]
+  compatibilityProfiles CompatibilityProfile[]
+  
+  @@map("sequences")
+}
+
+model SequenceVersion {
+  id          String    @id @default(cuid())
+  sequenceId  String
+  version     String
+  changelog   String?
+  fileUrl     String
+  fileSize    Int
+  checksum    String
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  
+  // Relations
+  sequence    Sequence  @relation(fields: [sequenceId], references: [id], onDelete: Cascade)
+  licenses    License[]
+  
+  @@unique([sequenceId, version])
+  @@map("sequence_versions")
+}
+
+model Asset {
+  id          String    @id @default(cuid())
+  sequenceId  String
+  type        String    // image, video, audio, etc.
+  url         String
+  filename    String
+  fileSize    Int
+  mimeType    String
+  createdAt   DateTime  @default(now())
+  
+  // Relations
+  sequence    Sequence  @relation(fields: [sequenceId], references: [id], onDelete: Cascade)
+  
+  @@map("assets")
+}
+
+model Order {
+  id              String      @id @default(cuid())
+  userId          String
+  stripePaymentId String?     @unique
+  status          OrderStatus @default(PENDING)
+  subtotal        Int         // Subtotal in cents
+  platformFee     Int         // Platform fee in cents
+  total           Int         // Total in cents
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  
+  // Relations
+  user            User        @relation(fields: [userId], references: [id])
+  items           OrderItem[]
+  
+  @@map("orders")
+}
+
+model OrderItem {
+  id                String    @id @default(cuid())
+  orderId           String
+  sequenceId        String
+  price             Int       // Price in cents at time of purchase
+  platformFee       Int       // Platform fee for this item in cents
+  createdAt         DateTime  @default(now())
+  
+  // Relations
+  order             Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  sequence          Sequence  @relation(fields: [sequenceId], references: [id])
+  license           License?
+  
+  @@map("order_items")
+}
+
+model License {
+  id                  String          @id @default(cuid())
+  orderItemId         String          @unique
+  sequenceVersionId   String
+  licenseType         LicenseType     @default(PERSONAL)
+  fingerprint         String          @unique
+  manifestUrl         String
+  expiresAt           DateTime?
+  createdAt           DateTime        @default(now())
+  
+  // Relations
+  orderItem           OrderItem       @relation(fields: [orderItemId], references: [id], onDelete: Cascade)
+  sequenceVersion     SequenceVersion @relation(fields: [sequenceVersionId], references: [id])
+  downloadGrants      DownloadGrant[]
+  
+  @@map("licenses")
+}
+
+model DownloadGrant {
+  id          String    @id @default(cuid())
+  licenseId   String
+  signedUrl   String
+  expiresAt   DateTime
+  downloadedAt DateTime?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime  @default(now())
+  
+  // Relations
+  license     License   @relation(fields: [licenseId], references: [id], onDelete: Cascade)
+  
+  @@map("download_grants")
+}
+
+model Review {
+  id          String    @id @default(cuid())
+  userId      String
+  sequenceId  String
+  rating      Int       // 1-5 stars
+  comment     String?
+  isVerified  Boolean   @default(false) // Verified purchase
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  // Relations
+  user        User      @relation(fields: [userId], references: [id])
+  sequence    Sequence  @relation(fields: [sequenceId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, sequenceId])
+  @@map("reviews")
+}
+
+model Payout {
+  id                String        @id @default(cuid())
+  sellerProfileId   String
+  amount            Int           // Amount in cents
+  platformFee       Int           // Platform fee deducted in cents
+  netAmount         Int           // Net amount paid to seller in cents
+  stripeTransferId  String?       @unique
+  status            PayoutStatus  @default(PENDING)
+  periodStart       DateTime
+  periodEnd         DateTime
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  
+  // Relations
+  sellerProfile     SellerProfile @relation(fields: [sellerProfileId], references: [id])
+  
+  @@map("payouts")
+}
+
+model Coupon {
+  id          String    @id @default(cuid())
+  code        String    @unique
+  description String?
+  discountType String   // percentage, fixed
+  discountValue Int     // Percentage (1-100) or fixed amount in cents
+  minAmount   Int?      // Minimum order amount in cents
+  maxUses     Int?      // Maximum number of uses
+  usedCount   Int       @default(0)
+  isActive    Boolean   @default(true)
+  expiresAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  @@map("coupons")
+}
+
+model Dispute {
+  id          String        @id @default(cuid())
+  userId      String
+  orderId     String?
+  reason      String
+  description String
+  status      DisputeStatus @default(OPEN)
+  resolution  String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  
+  // Relations
+  user        User          @relation(fields: [userId], references: [id])
+  
+  @@map("disputes")
+}
+
+model Takedown {
+  id          String         @id @default(cuid())
+  userId      String
+  sequenceId  String?
+  reason      String
+  description String
+  evidence    String?        // URLs to evidence
+  status      TakedownStatus @default(PENDING)
+  resolution  String?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  
+  // Relations
+  user        User           @relation(fields: [userId], references: [id])
+  
+  @@map("takedowns")
+}
+
+model CompatibilityProfile {
+  id          String    @id @default(cuid())
+  sequenceId  String
+  propName    String
+  propCount   Int
+  pixelCount  Int
+  difficulty  String?
+  metadata    Json?     // Additional compatibility metadata
+  createdAt   DateTime  @default(now())
+  
+  // Relations
+  sequence    Sequence  @relation(fields: [sequenceId], references: [id], onDelete: Cascade)
+  
+  @@map("compatibility_profiles")
+}
