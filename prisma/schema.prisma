@@ -8,7 +8,6 @@ generator client {
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
 }
 
 enum UserRole {
@@ -114,12 +113,15 @@ model Sequence {
   slug            String    @unique
   description     String?
   price           Int       // Price in cents
+  category        String?   // Category for filtering
   previewUrl      String?
   thumbnailUrl    String?
   demoVideoUrl    String?
   difficulty      String?   // beginner, intermediate, advanced
   duration        Int?      // Duration in seconds
   tags            String[]  @default([])
+  rating          Float?    @default(0) // Average rating
+  downloadCount   Int       @default(0) // Number of downloads
   isActive        Boolean   @default(true)
   isApproved      Boolean   @default(false)
   createdAt       DateTime  @default(now())
