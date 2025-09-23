@@ -13,7 +13,7 @@ export default function HomePage() {
       <Navigation />
       
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 dark:from-blue-800 dark:via-purple-800 dark:to-indigo-900">
+      <section className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 dark:from-blue-800 dark:via-purple-800 dark:to-indigo-900" aria-label="Hero Banner">
         {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 via-transparent to-purple-500/20"></div>
         
@@ -53,16 +53,16 @@ export default function HomePage() {
       </section>
 
       {/* Featured Sequences Section */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-gray-50" aria-label="Featured Sequences">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
+          <header className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               Featured Sequences
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
               Discover our most popular and highest-rated LED sequences from talented creators.
             </p>
-          </div>
+          </header>
           
           <div className="grid md:grid-cols-3 gap-8">
             {/* Featured Sequence 1 */}
@@ -190,16 +190,16 @@ export default function HomePage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-white" aria-label="Platform Features">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
+          <header className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               Why Choose SequenceHUB?
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
               We make it easy to find, purchase, and use LED sequences that work perfectly with your setup.
             </p>
-          </div>
+          </header>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div className="text-center">
@@ -265,17 +265,14 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 bg-blue-600">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            Ready to Light Up Your Display?
+      {/* Call to Action Section */}
+      <section className="py-20 bg-gradient-to-r from-blue-600 to-purple-600" aria-label="Call to Action">
+        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+            Ready to Get Started?
           </h2>
-          <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-            {session 
-              ? "Start browsing our collection of premium LED sequences."
-              : "Join thousands of creators and customers in our marketplace."
-            }
+          <p className="text-xl text-blue-100 mb-8">
+            Join thousands of creators and enthusiasts in the SequenceHUB community.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             {session ? (

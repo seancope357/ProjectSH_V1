@@ -1,0 +1,117 @@
+/* Section Styling for Consistent Visual Hierarchy */
+
+/* Main content sections */
+main {
+  @apply relative;
+}
+
+/* Section headers */
+section header,
+main header {
+  @apply mb-6;
+}
+
+section header h1,
+main header h1 {
+  @apply text-3xl md:text-4xl font-bold text-gray-900 mb-4;
+}
+
+section header h2,
+main header h2 {
+  @apply text-2xl md:text-3xl font-bold text-gray-900 mb-3;
+}
+
+section header p,
+main header p {
+  @apply text-lg text-gray-600 leading-relaxed;
+}
+
+/* Section spacing and visual separation */
+section {
+  @apply relative;
+}
+
+section + section {
+  @apply mt-2 md:mt-3;
+}
+
+/* Section backgrounds for better visual separation */
+section[aria-label="Hero Banner"] {
+  @apply relative overflow-hidden;
+}
+
+section[aria-label="Featured Sequences"],
+section[aria-label="Platform Features"] {
+  @apply py-4 md:py-5;
+}
+
+section[aria-label="Call to Action"] {
+  @apply py-4 md:py-5;
+}
+
+/* Profile page specific sections */
+section[aria-label="Breadcrumb Navigation"] {
+  @apply bg-white border-b border-gray-200 py-4;
+}
+
+section[aria-label="Quick Navigation"] {
+  @apply bg-gray-50 py-6;
+}
+
+section[aria-label="Profile Content"] {
+  @apply bg-gray-50 py-8;
+}
+
+section[aria-label="Profile Information"],
+section[aria-label="Profile Settings"],
+section[aria-label="User Statistics"],
+section[aria-label="Recent Sequences"],
+section[aria-label="Quick Actions"] {
+  @apply bg-white rounded-lg shadow-sm p-6 mb-1.5;
+}
+
+/* Search and filter sections */
+section[aria-label="Search Filters and Controls"] {
+  @apply bg-white rounded-lg shadow-sm p-6 mb-2;
+}
+
+section[aria-label="Sequences Results"] {
+  @apply mb-2;
+}
+
+/* Responsive section padding */
+@media (max-width: 768px) {
+  section[aria-label="Featured Sequences"],
+  section[aria-label="Platform Features"],
+  section[aria-label="Call to Action"] {
+    @apply py-3;
+  }
+  
+  section header h1,
+  main header h1 {
+    @apply text-2xl md:text-3xl;
+  }
+  
+  section header h2,
+  main header h2 {
+    @apply text-xl md:text-2xl;
+  }
+}
+
+/* Focus and accessibility improvements */
+section:focus-within {
+  @apply outline-none;
+}
+
+section[tabindex="0"]:focus {
+  @apply outline-2 outline-blue-500 outline-offset-2;
+}
+
+/* Visual hierarchy improvements */
+section aside {
+  @apply bg-gray-50 rounded-lg p-4;
+}
+
+section aside + section {
+  @apply mt-1.5;
+}

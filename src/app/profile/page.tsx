@@ -65,8 +65,8 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Breadcrumb Navigation */}
-      <div className="bg-white border-b border-gray-200">
+      {/* Navigation Section */}
+      <section className="bg-white border-b border-gray-200" aria-label="Breadcrumb Navigation">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center space-x-2 text-sm">
             <Link href="/" className="flex items-center text-gray-500 hover:text-blue-600 transition-colors">
@@ -77,10 +77,10 @@ export default function ProfilePage() {
             <span className="text-gray-900 font-medium">Profile</span>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Header */}
-      <div className="bg-white shadow-sm">
+      {/* Header Section */}
+      <section className="bg-white shadow-sm" aria-label="Profile Header">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center justify-between">
             <div>
@@ -114,56 +114,58 @@ export default function ProfilePage() {
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Mobile Quick Navigation */}
-        <div className="md:hidden mb-8">
-          <div className="grid grid-cols-2 gap-3">
-            <Link
-              href="/sequences"
-              className="flex items-center justify-center px-4 py-3 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors"
-            >
-              <ShoppingBag className="h-4 w-4 mr-2" />
-              Marketplace
-            </Link>
-            <Link
-              href="/compatibility"
-              className="flex items-center justify-center px-4 py-3 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors"
-            >
-              <Zap className="h-4 w-4 mr-2" />
-              Compatibility
-            </Link>
-            <Link
-              href="/orders"
-              className="flex items-center justify-center px-4 py-3 bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition-colors"
-            >
-              <Download className="h-4 w-4 mr-2" />
-              My Orders
-            </Link>
-            <Link
-              href="/seller/dashboard"
-              className="flex items-center justify-center px-4 py-3 bg-orange-50 text-orange-700 rounded-lg hover:bg-orange-100 transition-colors"
-            >
-              <Upload className="h-4 w-4 mr-2" />
-              Sell
-            </Link>
+      {/* Main Content Section */}
+      <section className="bg-gray-50 py-8" aria-label="Profile Content">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Mobile Quick Navigation */}
+          <div className="md:hidden mb-8">
+            <div className="grid grid-cols-2 gap-3">
+              <Link
+                href="/sequences"
+                className="flex items-center justify-center px-4 py-3 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors"
+              >
+                <ShoppingBag className="h-4 w-4 mr-2" />
+                Marketplace
+              </Link>
+              <Link
+                href="/compatibility"
+                className="flex items-center justify-center px-4 py-3 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors"
+              >
+                <Zap className="h-4 w-4 mr-2" />
+                Compatibility
+              </Link>
+              <Link
+                href="/orders"
+                className="flex items-center justify-center px-4 py-3 bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition-colors"
+              >
+                <Download className="h-4 w-4 mr-2" />
+                My Orders
+              </Link>
+              <Link
+                href="/seller/dashboard"
+                className="flex items-center justify-center px-4 py-3 bg-orange-50 text-orange-700 rounded-lg hover:bg-orange-100 transition-colors"
+              >
+                <Upload className="h-4 w-4 mr-2" />
+                Sell
+              </Link>
+            </div>
           </div>
-        </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Profile Information */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <div className="text-center mb-6">
-                <div className="relative inline-block">
-                  <div className="w-24 h-24 bg-blue-500 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">
-                    {profileData.name.split(' ').map(n => n[0]).join('')}
+          <div className="grid lg:grid-cols-3 gap-8">
+            {/* Profile Information Section */}
+            <aside className="lg:col-span-1" aria-label="Profile Information">
+              <section className="bg-white rounded-lg shadow-md p-6 mb-6" aria-label="User Profile">
+                <div className="text-center mb-6">
+                  <div className="relative inline-block">
+                    <div className="w-24 h-24 bg-blue-500 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">
+                      {profileData.name.split(' ').map(n => n[0]).join('')}
+                    </div>
+                    <button className="absolute bottom-0 right-0 bg-gray-100 rounded-full p-2 hover:bg-gray-200 transition-colors">
+                      <Upload className="h-4 w-4 text-gray-600" />
+                    </button>
                   </div>
-                  <button className="absolute bottom-0 right-0 bg-gray-100 rounded-full p-2 hover:bg-gray-200 transition-colors">
-                    <Upload className="h-4 w-4 text-gray-600" />
-                  </button>
-                </div>
                 
                 {!isEditing ? (
                   <div>
@@ -268,10 +270,10 @@ export default function ProfilePage() {
                   </>
                 )}
               </div>
-            </div>
+            </section>
 
             {/* Settings Section */}
-            <div className="bg-white rounded-lg shadow-md p-6">
+            <section className="bg-white rounded-lg shadow-md p-6" aria-label="User Settings">
               <div className="flex items-center gap-3 mb-6">
                 <Settings className="h-5 w-5 text-gray-600" />
                 <h3 className="text-lg font-semibold text-gray-900">Settings</h3>
@@ -286,13 +288,13 @@ export default function ProfilePage() {
                   <ThemeToggle />
                 </div>
               </div>
-            </div>
-          </div>
+            </section>
+          </aside>
 
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {/* Main Dashboard Section */}
+          <main className="lg:col-span-2 space-y-8" aria-label="Profile Dashboard">
+            {/* Stats Section */}
+            <section className="grid grid-cols-2 md:grid-cols-4 gap-4" aria-label="Profile Statistics">
               <div className="bg-white rounded-lg shadow-md p-6 text-center">
                 <Upload className="h-8 w-8 text-blue-500 mx-auto mb-2" />
                 <div className="text-2xl font-bold text-gray-900">{stats.sequences}</div>
@@ -316,10 +318,10 @@ export default function ProfilePage() {
                 <div className="text-2xl font-bold text-gray-900">{stats.views}</div>
                 <div className="text-sm text-gray-600">Views</div>
               </div>
-            </div>
+            </section>
 
-            {/* Recent Sequences */}
-            <div className="bg-white rounded-lg shadow-md">
+            {/* Recent Sequences Section */}
+            <section className="bg-white rounded-lg shadow-md" aria-label="Recent Sequences">
               <div className="p-6 border-b border-gray-200">
                 <h2 className="text-xl font-semibold text-gray-900">My Recent Sequences</h2>
               </div>
@@ -361,10 +363,10 @@ export default function ProfilePage() {
                   View All Sequences
                 </button>
               </div>
-            </div>
+            </section>
 
-            {/* Quick Actions */}
-            <div className="bg-white rounded-lg shadow-md p-6">
+            {/* Quick Actions Section */}
+            <section className="bg-white rounded-lg shadow-md p-6" aria-label="Quick Actions">
               <h2 className="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
               <div className="grid md:grid-cols-2 gap-4">
                 <button className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center gap-2">
@@ -376,10 +378,11 @@ export default function ProfilePage() {
                   Account Settings
                 </button>
               </div>
-            </div>
-          </div>
+            </section>
+          </main>
         </div>
       </div>
-    </div>
+    </section>
+  </div>
   )
 }

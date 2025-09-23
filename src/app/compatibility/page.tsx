@@ -368,13 +368,24 @@ export default function CompatibilityDiscoveryPage() {
     <div className="min-h-screen bg-gray-50">
       <Navigation />
       
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header Section */}
+        <header className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            Compatibility Discovery
+          </h1>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            Find LED sequences that are perfectly compatible with your hardware setup. 
+            Get personalized recommendations based on your configuration.
+          </p>
+        </header>
+        
+        {/* Current Setup Display */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">
               Compatible Sequences
-            </h1>
+            </h2>
             <p className="text-gray-600">
               Sequences perfectly matched to your {userSetup.controllerType} with {userSetup.ledCount} LEDs
             </p>
@@ -602,7 +613,7 @@ export default function CompatibilityDiscoveryPage() {
             )}
           </>
         )}
-      </div>
+      </main>
     </div>
   )
 }
