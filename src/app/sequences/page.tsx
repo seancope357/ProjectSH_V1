@@ -48,6 +48,7 @@ export default function SequencesPage() {
   const [compatibilityFilter, setCompatibilityFilter] = useState(false)
   const [userSetup, setUserSetup] = useState<UserSetupProfile | null>(null)
   const [showSetupModal, setShowSetupModal] = useState(false)
+  const [favorites, setFavorites] = useState<Set<string>>(new Set())
 
   // Local Storage utility functions
   const saveToLocalStorage = (key: string, data: any) => {
@@ -86,6 +87,14 @@ export default function SequencesPage() {
     { value: 'downloads', label: 'Most Downloaded' },
     { value: 'compatibility', label: 'Best Compatibility' },
   ]
+
+  // Load favorites from localStorage on mount
+  useEffect(() => {
+    const savedFavorites = getFromLocalStorage('favorites')
+    if (savedFavorites && Array.isArray(savedFavorites)) {
+      setFavorites(new Set(savedFavorites))
+    }
+  }, [])
 
   // Fetch user setup profile
   const fetchUserSetup = async () => {
@@ -189,6 +198,32 @@ export default function SequencesPage() {
   useEffect(() => {
     fetchSequences()
   }, [selectedCategory, sortBy, currentPage, compatibilityFilter])
+
+  // Toggle favorite function
+  const toggleFavorite = async (sequenceId: string) => {
+    const newFavorites = new Set(favorites)
+    
+    if (favorites.has(sequenceId)) {
+      newFavorites.delete(sequenceId)
+    } else {
+      newFavorites.add(sequenceId)
+    }
+    
+    setFavorites(newFavorites)
+    
+    // Save to localStorage for non-authenticated users or as backup
+    saveToLocalStorage('favorites', Array.from(newFavorites))
+    
+    // If user is authenticated, also sync with server
+    if (session?.user) {
+      try {
+        const method = favorites.has(sequenceId) ? 'DELETE' : 'POST'
+        await fetch(`/api/user/favorites/${sequenceId}`, { method })
+      } catch (error) {
+        console.error('Failed to sync favorite with server:', error)
+      }
+    }
+  }
 
   useEffect(() => {
     if (session) {
@@ -435,11 +470,15 @@ export default function SequencesPage() {
                       <button
                         onClick={(e) => {
                           e.stopPropagation()
-                          // Handle favorite toggle
+                          toggleFavorite(sequence.id)
                         }}
-                        className="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                        className={`p-1 transition-colors ${
+                          favorites.has(sequence.id) 
+                            ? 'text-red-500 hover:text-red-600' 
+                            : 'text-gray-400 hover:text-red-500'
+                        }`}
                       >
-                        <Heart className="w-4 h-4" />
+                        <Heart className={`w-4 h-4 ${favorites.has(sequence.id) ? 'fill-current' : ''}`} />
                       </button>
                     </div>
                   </div>

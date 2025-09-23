@@ -103,10 +103,14 @@ export default function SequenceDetailsPage() {
   }
 
   const checkUserStatus = async () => {
+    // Check local storage for favorites (works for both authenticated and non-authenticated users)
+    const savedFavorites = JSON.parse(localStorage.getItem('favorites') || '[]')
+    setIsFavorited(savedFavorites.includes(params.id))
+
     if (!session) return
 
     try {
-      // Check if favorited
+      // Check if favorited on server (for authenticated users)
       const favResponse = await fetch(`/api/user/favorites/${params.id}`)
       if (favResponse.ok) {
         const favData = await favResponse.json()
@@ -153,8 +157,19 @@ export default function SequenceDetailsPage() {
   }
 
   const handleToggleFavorite = async () => {
-    if (!session) return
+    // Handle local storage for non-authenticated users
+    if (!session) {
+      const savedFavorites = JSON.parse(localStorage.getItem('favorites') || '[]')
+      const newFavorites = isFavorited 
+        ? savedFavorites.filter((id: string) => id !== params.id)
+        : [...savedFavorites, params.id]
+      
+      localStorage.setItem('favorites', JSON.stringify(newFavorites))
+      setIsFavorited(!isFavorited)
+      return
+    }
 
+    // Handle server sync for authenticated users
     try {
       const method = isFavorited ? 'DELETE' : 'POST'
       const response = await fetch(`/api/user/favorites/${params.id}`, {
@@ -163,6 +178,13 @@ export default function SequenceDetailsPage() {
 
       if (response.ok) {
         setIsFavorited(!isFavorited)
+        
+        // Also update local storage as backup
+        const savedFavorites = JSON.parse(localStorage.getItem('favorites') || '[]')
+        const newFavorites = isFavorited 
+          ? savedFavorites.filter((id: string) => id !== params.id)
+          : [...savedFavorites, params.id]
+        localStorage.setItem('favorites', JSON.stringify(newFavorites))
       }
     } catch (error) {
       console.error('Failed to toggle favorite:', error)

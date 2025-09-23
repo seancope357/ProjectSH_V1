@@ -323,14 +323,39 @@ export default function CompatibilityDiscoveryPage() {
               </div>
 
               <div className="flex justify-end space-x-3 mt-6">
-                <button
-                  onClick={saveUserSetup}
-                  disabled={!userSetup.ledCount || !userSetup.controllerType}
-                  className="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
-                >
-                  <Save className="w-4 h-4 mr-2" />
-                  Save & Find Sequences
-                </button>
+                {!session ? (
+                  <div className="space-y-3">
+                    <div className="text-sm text-gray-600 text-right">
+                      💡 <strong>Sign in to save your setup</strong> and sync across devices
+                    </div>
+                    <div className="flex space-x-3">
+                      <button
+                        onClick={() => router.push('/auth/signin')}
+                        className="bg-gray-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-gray-700 flex items-center transition-colors"
+                      >
+                        <User className="w-4 h-4 mr-2" />
+                        Sign In
+                      </button>
+                      <button
+                        onClick={saveUserSetup}
+                        disabled={!userSetup.ledCount || !userSetup.controllerType}
+                        className="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center transition-colors"
+                      >
+                        <Save className="w-4 h-4 mr-2" />
+                        Continue as Guest
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    onClick={saveUserSetup}
+                    disabled={!userSetup.ledCount || !userSetup.controllerType}
+                    className="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center transition-colors"
+                  >
+                    <Save className="w-4 h-4 mr-2" />
+                    Save & Find Sequences
+                  </button>
+                )}
               </div>
             </div>
           </div>
