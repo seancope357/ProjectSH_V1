@@ -56,6 +56,7 @@ export async function GET(
       id: sequence.id,
       title: sequence.title,
       description: sequence.description,
+      instructions: sequence.instructions,
       price: sequence.price,
       category: sequence.category,
       tags: sequence.tags,

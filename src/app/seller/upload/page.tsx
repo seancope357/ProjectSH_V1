@@ -8,6 +8,7 @@ import { Navigation } from '@/components/ui/navigation';
 interface SequenceFormData {
   title: string;
   description: string;
+  instructions: string;
   category: string;
   tags: string;
   price: string;
@@ -28,6 +29,7 @@ export default function SellerUploadPage() {
   const [formData, setFormData] = useState<SequenceFormData>({
     title: '',
     description: '',
+    instructions: '',
     category: '',
     tags: '',
     price: '',
@@ -119,6 +121,7 @@ export default function SellerUploadPage() {
       const uploadFormData = new FormData();
       uploadFormData.append('title', formData.title);
       uploadFormData.append('description', formData.description);
+      uploadFormData.append('instructions', formData.instructions);
       uploadFormData.append('category', formData.category);
       uploadFormData.append('tags', formData.tags);
       uploadFormData.append('price', formData.price);
@@ -142,6 +145,7 @@ export default function SellerUploadPage() {
         setFormData({
           title: '',
           description: '',
+          instructions: '',
           category: '',
           tags: '',
           price: '',
@@ -254,6 +258,24 @@ export default function SellerUploadPage() {
                 value={formData.description}
                 onChange={handleInputChange}
               />
+            </div>
+            
+            <div>
+              <label htmlFor="instructions" className="block text-sm font-medium text-gray-700">
+                xLights Import Instructions
+              </label>
+              <textarea
+                id="instructions"
+                name="instructions"
+                rows={6}
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
+                placeholder="Provide specific instructions for importing this sequence into xLights (e.g., model requirements, special setup steps, prop configurations, etc.)"
+                value={formData.instructions}
+                onChange={handleInputChange}
+              />
+              <p className="mt-1 text-xs text-gray-500">
+                Help buyers understand any specific requirements or steps needed to use your sequence in xLights
+              </p>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

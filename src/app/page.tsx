@@ -26,12 +26,11 @@ export default function HomePage() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
           <div className="text-center">
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 drop-shadow-lg">
-              Premium LED Sequences
-              <span className="block text-blue-200">Made Simple</span>
+              Your One-Stop Marketplace For Premium xLights Sequences
             </h1>
             <p className="text-xl text-blue-100 mb-8 max-w-3xl mx-auto drop-shadow-md">
-              Discover thousands of high-quality LED sequences created by talented artists. 
-              Find the perfect match for your display with our compatibility scoring system.
+              Discover thousands of high-quality xLights sequences created by talented sequence designers. 
+              Find the perfect match for your xLights display with our compatibility scoring system.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link

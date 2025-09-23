@@ -16,13 +16,22 @@ import {
   Pause,
   User,
   Calendar,
-  Shield
+  Shield,
+  FileDown,
+  Archive,
+  FileText,
+  Music,
+  Import,
+  Map,
+  Save,
+  Info
 } from 'lucide-react'
 
 interface Sequence {
   id: string
   title: string
   description: string
+  instructions?: string
   price: number
   previewUrl: string | null
   category: string
@@ -362,6 +371,123 @@ export default function SequenceDetailsPage() {
                 <div>
                   <span className="text-sm text-gray-500">Format</span>
                   <p className="font-medium">{sequence.specifications.format}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* xLights Import Instructions */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <FileText className="w-5 h-5 text-blue-600" />
+                xLights Import Instructions
+              </h2>
+              
+              <div className="space-y-4">
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-medium">
+                      1
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <FileDown className="w-4 h-4 text-gray-600" />
+                        <span className="font-medium text-gray-900">Download Sequence</span>
+                      </div>
+                      <p className="text-sm text-gray-600">Download to a directory outside your show directory</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-medium">
+                      2
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <Archive className="w-4 h-4 text-gray-600" />
+                        <span className="font-medium text-gray-900">Unzip File</span>
+                      </div>
+                      <p className="text-sm text-gray-600">Keep the zipped file for importing</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-medium">
+                      3
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <FileText className="w-4 h-4 text-gray-600" />
+                        <span className="font-medium text-gray-900">Read Instructions</span>
+                      </div>
+                      <p className="text-sm text-gray-600">Check the included PDF for specific details</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-medium">
+                      4
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <Music className="w-4 h-4 text-gray-600" />
+                        <span className="font-medium text-gray-900">Create New Sequence</span>
+                      </div>
+                      <p className="text-sm text-gray-600">Start a new musical sequence with the MP3</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-medium">
+                      5
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <Import className="w-4 h-4 text-gray-600" />
+                        <span className="font-medium text-gray-900">Import Effects</span>
+                      </div>
+                      <p className="text-sm text-gray-600">Use Import/Import Effects from Sequencer tab</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-medium">
+                      6
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <Map className="w-4 h-4 text-gray-600" />
+                        <span className="font-medium text-gray-900">Map Models</span>
+                      </div>
+                      <p className="text-sm text-gray-600">Map effects from right panel to left panel models</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-medium">
+                      7
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <Save className="w-4 h-4 text-gray-600" />
+                        <span className="font-medium text-gray-900">Render and Save</span>
+                      </div>
+                      <p className="text-sm text-gray-600">Complete the process by rendering and saving</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                <div className="flex items-start gap-2">
+                  <div className="w-5 h-5 text-green-600 mt-0.5">
+                    💡
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-green-900">Pro Tip</h4>
+                    <p className="text-sm text-green-800 mt-1">
+                      If you have multiple similar props (like multiple trees or arches), you can often map them to the same model group to save time during the mapping process.
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>

@@ -113,6 +113,7 @@ model Sequence {
   title           String
   slug            String    @unique
   description     String?
+  instructions    String?   // Custom seller instructions for xLights import
   price           Int       // Price in cents
   category        String?   // Category for filtering
   previewUrl      String?
