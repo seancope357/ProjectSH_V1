@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useSession } from 'next-auth/react'
 import { Navigation } from '@/components/ui/navigation'
+import { AuthButton } from '@/components/ui/auth-button'
 import { Search, Zap, Shield, Users, ArrowRight } from 'lucide-react'
 
 export default function HomePage() {
@@ -29,8 +30,8 @@ export default function HomePage() {
               Your One-Stop Marketplace For Premium xLights Sequences
             </h1>
             <p className="text-xl text-blue-100 mb-8 max-w-3xl mx-auto drop-shadow-md">
-              Discover thousands of high-quality xLights sequences created by talented sequence designers. 
-              Find the perfect match for your xLights display with our compatibility scoring system.
+              A premier marketplace where talented xLights sequence creators showcase and sell their premium sequences. 
+              Connect with skilled vendors and discover the perfect sequences for your holiday light displays.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
@@ -40,12 +41,7 @@ export default function HomePage() {
                 Browse Sequences
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
-              <Link
-                href="/compatibility"
-                className="bg-blue-500/20 backdrop-blur-sm text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-500/30 transition-all duration-300 border-2 border-white/30 hover:border-white/50 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-              >
-                Check Compatibility
-              </Link>
+              <AuthButton />
             </div>
           </div>
         </div>
@@ -225,9 +221,9 @@ export default function HomePage() {
               <div className="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Shield className="h-8 w-8 text-purple-600" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Quality Assured</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">High Quality Content</h3>
               <p className="text-gray-600">
-                All sequences are reviewed and tested to ensure the highest quality standards.
+                All sequences in our marketplace are carefully curated and tested to ensure the highest quality lighting effects for your LED displays.
               </p>
             </div>
             
@@ -240,63 +236,6 @@ export default function HomePage() {
                 Join a thriving community of LED artists and sequence creators.
               </p>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-3 gap-8 text-center">
-            <div>
-              <div className="text-4xl font-bold text-blue-600 mb-2">10,000+</div>
-              <div className="text-xl text-gray-600">Premium Sequences</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold text-green-600 mb-2">500+</div>
-              <div className="text-xl text-gray-600">Talented Creators</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold text-purple-600 mb-2">50,000+</div>
-              <div className="text-xl text-gray-600">Happy Customers</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Call to Action Section */}
-      <section className="py-20 bg-gradient-to-r from-blue-600 to-purple-600" aria-label="Call to Action">
-        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-            Ready to Get Started?
-          </h2>
-          <p className="text-xl text-blue-100 mb-8">
-            Join thousands of creators and enthusiasts in the SequenceHUB community.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            {session ? (
-              <Link
-                href="/sequences"
-                className="bg-white text-blue-600 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-100 transition-colors"
-              >
-                Browse Sequences
-              </Link>
-            ) : (
-              <>
-                <Link
-                  href="/api/auth/signin"
-                  className="bg-white text-blue-600 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-100 transition-colors"
-                >
-                  Get Started
-                </Link>
-                <Link
-                  href="/sequences"
-                  className="bg-transparent text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-colors border-2 border-white"
-                >
-                  Browse as Guest
-                </Link>
-              </>
-            )}
           </div>
         </div>
       </section>
@@ -315,7 +254,6 @@ export default function HomePage() {
               <h4 className="font-semibold mb-4">Marketplace</h4>
               <ul className="space-y-2 text-gray-400">
                 <li><Link href="/sequences" className="hover:text-white">Browse Sequences</Link></li>
-                <li><Link href="/compatibility" className="hover:text-white">Compatibility Check</Link></li>
                 <li><Link href="/categories" className="hover:text-white">Categories</Link></li>
               </ul>
             </div>

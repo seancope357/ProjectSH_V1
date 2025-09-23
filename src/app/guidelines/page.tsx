@@ -1,10 +1,13 @@
 'use client'
 
+import { Navigation } from '@/components/ui/navigation'
 import { CheckCircle, AlertTriangle, XCircle, Info } from 'lucide-react'
 
 export default function GuidelinesPage() {
   return (
     <div className="min-h-screen bg-gray-50">
+      <Navigation />
+      
       {/* Header */}
       <div className="bg-white shadow-sm">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -38,12 +41,15 @@ export default function GuidelinesPage() {
           <div className="space-y-6">
             <div>
               <h3 className="text-lg font-medium text-gray-900 mb-3">✅ What to Share</h3>
+              <p className="text-gray-600 mb-4">
+                All sequences must meet our quality standards to ensure the best user experience:
+              </p>
               <ul className="space-y-2 text-gray-600">
-                <li>• Original automation sequences you've created</li>
-                <li>• Well-documented sequences with clear descriptions</li>
-                <li>• Sequences that solve real problems or improve workflows</li>
-                <li>• Educational content that helps others learn</li>
-                <li>• Constructive feedback and suggestions</li>
+                <li>• Test your sequences thoroughly before submission</li>
+                <li>• Provide clear documentation and usage instructions</li>
+                <li>• Ensure sequences are optimized for performance</li>
+                <li>• Include appropriate metadata and tags</li>
+                <li>• Follow naming conventions for easy discovery</li>
               </ul>
             </div>
 
@@ -74,7 +80,7 @@ export default function GuidelinesPage() {
                 <li>• Clear, descriptive titles</li>
                 <li>• Detailed descriptions of functionality</li>
                 <li>• Proper categorization</li>
-                <li>• Compatibility information</li>
+                <li>• System requirements and setup details</li>
                 <li>• Testing on target systems</li>
               </ul>
             </div>

@@ -38,7 +38,6 @@ export async function GET(
           orderBy: { createdAt: 'desc' },
           take: 10,
         },
-        compatibilityProfiles: true,
         _count: {
           select: {
             reviews: true,
@@ -80,7 +79,6 @@ export async function GET(
         },
       })),
       reviewCount: sequence._count.reviews,
-      compatibilityProfiles: sequence.compatibilityProfiles,
     }
 
     return NextResponse.json(formattedSequence)

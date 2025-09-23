@@ -11,17 +11,15 @@ interface Sequence {
   title: string
   description: string
   price: number
-  previewUrl: string | null
+  previewUrl?: string
   category: string
   tags: string[]
   rating: number
-  downloadCount: number
-  seller: {
-    username: string
-  }
+  downloads: number
   createdAt: string
-  compatibilityScore?: number
-  isCompatible?: boolean
+  seller: {
+    name: string
+  }
 }
 
 function SearchPageContent() {
@@ -199,9 +197,9 @@ function SearchPageContent() {
                       <div className="flex items-center justify-between text-sm text-gray-500 mb-3">
                         <span className="flex items-center gap-1">
                           <Download className="w-4 h-4" />
-                          {sequence.downloadCount}
+                          {sequence.downloads}
                         </span>
-                        <span>by {sequence.seller.username}</span>
+                        <span>by {sequence.seller.name}</span>
                       </div>
                       <div className="flex gap-2">
                         <button className="flex-1 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors">
@@ -249,9 +247,9 @@ function SearchPageContent() {
                             </span>
                             <span className="flex items-center gap-1">
                               <Download className="w-4 h-4" />
-                              {sequence.downloadCount}
+                              {sequence.downloads}
                             </span>
-                            <span>by {sequence.seller.username}</span>
+                            <span>by {sequence.seller.name}</span>
                           </div>
                           <div className="flex gap-2">
                             <button className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors">

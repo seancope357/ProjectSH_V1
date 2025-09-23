@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { Navigation } from '@/components/ui/navigation'
 import { User, Mail, Calendar, MapPin, Edit, Save, X, Upload, Download, Star, Eye, Settings, ArrowLeft, Home, ShoppingBag, Zap } from 'lucide-react'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
 
@@ -65,6 +66,8 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Navigation />
+      
       {/* Navigation Section */}
       <section className="bg-white border-b border-gray-200" aria-label="Breadcrumb Navigation">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -97,13 +100,7 @@ export default function ProfilePage() {
                 <ShoppingBag className="h-4 w-4 mr-2" />
                 Browse Marketplace
               </Link>
-              <Link
-                href="/compatibility"
-                className="flex items-center px-4 py-2 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors"
-              >
-                <Zap className="h-4 w-4 mr-2" />
-                Check Compatibility
-              </Link>
+
               <Link
                 href="/orders"
                 className="flex items-center px-4 py-2 bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition-colors"
@@ -129,13 +126,7 @@ export default function ProfilePage() {
                 <ShoppingBag className="h-4 w-4 mr-2" />
                 Marketplace
               </Link>
-              <Link
-                href="/compatibility"
-                className="flex items-center justify-center px-4 py-3 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors"
-              >
-                <Zap className="h-4 w-4 mr-2" />
-                Compatibility
-              </Link>
+
               <Link
                 href="/orders"
                 className="flex items-center justify-center px-4 py-3 bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition-colors"

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { Navigation } from '@/components/ui/navigation'
 import { Package, Download, Star, Calendar, Search, Eye, RefreshCw } from 'lucide-react'
 
 const orderData = [
@@ -117,6 +118,8 @@ export default function OrdersPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Navigation />
+      
       {/* Header */}
       <div className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

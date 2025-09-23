@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { Navigation } from '@/components/ui/navigation'
 import { Search, ChevronDown, ChevronRight, HelpCircle, Book, MessageCircle, Mail } from 'lucide-react'
 
 const faqData = [
@@ -35,8 +36,8 @@ const faqData = [
         a: 'We support various formats including .json, .xml, .ahk (AutoHotkey), .py (Python), and custom sequence formats. Check our documentation for the complete list.'
       },
       {
-        q: 'How do I test sequence compatibility?',
-        a: 'Use our Compatibility Checker tool to verify if a sequence will work with your system configuration before downloading or purchasing.'
+        q: 'How do I ensure sequence quality?',
+        a: 'All sequences go through our quality review process. You can also check user ratings and reviews before downloading to ensure you get high-quality content.'
       }
     ]
   },
@@ -109,6 +110,8 @@ export default function HelpPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Navigation />
+      
       {/* Header */}
       <div className="bg-white shadow-sm">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

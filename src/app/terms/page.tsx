@@ -1,6 +1,10 @@
+import { Navigation } from '@/components/ui/navigation'
+
 export default function TermsPage() {
   return (
     <div className="min-h-screen bg-gray-50">
+      <Navigation />
+      
       {/* Header */}
       <div className="bg-white shadow-sm">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -26,7 +30,7 @@ export default function TermsPage() {
             <li>Uploading and sharing automation sequences</li>
             <li>Browsing and downloading sequences created by other users</li>
             <li>Purchasing premium sequences from verified sellers</li>
-            <li>Using compatibility checking tools</li>
+            <li>Accessing marketplace features and vendor tools</li>
             <li>Participating in community discussions</li>
           </ul>
 
@@ -84,14 +88,19 @@ export default function TermsPage() {
             of the Service, to understand our practices regarding the collection and use of your information.
           </p>
 
-          <h2>8. Disclaimers and Limitations</h2>
+          <h2>8. Quality Standards</h2>
+          <p>
+            All content on our platform must meet quality standards. We review sequences to ensure they provide value to users and maintain platform integrity.
+          </p>
+
+          <h2>9. Disclaimers and Limitations</h2>
           <p>
             SequenceHUB is provided &quot;as is&quot; without warranties of any kind. We do not guarantee:
           </p>
           <ul>
             <li>The accuracy, completeness, or functionality of user-generated sequences</li>
             <li>Uninterrupted or error-free service</li>
-            <li>Compatibility of sequences with your specific system configuration</li>
+            <li>Performance of sequences on all system configurations</li>
             <li>The security of data transmitted through the Service</li>
           </ul>
           <p>

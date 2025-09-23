@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from 'react'
 import { signIn, getSession } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
+import { Navigation } from '@/components/ui/navigation'
 import { Eye, EyeOff, Mail, Lock, AlertCircle, Github } from 'lucide-react'
 
 function SignInPageContent() {
@@ -107,24 +108,27 @@ function SignInPageContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold text-blue-600">SequenceHUB</h1>
-          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
-            Sign in to your account
-          </h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Or{' '}
-            <Link
-              href="/auth/register"
-              className="font-medium text-blue-600 hover:text-blue-500"
-            >
-              create a new account
-            </Link>
-          </p>
+    <div className="min-h-screen bg-gray-50">
+      <Navigation />
+      
+      <div className="flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+        <div className="sm:mx-auto sm:w-full sm:max-w-md">
+          <div className="text-center">
+            <h1 className="text-3xl font-bold text-blue-600">SequenceHUB</h1>
+            <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
+              Sign in to your account
+            </h2>
+            <p className="mt-2 text-sm text-gray-600">
+              Or{' '}
+              <Link
+                href="/auth/register"
+                className="font-medium text-blue-600 hover:text-blue-500"
+              >
+                create a new account
+              </Link>
+            </p>
+          </div>
         </div>
-      </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
@@ -278,6 +282,7 @@ function SignInPageContent() {
             </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
   )
