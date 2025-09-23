@@ -1,7 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { User, Mail, Calendar, MapPin, Edit, Save, X, Upload, Download, Star, Eye } from 'lucide-react'
+import Link from 'next/link'
+import { User, Mail, Calendar, MapPin, Edit, Save, X, Upload, Download, Star, Eye, Settings, ArrowLeft, Home, ShoppingBag, Zap } from 'lucide-react'
+import { ThemeToggle } from '@/components/ui/theme-toggle'
 
 export default function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false)
@@ -63,15 +65,92 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Breadcrumb Navigation */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center space-x-2 text-sm">
+            <Link href="/" className="flex items-center text-gray-500 hover:text-blue-600 transition-colors">
+              <Home className="h-4 w-4 mr-1" />
+              Home
+            </Link>
+            <span className="text-gray-400">/</span>
+            <span className="text-gray-900 font-medium">Profile</span>
+          </div>
+        </div>
+      </div>
+
       {/* Header */}
       <div className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <h1 className="text-3xl font-bold text-gray-900">My Profile</h1>
-          <p className="mt-2 text-gray-600">Manage your account and view your activity</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">My Profile</h1>
+              <p className="mt-2 text-gray-600">Manage your account and view your activity</p>
+            </div>
+            
+            {/* Quick Navigation */}
+            <div className="hidden md:flex items-center space-x-4">
+              <Link
+                href="/sequences"
+                className="flex items-center px-4 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors"
+              >
+                <ShoppingBag className="h-4 w-4 mr-2" />
+                Browse Marketplace
+              </Link>
+              <Link
+                href="/compatibility"
+                className="flex items-center px-4 py-2 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors"
+              >
+                <Zap className="h-4 w-4 mr-2" />
+                Check Compatibility
+              </Link>
+              <Link
+                href="/orders"
+                className="flex items-center px-4 py-2 bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition-colors"
+              >
+                <Download className="h-4 w-4 mr-2" />
+                My Orders
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Mobile Quick Navigation */}
+        <div className="md:hidden mb-8">
+          <div className="grid grid-cols-2 gap-3">
+            <Link
+              href="/sequences"
+              className="flex items-center justify-center px-4 py-3 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors"
+            >
+              <ShoppingBag className="h-4 w-4 mr-2" />
+              Marketplace
+            </Link>
+            <Link
+              href="/compatibility"
+              className="flex items-center justify-center px-4 py-3 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors"
+            >
+              <Zap className="h-4 w-4 mr-2" />
+              Compatibility
+            </Link>
+            <Link
+              href="/orders"
+              className="flex items-center justify-center px-4 py-3 bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition-colors"
+            >
+              <Download className="h-4 w-4 mr-2" />
+              My Orders
+            </Link>
+            <Link
+              href="/seller/dashboard"
+              className="flex items-center justify-center px-4 py-3 bg-orange-50 text-orange-700 rounded-lg hover:bg-orange-100 transition-colors"
+            >
+              <Upload className="h-4 w-4 mr-2" />
+              Sell
+            </Link>
+          </div>
+        </div>
+
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Profile Information */}
           <div className="lg:col-span-1">
@@ -188,6 +267,24 @@ export default function ProfilePage() {
                     </button>
                   </>
                 )}
+              </div>
+            </div>
+
+            {/* Settings Section */}
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <div className="flex items-center gap-3 mb-6">
+                <Settings className="h-5 w-5 text-gray-600" />
+                <h3 className="text-lg font-semibold text-gray-900">Settings</h3>
+              </div>
+              
+              <div className="space-y-4">
+                <div className="flex items-center justify-between py-3 border-b border-gray-200">
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-900">Theme</h4>
+                    <p className="text-sm text-gray-600">Choose your preferred theme</p>
+                  </div>
+                  <ThemeToggle />
+                </div>
               </div>
             </div>
           </div>
