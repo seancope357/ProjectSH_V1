@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
+import Image from 'next/image'
 import { Navigation } from '@/components/ui/navigation'
 import { Search, Filter, Grid, List, Star, Download, Eye } from 'lucide-react'
 
@@ -56,7 +57,7 @@ export default function SearchPage() {
 
   useEffect(() => {
     fetchSequences()
-  }, [searchQuery, category, sortBy, currentPage])
+  }, [searchQuery, category, sortBy, currentPage]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchSequences = async () => {
     setLoading(true)
@@ -190,9 +191,11 @@ export default function SearchPage() {
                   {/* Preview Image */}
                   <div className={viewMode === 'list' ? 'w-48 flex-shrink-0' : 'aspect-video'}>
                     {sequence.previewUrl ? (
-                      <img
+                      <Image
                         src={sequence.previewUrl}
                         alt={sequence.title}
+                        width={400}
+                        height={225}
                         className="w-full h-full object-cover"
                       />
                     ) : (
@@ -240,9 +243,11 @@ export default function SearchPage() {
                       <div className="flex items-center gap-2">
                         <div className="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center">
                           {sequence.seller.avatar ? (
-                            <img
+                            <Image
                               src={sequence.seller.avatar}
                               alt={sequence.seller.username}
+                              width={24}
+                              height={24}
                               className="w-full h-full rounded-full object-cover"
                             />
                           ) : (

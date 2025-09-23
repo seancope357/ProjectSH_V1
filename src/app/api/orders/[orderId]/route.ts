@@ -31,7 +31,7 @@ export async function GET(
                     name: true,
                     sellerProfile: {
                       select: {
-                        businessName: true,
+                        displayName: true,
                       },
                     },
                   },

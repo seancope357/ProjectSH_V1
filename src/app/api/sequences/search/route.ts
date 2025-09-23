@@ -62,7 +62,6 @@ export async function GET(request: NextRequest) {
               sellerProfile: {
                 select: {
                   displayName: true,
-                  businessName: true,
                 },
               },
             },
@@ -94,7 +93,7 @@ export async function GET(request: NextRequest) {
       previewUrl: sequence.previewUrl,
       seller: {
         name: sequence.storefront?.sellerProfile?.displayName || 
-              sequence.storefront?.sellerProfile?.businessName || 
+              sequence.storefront?.sellerProfile?.displayName || 
               'Unknown Seller',
       },
       reviewCount: sequence._count?.reviews || 0,

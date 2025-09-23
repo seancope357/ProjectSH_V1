@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { Navigation } from '@/components/ui/navigation'
 import { 
   Plus, 
@@ -65,7 +66,7 @@ export default function SellerDashboard() {
       return
     }
 
-    if (session?.user?.role !== 'seller' && session?.user?.role !== 'admin') {
+    if (session?.user?.role !== 'SELLER' && session?.user?.role !== 'ADMIN') {
       router.push('/')
       return
     }
@@ -124,7 +125,7 @@ export default function SellerDashboard() {
 
       if (response.ok) {
         setSequences(sequences.map(seq => 
-          seq.id === sequenceId ? { ...seq, status: newStatus as any } : seq
+          seq.id === sequenceId ? { ...seq, status: newStatus as 'draft' | 'published' | 'suspended' } : seq
         ))
       }
     } catch (error) {
@@ -171,7 +172,7 @@ export default function SellerDashboard() {
               ].map((tab) => (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id as any)}
+                  onClick={() => setActiveTab(tab.id as 'overview' | 'sequences' | 'analytics')}
                   className={`flex items-center gap-2 py-2 px-1 border-b-2 font-medium text-sm ${
                     activeTab === tab.id
                       ? 'border-blue-500 text-blue-600'
@@ -302,7 +303,7 @@ export default function SellerDashboard() {
               <div className="flex items-center gap-4">
                 <select
                   value={filterStatus}
-                  onChange={(e) => setFilterStatus(e.target.value as any)}
+                  onChange={(e) => setFilterStatus(e.target.value as 'all' | 'draft' | 'published' | 'suspended')}
                   className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="all">All Status</option>
@@ -328,9 +329,11 @@ export default function SellerDashboard() {
                   {/* Preview */}
                   <div className="aspect-video bg-gray-200">
                     {sequence.previewUrl ? (
-                      <img
+                      <Image
                         src={sequence.previewUrl}
                         alt={sequence.title}
+                        width={400}
+                        height={225}
                         className="w-full h-full object-cover"
                       />
                     ) : (

@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
       where: {
         id: sequenceId,
         storefront: {
-          sellerId: sellerProfile.id,
+          sellerProfileId: sellerProfile.id,
         },
       },
     })
@@ -84,20 +84,23 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Upload failed' }, { status: 500 })
     }
 
-    // Update sequence with file path
-    await prisma.sequence.update({
-      where: { id: sequenceId },
-      data: { 
-        filePath: data.path,
+    // Create a new sequence version instead of updating sequence with filePath
+    const sequenceVersion = await prisma.sequenceVersion.create({
+      data: {
+        sequenceId: sequenceId,
+        version: '1.0.0', // You might want to increment this based on existing versions
+        fileUrl: data.path,
         fileSize: file.size,
+        checksum: '', // You might want to calculate an actual checksum
       },
     })
 
     return NextResponse.json({
       success: true,
-      filePath: data.path,
+      fileUrl: data.path,
       fileName,
       fileSize: file.size,
+      version: sequenceVersion.version,
     })
   } catch (error) {
     console.error('Upload error:', error)

@@ -28,8 +28,16 @@ export async function GET(
       },
       include: {
         sequence: {
+          include: {
+            versions: {
+              where: { isActive: true },
+              select: {
+                fileUrl: true,
+              },
+              take: 1,
+            },
+          },
           select: {
-            filePath: true,
             title: true,
           },
         },
@@ -40,14 +48,15 @@ export async function GET(
       return NextResponse.json({ error: 'Sequence not purchased or access denied' }, { status: 403 })
     }
 
-    if (!purchase.sequence.filePath) {
+    const activeVersion = purchase.sequence.versions[0]
+    if (!activeVersion?.fileUrl) {
       return NextResponse.json({ error: 'Sequence file not available' }, { status: 404 })
     }
 
     // Generate signed URL (valid for 1 hour)
     const { data, error } = await supabaseAdmin.storage
       .from('sequence-files')
-      .createSignedUrl(purchase.sequence.filePath, 3600)
+      .createSignedUrl(activeVersion.fileUrl, 3600)
 
     if (error) {
       console.error('Signed URL error:', error)

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { Navigation } from '@/components/ui/navigation'
 import { Trash2, Plus, Minus, ShoppingBag, CreditCard, ArrowRight } from 'lucide-react'
 
@@ -149,7 +150,7 @@ export default function CartPage() {
               Your cart is empty
             </h2>
             <p className="text-gray-600 mb-6">
-              Looks like you haven't added any sequences to your cart yet.
+              Looks like you haven&apos;t added any sequences to your cart yet.
             </p>
             <button
               onClick={() => router.push('/search')}
@@ -184,9 +185,11 @@ export default function CartPage() {
                         {/* Preview Image */}
                         <div className="w-24 h-16 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
                           {item.sequence.previewUrl ? (
-                            <img
+                            <Image
                               src={item.sequence.previewUrl}
                               alt={item.sequence.title}
+                              width={96}
+                              height={64}
                               className="w-full h-full object-cover"
                             />
                           ) : (

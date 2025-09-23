@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import { Search, Filter, Grid, List } from 'lucide-react'
 
 const categories = [
@@ -127,9 +128,11 @@ export default function CategoriesPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {sortedCategories.map((category) => (
               <div key={category.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                <img
+                <Image
                   src={category.image}
                   alt={category.name}
+                  width={300}
+                  height={192}
                   className="w-full h-48 object-cover"
                 />
                 <div className="p-6">
@@ -149,9 +152,11 @@ export default function CategoriesPage() {
           <div className="space-y-4">
             {sortedCategories.map((category) => (
               <div key={category.id} className="bg-white rounded-lg shadow-md p-6 flex items-center gap-6">
-                <img
+                <Image
                   src={category.image}
                   alt={category.name}
+                  width={96}
+                  height={96}
                   className="w-24 h-24 object-cover rounded-lg"
                 />
                 <div className="flex-1">

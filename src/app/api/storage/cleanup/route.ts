@@ -35,13 +35,13 @@ export async function POST(request: NextRequest) {
     let cleanedCount = 0
 
     if (bucket === 'sequence-files') {
-      // Check for orphaned sequence files
-      const sequences = await prisma.sequence.findMany({
-        select: { filePath: true },
-        where: { filePath: { not: null } },
+      // Check for orphaned sequence files using SequenceVersion
+      const sequenceVersions = await prisma.sequenceVersion.findMany({
+        select: { fileUrl: true },
+        where: { fileUrl: { not: null } },
       })
 
-      const validPaths = new Set(sequences.map((s: { filePath: string | null }) => s.filePath).filter(Boolean))
+      const validPaths = new Set(sequenceVersions.map((sv: { fileUrl: string | null }) => sv.fileUrl).filter(Boolean))
       
       for (const file of files || []) {
         const fullPath = file.name

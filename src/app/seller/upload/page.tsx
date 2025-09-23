@@ -58,7 +58,7 @@ export default function SellerUploadPage() {
     return null;
   }
 
-  if (session.user.role !== 'seller') {
+  if (session.user.role !== 'SELLER') {
     return (
       <div className="min-h-screen bg-gray-50">
         <Navigation />

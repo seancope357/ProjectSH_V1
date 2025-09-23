@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { Navigation } from '@/components/ui/navigation'
 import { Search, Filter, Grid, List, Eye, Heart, Star, Download } from 'lucide-react'
 
@@ -45,10 +46,6 @@ export default function SequencesPage() {
     { value: 'downloads', label: 'Most Downloaded' }
   ]
 
-  useEffect(() => {
-    fetchSequences()
-  }, [sortBy, category, currentPage])
-
   const fetchSequences = async () => {
     setLoading(true)
     try {
@@ -77,42 +74,26 @@ export default function SequencesPage() {
             rating: 4.8,
             downloads: 1250,
             createdAt: '2024-01-15',
-            seller: { name: 'LightMaster' }
-          },
-          {
-            id: '2',
-            title: 'Halloween Spooky',
-            description: 'Eerie orange and purple Halloween display',
-            price: 7.99,
-            category: 'halloween',
-            tags: ['halloween', 'spooky', 'orange'],
-            rating: 4.6,
-            downloads: 890,
-            createdAt: '2024-01-10',
-            seller: { name: 'SpookyCoder' }
-          },
-          {
-            id: '3',
-            title: 'Music Visualizer',
-            description: 'Dynamic music-reactive LED sequence',
-            price: 12.99,
-            category: 'music',
-            tags: ['music', 'reactive', 'dynamic'],
-            rating: 4.9,
-            downloads: 2100,
-            createdAt: '2024-01-20',
-            seller: { name: 'BeatSync' }
+            seller: {
+              name: 'LightMaster',
+              avatar: '/avatars/lightmaster.jpg'
+            }
           }
         ])
+        setTotalPages(1)
       }
     } catch (error) {
       console.error('Failed to fetch sequences:', error)
-      // Set mock data on error
       setSequences([])
+      setTotalPages(1)
     } finally {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    fetchSequences()
+  }, [sortBy, category, currentPage]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSequenceClick = (sequenceId: string) => {
     router.push(`/sequence/${sequenceId}`)
@@ -224,9 +205,11 @@ export default function SequencesPage() {
                   {/* Preview Image */}
                   <div className={viewMode === 'list' ? 'w-48 flex-shrink-0' : 'aspect-video'}>
                     {sequence.previewUrl ? (
-                      <img
+                      <Image
                         src={sequence.previewUrl}
                         alt={sequence.title}
+                        width={400}
+                        height={300}
                         className="w-full h-full object-cover"
                       />
                     ) : (

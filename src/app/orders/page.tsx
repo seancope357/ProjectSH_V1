@@ -288,7 +288,7 @@ export default function OrdersPage() {
               <p className="text-gray-600">
                 {searchTerm || statusFilter !== 'all' 
                   ? 'Try adjusting your search or filters'
-                  : 'You haven\'t made any purchases yet'
+                  : 'You haven&apos;t made any purchases yet'
                 }
               </p>
             </div>

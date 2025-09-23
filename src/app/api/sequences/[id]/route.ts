@@ -22,7 +22,6 @@ export async function GET(
             sellerProfile: {
               select: {
                 displayName: true,
-                businessName: true,
                 avatar: true,
               },
             },
@@ -68,7 +67,7 @@ export async function GET(
       previewUrl: sequence.previewUrl,
       seller: {
         name: sequence.storefront.sellerProfile?.displayName || 
-              sequence.storefront.sellerProfile?.businessName || 
+              sequence.storefront.sellerProfile?.displayName || 
               'Unknown Seller',
         avatar: sequence.storefront.sellerProfile?.avatar,
       },

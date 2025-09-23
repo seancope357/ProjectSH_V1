@@ -18,7 +18,7 @@ interface User {
   id: string;
   name: string;
   email: string;
-  role: 'buyer' | 'seller' | 'admin';
+  role: 'USER' | 'SELLER' | 'ADMIN';
   createdAt: string;
   isActive: boolean;
   totalPurchases?: number;
@@ -53,7 +53,7 @@ export default function AdminDashboard() {
       return;
     }
     
-    if (session.user.role !== 'admin') {
+    if (session.user.role !== 'ADMIN') {
       router.push('/');
       return;
     }
@@ -140,7 +140,7 @@ export default function AdminDashboard() {
     );
   }
 
-  if (!session || session.user.role !== 'admin') {
+  if (!session || session.user.role !== 'ADMIN') {
     return null;
   }
 
@@ -241,8 +241,8 @@ export default function AdminDashboard() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          user.role === 'admin' ? 'bg-red-100 text-red-800' :
-                          user.role === 'seller' ? 'bg-blue-100 text-blue-800' :
+                          user.role === 'ADMIN' ? 'bg-red-100 text-red-800' :
+                          user.role === 'SELLER' ? 'bg-blue-100 text-blue-800' :
                           'bg-gray-100 text-gray-800'
                         }`}>
                           {user.role}
@@ -267,12 +267,12 @@ export default function AdminDashboard() {
                         >
                           {user.isActive ? 'Deactivate' : 'Activate'}
                         </button>
-                        {user.role !== 'admin' && (
+                        {user.role !== 'ADMIN' && (
                           <button
-                            onClick={() => handleUserAction(user.id, user.role === 'seller' ? 'demote' : 'promote')}
+                            onClick={() => handleUserAction(user.id, user.role === 'SELLER' ? 'demote' : 'promote')}
                             className="text-blue-600 hover:text-blue-900"
                           >
-                            {user.role === 'seller' ? 'Demote' : 'Promote'}
+                            {user.role === 'SELLER' ? 'Demote' : 'Promote'}
                           </button>
                         )}
                       </td>

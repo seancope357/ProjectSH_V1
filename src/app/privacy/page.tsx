@@ -157,7 +157,7 @@ export default function PrivacyPage() {
             <p className="text-green-800 font-medium mb-2">Your Privacy Matters</p>
             <p className="text-green-700 text-sm">
               We are committed to transparency and protecting your privacy. If you have any concerns 
-              or questions about how we handle your data, please don't hesitate to reach out to us.
+              or questions about how we handle your data, please don&apos;t hesitate to reach out to us.
             </p>
           </div>
         </div>

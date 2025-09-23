@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import { useSession } from 'next-auth/react'
+import Image from 'next/image'
 import { Navigation } from '@/components/ui/navigation'
 import { 
   Star, 
@@ -26,7 +27,6 @@ interface Sequence {
   description: string
   price: number
   previewUrl: string | null
-  filePath: string | null
   category: string
   tags: string[]
   rating: number
@@ -78,7 +78,7 @@ export default function SequenceDetailsPage() {
       fetchReviews()
       checkUserStatus()
     }
-  }, [params.id, session])
+  }, [params.id, session]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchSequence = async () => {
     try {
@@ -121,7 +121,7 @@ export default function SequenceDetailsPage() {
       const cartResponse = await fetch('/api/cart')
       if (cartResponse.ok) {
         const cartData = await cartResponse.json()
-        setIsInCart(cartData.items.some((item: any) => item.sequenceId === params.id))
+        setIsInCart(cartData.items.some((item: { sequenceId: string }) => item.sequenceId === params.id))
       }
 
       // Check if purchased
@@ -207,7 +207,7 @@ export default function SequenceDetailsPage() {
         <Navigation />
         <div className="max-w-4xl mx-auto px-4 py-20 text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Sequence Not Found</h1>
-          <p className="text-gray-600">The sequence you're looking for doesn't exist or has been removed.</p>
+          <p className="text-gray-600">The sequence you&apos;re looking for doesn&apos;t exist or has been removed.</p>
         </div>
       </div>
     )
@@ -225,9 +225,11 @@ export default function SequenceDetailsPage() {
             <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
               <div className="aspect-video bg-gray-900 relative">
                 {sequence.previewUrl ? (
-                  <img
+                  <Image
                     src={sequence.previewUrl}
                     alt={sequence.title}
+                    width={800}
+                    height={450}
                     className="w-full h-full object-cover"
                   />
                 ) : (
@@ -359,9 +361,11 @@ export default function SequenceDetailsPage() {
                       <div className="flex items-start gap-3">
                         <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
                           {review.user.avatar ? (
-                            <img
+                            <Image
                               src={review.user.avatar}
                               alt={review.user.username}
+                              width={32}
+                              height={32}
                               className="w-full h-full rounded-full object-cover"
                             />
                           ) : (
@@ -463,9 +467,11 @@ export default function SequenceDetailsPage() {
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center">
                   {sequence.seller.avatar ? (
-                    <img
+                    <Image
                       src={sequence.seller.avatar}
                       alt={sequence.seller.username}
+                      width={48}
+                      height={48}
                       className="w-full h-full rounded-full object-cover"
                     />
                   ) : (

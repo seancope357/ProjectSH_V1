@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
       where: {
         id: sequenceId,
         storefront: {
-          sellerId: sellerProfile.id,
+          sellerProfileId: sellerProfile.id,
         },
       },
     })

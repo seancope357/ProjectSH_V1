@@ -13,7 +13,7 @@ export default function TermsPage() {
         <div className="bg-white rounded-lg shadow-md p-8 prose prose-gray max-w-none">
           <h2>1. Acceptance of Terms</h2>
           <p>
-            By accessing and using SequenceHUB ("the Service"), you accept and agree to be bound by the terms 
+            By accessing and using SequenceHUB (&quot;the Service&quot;), you accept and agree to be bound by the terms 
             and provision of this agreement. If you do not agree to abide by the above, please do not use this service.
           </p>
 
@@ -52,7 +52,7 @@ export default function TermsPage() {
             <li>Infringe on intellectual property rights of others</li>
             <li>Share personal information of other users without consent</li>
             <li>Engage in spam, harassment, or abusive behavior</li>
-            <li>Attempt to gain unauthorized access to the Service or other users' accounts</li>
+            <li>Attempt to gain unauthorized access to the Service or other users&apos; accounts</li>
           </ul>
 
           <h2>5. Intellectual Property</h2>
@@ -86,7 +86,7 @@ export default function TermsPage() {
 
           <h2>8. Disclaimers and Limitations</h2>
           <p>
-            SequenceHUB is provided "as is" without warranties of any kind. We do not guarantee:
+            SequenceHUB is provided &quot;as is&quot; without warranties of any kind. We do not guarantee:
           </p>
           <ul>
             <li>The accuracy, completeness, or functionality of user-generated sequences</li>

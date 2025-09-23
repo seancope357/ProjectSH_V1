@@ -223,7 +223,7 @@ export default function HelpPage() {
         <div className="mt-12 bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
           <h3 className="text-lg font-semibold text-blue-900 mb-2">Still need help?</h3>
           <p className="text-blue-700 mb-4">
-            Can't find what you're looking for? Our support team is here to help.
+            Can&apos;t find what you&apos;re looking for? Our support team is here to help.
           </p>
           <button className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors">
             Contact Support

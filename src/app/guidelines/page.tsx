@@ -117,7 +117,7 @@ export default function GuidelinesPage() {
             
             <div className="border-l-4 border-orange-500 pl-4">
               <h3 className="font-medium text-gray-900">Be Original</h3>
-              <p className="text-gray-600">Share your own work and give credit where it's due.</p>
+              <p className="text-gray-600">Share your own work and give credit where it&apos;s due.</p>
             </div>
           </div>
         </div>
