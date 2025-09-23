@@ -30,8 +30,8 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ThemeProvider
-          defaultTheme="system"
-          storageKey="sequencehub-theme"
+          defaultTheme="light"
+          storageKey="sequencehub-theme-v2"
         >
           <AuthSessionProvider>
             {children}
