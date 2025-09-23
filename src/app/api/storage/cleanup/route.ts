@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
       const validPaths = new Set(
         sequences
           .map((s: { previewUrl: string | null }) => s.previewUrl)
-          .filter(Boolean)
+          .filter((url: string | null): url is string => Boolean(url))
           .map((url: string) => url.split('/').slice(-3).join('/'))
       )
       

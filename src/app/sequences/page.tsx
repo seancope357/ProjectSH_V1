@@ -19,7 +19,6 @@ interface Sequence {
   createdAt: string
   seller: {
     name: string
-    avatar?: string
   }
 }
 
@@ -75,8 +74,7 @@ export default function SequencesPage() {
             downloads: 1250,
             createdAt: '2024-01-15',
             seller: {
-              name: 'LightMaster',
-              avatar: '/avatars/lightmaster.jpg'
+              name: 'LightMaster'
             }
           }
         ])

@@ -63,7 +63,6 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent) {
       where: { id: orderId },
       data: { 
         status: 'COMPLETED',
-        completedAt: new Date(),
       },
       include: {
         items: {
@@ -119,10 +118,10 @@ async function handlePaymentFailed(paymentIntent: Stripe.PaymentIntent) {
   try {
     await prisma.order.update({
       where: { id: orderId },
-      data: { status: 'FAILED' },
+      data: { status: 'CANCELLED' },
     })
 
-    console.log(`Order ${orderId} marked as failed`)
+    console.log(`Order ${orderId} marked as cancelled`)
   } catch (error) {
     console.error(`Failed to update failed order ${orderId}:`, error)
   }
@@ -138,7 +137,7 @@ async function handleAccountUpdated(account: Stripe.Account) {
       await prisma.sellerProfile.update({
         where: { id: seller.id },
         data: {
-          stripeOnboardingComplete: account.details_submitted && account.charges_enabled,
+          stripeOnboarded: account.details_submitted && account.charges_enabled,
         },
       })
 

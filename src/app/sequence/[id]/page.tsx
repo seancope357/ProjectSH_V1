@@ -32,7 +32,6 @@ interface Sequence {
   seller: {
     id: string
     username: string
-    avatar: string | null
     isVerified: boolean
     totalSales: number
     memberSince: string
@@ -54,7 +53,6 @@ interface Review {
   comment: string
   user: {
     username: string
-    avatar: string | null
   }
   createdAt: string
 }
@@ -358,19 +356,9 @@ export default function SequenceDetailsPage() {
                     <div key={review.id} className="border-b border-gray-200 pb-4 last:border-b-0">
                       <div className="flex items-start gap-3">
                         <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-                          {review.user.avatar ? (
-                            <Image
-                              src={review.user.avatar}
-                              alt={review.user.username}
-                              width={32}
-                              height={32}
-                              className="w-full h-full rounded-full object-cover"
-                            />
-                          ) : (
-                            <span className="text-sm text-gray-600">
-                              {review.user.username.charAt(0).toUpperCase()}
-                            </span>
-                          )}
+                          <span className="text-sm text-gray-600">
+                            {review.user.username.charAt(0).toUpperCase()}
+                          </span>
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
@@ -464,17 +452,7 @@ export default function SequenceDetailsPage() {
               
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center">
-                  {sequence.seller.avatar ? (
-                    <Image
-                      src={sequence.seller.avatar}
-                      alt={sequence.seller.username}
-                      width={48}
-                      height={48}
-                      className="w-full h-full rounded-full object-cover"
-                    />
-                  ) : (
-                    <User className="w-6 h-6 text-gray-600" />
-                  )}
+                  <User className="w-6 h-6 text-gray-600" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">

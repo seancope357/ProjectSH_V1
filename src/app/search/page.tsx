@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import { Navigation } from '@/components/ui/navigation'
@@ -18,12 +18,11 @@ interface Sequence {
   downloadCount: number
   seller: {
     username: string
-    avatar: string | null
   }
   createdAt: string
 }
 
-export default function SearchPage() {
+function SearchPageContent() {
   const searchParams = useSearchParams()
   const [sequences, setSequences] = useState<Sequence[]>([])
   const [loading, setLoading] = useState(true)
@@ -242,19 +241,9 @@ export default function SearchPage() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <div className="w-6 h-6 bg-gray-300 rounded-full flex items-center justify-center">
-                          {sequence.seller.avatar ? (
-                            <Image
-                              src={sequence.seller.avatar}
-                              alt={sequence.seller.username}
-                              width={24}
-                              height={24}
-                              className="w-full h-full rounded-full object-cover"
-                            />
-                          ) : (
-                            <span className="text-xs text-gray-600">
-                              {sequence.seller.username.charAt(0).toUpperCase()}
-                            </span>
-                          )}
+                          <span className="text-xs text-gray-600">
+                            {sequence.seller.username.charAt(0).toUpperCase()}
+                          </span>
                         </div>
                         <span className="text-sm text-gray-600">
                           {sequence.seller.username}
@@ -312,5 +301,13 @@ export default function SearchPage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SearchPageContent />
+    </Suspense>
   )
 }
