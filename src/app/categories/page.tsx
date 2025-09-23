@@ -10,42 +10,42 @@ const categories = [
     name: 'Gaming',
     description: 'Gaming sequences and macros',
     count: 245,
-    image: '/api/placeholder/300/200'
+    image: '/images/category-gaming.jpg'
   },
   {
     id: 2,
     name: 'Productivity',
     description: 'Work and productivity automation',
     count: 189,
-    image: '/api/placeholder/300/200'
+    image: '/images/category-productivity.jpg'
   },
   {
     id: 3,
     name: 'Creative',
     description: 'Design and creative workflows',
     count: 156,
-    image: '/api/placeholder/300/200'
+    image: '/images/category-creative.jpg'
   },
   {
     id: 4,
     name: 'Development',
     description: 'Programming and development tools',
     count: 203,
-    image: '/api/placeholder/300/200'
+    image: '/images/category-development.jpg'
   },
   {
     id: 5,
     name: 'Entertainment',
     description: 'Media and entertainment sequences',
     count: 98,
-    image: '/api/placeholder/300/200'
+    image: '/images/category-entertainment.jpg'
   },
   {
     id: 6,
     name: 'Education',
     description: 'Learning and educational content',
     count: 134,
-    image: '/api/placeholder/300/200'
+    image: '/images/category-education.jpg'
   }
 ]
 

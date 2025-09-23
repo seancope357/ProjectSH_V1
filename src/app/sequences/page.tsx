@@ -177,7 +177,7 @@ export default function SequencesPage() {
           title: 'Christmas Wonderland',
           description: 'A magical Christmas light sequence with twinkling effects and smooth transitions.',
           price: 12.99,
-          previewUrl: '/api/placeholder/400/300',
+          previewUrl: '/images/sequence-preview-default.jpg',
           category: 'christmas',
           tags: ['christmas', 'twinkling', 'festive'],
           rating: 4.8,
