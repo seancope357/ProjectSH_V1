@@ -173,11 +173,12 @@ function SearchPageContent() {
                     <div className="relative h-48 bg-gray-200">
                       {sequence.previewUrl ? (
                         <Image
-                          src={sequence.previewUrl}
-                          alt={sequence.title}
-                          fill
-                          className="object-cover"
-                        />
+                            src={sequence.previewUrl}
+                            alt={sequence.title}
+                            fill
+                            className="object-cover"
+                            unoptimized
+                          />
                       ) : (
                         <div className="flex items-center justify-center h-full">
                           <Zap className="w-12 h-12 text-gray-400" />
@@ -226,6 +227,7 @@ function SearchPageContent() {
                             width={96}
                             height={96}
                             className="object-cover rounded-lg"
+                            unoptimized
                           />
                         ) : (
                           <div className="flex items-center justify-center h-full">

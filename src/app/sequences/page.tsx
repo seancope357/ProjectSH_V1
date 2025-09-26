@@ -271,6 +271,7 @@ function SequencesContent() {
                           alt={sequence.title}
                           fill
                           className="object-cover"
+                          unoptimized
                         />
                       ) : (
                         <div className="w-full h-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
@@ -362,6 +363,7 @@ function SequencesContent() {
                           alt={sequence.title}
                           fill
                           className="object-cover rounded-lg"
+                          unoptimized
                         />
                       ) : (
                         <div className="w-full h-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center rounded-lg">

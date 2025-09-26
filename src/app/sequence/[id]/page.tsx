@@ -258,6 +258,7 @@ export default function SequenceDetailsPage() {
                     width={800}
                     height={450}
                     className="w-full h-full object-cover"
+                    unoptimized
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
