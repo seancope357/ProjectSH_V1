@@ -3,51 +3,97 @@ import { prisma } from '@/lib/prisma'
 
 export async function GET(request: NextRequest) {
   try {
-    // Return mock data for now to bypass database connection issues
-    const mockSequences = [
-      {
-        id: '1',
-        title: 'Sample LED Sequence',
-        description: 'A beautiful LED light sequence for your project',
-        price: 9.99,
-        category: 'Entertainment',
-        tags: ['led', 'lights', 'animation'],
-        rating: 4.5,
-        downloads: 150,
-        createdAt: new Date().toISOString(),
-        previewUrl: '/images/sequence-preview-default.jpg',
-        seller: {
-          name: 'Demo Seller',
+    const { searchParams } = new URL(request.url)
+    const category = searchParams.get('category') || ''
+    const sort = searchParams.get('sort') || 'newest'
+    const page = parseInt(searchParams.get('page') || '1')
+    const limit = parseInt(searchParams.get('limit') || '12')
+
+    // Build where clause
+    const where: any = {
+      isActive: true,
+      isApproved: true,
+    }
+
+    if (category) {
+      where.category = category
+    }
+
+    // Build orderBy clause
+    let orderBy: any = { createdAt: 'desc' }
+    
+    switch (sort) {
+      case 'price-low':
+        orderBy = { price: 'asc' }
+        break
+      case 'price-high':
+        orderBy = { price: 'desc' }
+        break
+      case 'popular':
+        orderBy = { downloadCount: 'desc' }
+        break
+      case 'rating':
+        orderBy = { rating: 'desc' }
+        break
+      default:
+        orderBy = { createdAt: 'desc' }
+    }
+
+    const skip = (page - 1) * limit
+
+    const [sequences, total] = await Promise.all([
+      prisma.sequence.findMany({
+        where,
+        orderBy,
+        skip,
+        take: limit,
+        include: {
+          storefront: {
+            include: {
+              sellerProfile: {
+                select: {
+                  displayName: true,
+                },
+              },
+            },
+          },
+          _count: {
+            select: {
+              reviews: true,
+            },
+          },
         },
-        reviewCount: 12,
+      }),
+      prisma.sequence.count({ where }),
+    ])
+
+    // Format the response
+    const formattedSequences = sequences.map((sequence) => ({
+      id: sequence.id,
+      title: sequence.title,
+      description: sequence.description,
+      price: sequence.price / 100, // Convert from cents
+      category: sequence.category,
+      tags: sequence.tags,
+      rating: sequence.rating || 0,
+      downloads: sequence.downloadCount || 0,
+      createdAt: sequence.createdAt.toISOString(),
+      previewUrl: sequence.previewUrl,
+      seller: {
+        name: sequence.storefront.sellerProfile.displayName,
       },
-      {
-        id: '2',
-        title: 'Holiday Light Show',
-        description: 'Perfect for holiday decorations and celebrations',
-        price: 14.99,
-        category: 'Holiday',
-        tags: ['holiday', 'christmas', 'celebration'],
-        rating: 4.8,
-        downloads: 89,
-        createdAt: new Date().toISOString(),
-        previewUrl: '/images/sequence-preview-default.jpg',
-        seller: {
-          name: 'Holiday Lights Pro',
-        },
-        reviewCount: 8,
-      },
-    ]
+      reviewCount: sequence._count.reviews,
+    }))
 
     return NextResponse.json({
-      sequences: mockSequences,
+      sequences: formattedSequences,
       pagination: {
-        page: 1,
-        limit: 12,
-        total: 2,
-        pages: 1,
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit),
       },
-      total: 2,
+      total,
     })
   } catch (error) {
     console.error('Get sequences error:', error)

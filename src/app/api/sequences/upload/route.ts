@@ -20,72 +20,102 @@ const ALLOWED_IMAGE_TYPES = [
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
-    
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
     const formData = await request.formData()
-    
-    // Extract form fields
+    const file = formData.get('file') as File
     const title = formData.get('title') as string
     const description = formData.get('description') as string
-    const instructions = formData.get('instructions') as string
+    const price = parseFloat(formData.get('price') as string)
     const category = formData.get('category') as string
-    const tags = formData.get('tags') as string
-    const price = formData.get('price') as string
-    const duration = formData.get('duration') as string
-    const ledCount = formData.get('ledCount') as string
-    const difficulty = formData.get('difficulty') as string
-    const sequenceFile = formData.get('sequenceFile') as File
-    const previewImage = formData.get('previewImage') as File | null
+    const tags = JSON.parse(formData.get('tags') as string || '[]')
 
-    // Validation
-    if (!title || !description || !category || !price || !sequenceFile) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+    if (!file) {
+      return NextResponse.json(
+        { error: 'No file uploaded' },
+        { status: 400 }
+      )
     }
 
-    if (parseFloat(price) <= 0) {
-      return NextResponse.json({ error: 'Price must be greater than 0' }, { status: 400 })
+    // Validate file type
+    if (!file.name.endsWith('.zip')) {
+      return NextResponse.json(
+        { error: 'Only ZIP files are allowed' },
+        { status: 400 }
+      )
     }
 
-    // Validate sequence file
-    if (sequenceFile.size > MAX_FILE_SIZE) {
-      return NextResponse.json({ error: 'Sequence file too large (max 50MB)' }, { status: 400 })
+    // Validate required fields
+    if (!title || !description || !price || !category) {
+      return NextResponse.json(
+        { error: 'Missing required fields' },
+        { status: 400 }
+      )
     }
 
-    if (!ALLOWED_SEQUENCE_TYPES.includes(sequenceFile.type)) {
-      return NextResponse.json({ error: 'Invalid sequence file type. Only ZIP files allowed.' }, { status: 400 })
+    // Get user session
+    const session = await getServerSession(authOptions)
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      )
     }
 
-    // Validate preview image if provided
-    if (previewImage && previewImage.size > 0) {
-      if (previewImage.size > 10 * 1024 * 1024) { // 10MB for images
-        return NextResponse.json({ error: 'Preview image too large (max 10MB)' }, { status: 400 })
-      }
+    // Get user's storefront
+    const storefront = await prisma.storefront.findFirst({
+      where: { 
+        sellerProfile: {
+          userId: session.user.id
+        }
+      },
+    })
 
-      if (!ALLOWED_IMAGE_TYPES.includes(previewImage.type)) {
-        return NextResponse.json({ error: 'Invalid image type. Only JPEG, PNG, WebP, and GIF allowed.' }, { status: 400 })
-      }
+    if (!storefront) {
+      return NextResponse.json(
+        { error: 'Storefront not found' },
+        { status: 404 }
+      )
     }
 
-    // Mock successful upload response (bypassing database operations for now)
-    const mockSequenceId = `seq_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-    
-    // Simulate processing delay
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    // Convert file to buffer for storage
+    const bytes = await file.arrayBuffer()
+    const buffer = Buffer.from(bytes)
+
+    // Generate unique filename
+    const fileExtension = file.name.split('.').pop()
+    const uniqueFilename = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExtension}`
+
+    // Create sequence record with initial version
+    const sequence = await prisma.sequence.create({
+      data: {
+        title,
+        description,
+        price: Math.round(price * 100), // Convert to cents
+        category,
+        tags,
+        slug: `${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${Date.now()}`,
+        storefrontId: storefront.id,
+        isActive: false, // Requires approval
+        isApproved: false,
+        versions: {
+          create: {
+            version: '1.0.0',
+            fileUrl: `/uploads/sequences/${uniqueFilename}`,
+            fileSize: buffer.length,
+            checksum: `sha256-${Date.now()}`, // In production, calculate actual checksum
+          }
+        }
+      },
+    })
 
     return NextResponse.json({
       success: true,
-      sequenceId: mockSequenceId,
-      message: 'Sequence uploaded successfully and is pending approval',
+      message: 'Sequence uploaded successfully',
+      sequenceId: sequence.id,
     })
-
   } catch (error) {
-    console.error('Sequence creation error:', error)
+    console.error('Upload error:', error)
     return NextResponse.json(
-      { error: 'Failed to create sequence' },
+      { error: 'Failed to upload sequence' },
       { status: 500 }
     )
   }

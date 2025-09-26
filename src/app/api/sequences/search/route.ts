@@ -10,87 +10,102 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '12')
 
-    // Return mock data for now while database connection is being fixed
-    const mockSequences = [
-      {
-        id: '1',
-        title: 'Sample LED Sequence',
-        description: 'A beautiful LED light sequence for your project',
-        price: 9.99,
-        category: 'Entertainment',
-        tags: ['led', 'lights', 'animation'],
-        rating: 4.5,
-        downloads: 150,
-        createdAt: new Date().toISOString(),
-        previewUrl: '/images/sequence-preview-default.jpg',
-        seller: {
-          name: 'Demo Seller',
-        },
-        reviewCount: 12,
-      },
-      {
-        id: '2',
-        title: 'Holiday Light Show',
-        description: 'Perfect for holiday decorations and celebrations',
-        price: 14.99,
-        category: 'Holiday',
-        tags: ['holiday', 'christmas', 'celebration'],
-        rating: 4.8,
-        downloads: 89,
-        createdAt: new Date().toISOString(),
-        previewUrl: '/images/sequence-preview-default.jpg',
-        seller: {
-          name: 'Holiday Lights Pro',
-        },
-        reviewCount: 8,
-      },
-    ]
+    // Build where clause
+    const where: any = {
+      isActive: true,
+      isApproved: true,
+    }
 
-    // Filter by query if provided
-    let filteredSequences = mockSequences
     if (query) {
-      filteredSequences = mockSequences.filter(seq => 
-        seq.title.toLowerCase().includes(query.toLowerCase()) ||
-        seq.description.toLowerCase().includes(query.toLowerCase()) ||
-        seq.tags.some(tag => tag.toLowerCase().includes(query.toLowerCase()))
-      )
+      where.OR = [
+        { title: { contains: query, mode: 'insensitive' } },
+        { description: { contains: query, mode: 'insensitive' } },
+        { tags: { has: query } },
+      ]
     }
 
-    // Filter by category if provided
     if (category) {
-      filteredSequences = filteredSequences.filter(seq => seq.category === category)
+      where.category = category
     }
 
-    // Sort sequences
+    // Build orderBy clause
+    let orderBy: any = { createdAt: 'desc' }
+    
     switch (sort) {
       case 'price-low':
-        filteredSequences.sort((a, b) => a.price - b.price)
+        orderBy = { price: 'asc' }
         break
       case 'price-high':
-        filteredSequences.sort((a, b) => b.price - a.price)
+        orderBy = { price: 'desc' }
+        break
+      case 'popular':
+        orderBy = { downloadCount: 'desc' }
         break
       case 'rating':
-        filteredSequences.sort((a, b) => b.rating - a.rating)
-        break
-      case 'downloads':
-        filteredSequences.sort((a, b) => b.downloads - a.downloads)
+        orderBy = { rating: 'desc' }
         break
       default:
-        filteredSequences.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        orderBy = { createdAt: 'desc' }
     }
 
-    // Paginate
-    const startIndex = (page - 1) * limit
-    const paginatedSequences = filteredSequences.slice(startIndex, startIndex + limit)
+    const skip = (page - 1) * limit
+
+    const [sequences, total] = await Promise.all([
+      prisma.sequence.findMany({
+        where,
+        orderBy,
+        skip,
+        take: limit,
+        include: {
+          storefront: {
+            include: {
+              sellerProfile: {
+                select: {
+                  displayName: true,
+                },
+              },
+            },
+          },
+          _count: {
+            select: {
+              reviews: true,
+            },
+          },
+        },
+      }),
+      prisma.sequence.count({ where }),
+    ])
+
+    // Format the response
+    const formattedSequences = sequences.map((sequence) => ({
+      id: sequence.id,
+      title: sequence.title,
+      description: sequence.description,
+      price: sequence.price / 100, // Convert from cents
+      category: sequence.category,
+      tags: sequence.tags,
+      rating: sequence.rating || 0,
+      downloads: sequence.downloadCount || 0,
+      createdAt: sequence.createdAt.toISOString(),
+      previewUrl: sequence.previewUrl,
+      seller: {
+        name: sequence.storefront.sellerProfile.displayName,
+      },
+      reviewCount: sequence._count.reviews,
+    }))
 
     return NextResponse.json({
-      sequences: paginatedSequences,
-      total: filteredSequences.length,
-      page,
-      totalPages: Math.ceil(filteredSequences.length / limit),
+      sequences: formattedSequences,
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit),
+      },
+      total,
     })
   } catch (error) {
-    console.error('Search API error:', error)
+    console.error('Search sequences error:', error)
     return NextResponse.json(
       { error: 'Failed to search sequences' },
       { status: 500 }
