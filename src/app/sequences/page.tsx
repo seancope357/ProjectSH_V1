@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import { Navigation } from '@/components/ui/navigation'
@@ -23,7 +23,7 @@ interface Sequence {
   }
 }
 
-export default function SequencesPage() {
+function SequencesContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { data: session } = useSession()
@@ -505,5 +505,13 @@ export default function SequencesPage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function SequencesPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center">Loading...</div>}>
+      <SequencesContent />
+    </Suspense>
   )
 }

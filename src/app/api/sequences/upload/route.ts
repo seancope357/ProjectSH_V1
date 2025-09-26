@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get seller's storefront
-    const storefront = await prisma.storefront.findUnique({
+    const storefront = await prisma.storefront.findFirst({
       where: { sellerProfileId: sellerProfile.id },
     })
 
@@ -92,13 +92,13 @@ export async function POST(request: NextRequest) {
     const sequence = await prisma.sequence.create({
       data: {
         title,
+        slug: title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') + '-' + Date.now(),
         description,
         instructions: instructions || null,
         category,
         tags: tags ? tags.split(',').map(tag => tag.trim()) : [],
         price: Math.round(parseFloat(price) * 100), // Convert to cents
-        duration: duration || null,
-        ledCount: ledCount ? parseInt(ledCount) : null,
+        duration: duration ? parseInt(duration) : null,
         difficulty: difficulty as any,
         storefrontId: storefront.id,
         isActive: false, // Set to false until files are uploaded
