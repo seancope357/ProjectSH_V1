@@ -15,43 +15,21 @@ export function Navigation() {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link href="/" className="flex-shrink-0">
-              <div className="flex items-center space-x-2">
-                {/* LED Circuit Icon */}
-                <div className="relative">
-                  <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center shadow-lg">
-                    <div className="w-6 h-6 grid grid-cols-3 gap-0.5">
-                      <div className="w-1 h-1 bg-white rounded-full animate-pulse"></div>
-                      <div className="w-1 h-1 bg-white rounded-full animate-pulse delay-100"></div>
-                      <div className="w-1 h-1 bg-white rounded-full animate-pulse delay-200"></div>
-                      <div className="w-1 h-1 bg-white rounded-full animate-pulse delay-300"></div>
-                      <div className="w-1 h-1 bg-white rounded-full animate-pulse delay-400"></div>
-                      <div className="w-1 h-1 bg-white rounded-full animate-pulse delay-500"></div>
-                      <div className="w-1 h-1 bg-white rounded-full animate-pulse delay-600"></div>
-                      <div className="w-1 h-1 bg-white rounded-full animate-pulse delay-700"></div>
-                      <div className="w-1 h-1 bg-white rounded-full animate-pulse delay-800"></div>
-                    </div>
-                  </div>
-                  {/* Connection lines */}
-                  <div className="absolute -right-1 top-1/2 w-2 h-0.5 bg-gradient-to-r from-blue-500 to-transparent transform -translate-y-1/2"></div>
-                </div>
+              <div className="flex flex-col items-center">
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-700 dark:from-blue-400 dark:via-purple-400 dark:to-blue-500 bg-clip-text text-transparent">
+                  Sequence<span className="text-blue-600 dark:text-blue-400">HUB</span>
+                </h1>
                 
-                {/* Logo Text with LED dots underneath */}
-                <div className="flex flex-col items-center">
-                  <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-700 dark:from-blue-400 dark:via-purple-400 dark:to-blue-500 bg-clip-text text-transparent">
-                    Sequence<span className="text-blue-600 dark:text-blue-400">HUB</span>
-                  </h1>
-                  
-                  {/* LED String Dots - Colorful gradient progression */}
-                  <div className="flex space-x-1 mt-1">
-                    <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></div>
-                    <div className="w-1.5 h-1.5 bg-orange-500 rounded-full animate-pulse delay-150"></div>
-                    <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full animate-pulse delay-300"></div>
-                    <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse delay-450"></div>
-                    <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse delay-600"></div>
-                    <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-pulse delay-750"></div>
-                    <div className="w-1.5 h-1.5 bg-purple-500 rounded-full animate-pulse delay-900"></div>
-                    <div className="w-1.5 h-1.5 bg-pink-500 rounded-full animate-pulse delay-1000"></div>
-                  </div>
+                {/* LED String Dots - Colorful gradient progression */}
+                <div className="flex space-x-1 -mt-0.5">
+                  <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></div>
+                  <div className="w-1.5 h-1.5 bg-orange-500 rounded-full animate-pulse delay-150"></div>
+                  <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full animate-pulse delay-300"></div>
+                  <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse delay-450"></div>
+                  <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse delay-600"></div>
+                  <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-pulse delay-750"></div>
+                  <div className="w-1.5 h-1.5 bg-purple-500 rounded-full animate-pulse delay-900"></div>
+                  <div className="w-1.5 h-1.5 bg-pink-500 rounded-full animate-pulse delay-1000"></div>
                 </div>
               </div>
             </Link>
