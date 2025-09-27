@@ -26,14 +26,16 @@ export const authOptions: NextAuthOptions = {
       }
       return session
     },
-    async signIn({ user, account }) {
+    async signIn({ user, account, profile }) {
       if (account?.provider === 'google') {
         const existingUser = await prisma.user.findUnique({
           where: { email: user.email! },
         })
 
         if (!existingUser) {
-          await prisma.user.create({
+          // Default to USER role for Google OAuth
+          // Role can be updated later through profile setup
+          const newUser = await prisma.user.create({
             data: {
               email: user.email!,
               name: user.name,
@@ -45,6 +47,17 @@ export const authOptions: NextAuthOptions = {
         return true
       }
       return true
+    },
+    async redirect({ url, baseUrl }) {
+      // If user just signed in with Google and has USER role, redirect to role selection
+      if (url === baseUrl) {
+        return `${baseUrl}/auth/role-selection`
+      }
+      // Allows relative callback URLs
+      if (url.startsWith("/")) return `${baseUrl}${url}`
+      // Allows callback URLs on the same origin
+      else if (new URL(url).origin === baseUrl) return url
+      return baseUrl
     },
   },
   pages: {
