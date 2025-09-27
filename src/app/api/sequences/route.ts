@@ -103,9 +103,8 @@ export async function GET(request: NextRequest) {
       console.error('Prisma error, falling back to Supabase:', prismaError)
       
       // Fallback to Supabase
-      const { sequences, total } = await SupabaseDB.getSequences({
+      const sequences = await SupabaseDB.getSequences({
         category: category || undefined,
-        sort,
         page,
         limit,
       })
@@ -115,20 +114,23 @@ export async function GET(request: NextRequest) {
         id: sequence.id,
         title: sequence.title,
         description: sequence.description,
-        price: sequence.price,
         category: sequence.category,
-        tags: sequence.tags,
+        price: sequence.price,
         rating: sequence.rating || 0,
-        downloads: sequence.downloadCount || 0,
-        reviewCount: sequence.reviews?.length || 0,
+        downloads: sequence.downloads || 0,
+        reviewCount: sequence.reviewCount || 0,
+        imageUrl: sequence.imageUrl,
         createdAt: sequence.createdAt,
         updatedAt: sequence.updatedAt,
-        previewUrl: sequence.previewUrl,
-        seller: {
-          name: sequence.storefront?.sellerProfile?.displayName || 'Unknown Seller',
-          storefront: sequence.storefront?.name || 'Unknown Store',
+        storefront: {
+          id: sequence.userId,
+          name: sequence.userName || 'Unknown',
+          image: sequence.userImage || null,
         },
       }))
+
+      const total = sequences.length // This is an approximation since we don't have total count from Supabase
+      const totalPages = Math.ceil(total / limit)
 
       return NextResponse.json({
         sequences: formattedSequences,
@@ -136,7 +138,7 @@ export async function GET(request: NextRequest) {
           page,
           limit,
           total,
-          pages: Math.ceil(total / limit),
+          totalPages,
         },
       })
     }
