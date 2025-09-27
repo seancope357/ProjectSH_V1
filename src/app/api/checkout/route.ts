@@ -4,7 +4,6 @@ import { authOptions } from '@/lib/auth'
 import { stripe } from '@/lib/stripe'
 import { prisma } from '@/lib/prisma'
 import { calcOrderFees } from '@/lib/fees'
-import { SupabaseDB } from '@/lib/supabase-db'
 
 interface CheckoutItem {
   sequenceId: string
@@ -27,38 +26,20 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate sequences exist and are active
-    let sequences
-    try {
-      sequences = await prisma.sequence.findMany({
-        where: {
-          id: { in: items.map(item => item.sequenceId) },
-          isActive: true,
-          isApproved: true,
-        },
-        include: {
-          storefront: {
-            include: {
-              sellerProfile: true,
-            },
+    const sequences = await prisma.sequence.findMany({
+      where: {
+        id: { in: items.map(item => item.sequenceId) },
+        isActive: true,
+        isApproved: true,
+      },
+      include: {
+        storefront: {
+          include: {
+            sellerProfile: true,
           },
         },
-      })
-    } catch (prismaError) {
-      console.error('Prisma error, falling back to Supabase:', prismaError)
-      
-      // Fallback to Supabase - get sequences by IDs
-      const sequenceIds = items.map(item => item.sequenceId)
-      const supabaseSequences = []
-      
-      for (const sequenceId of sequenceIds) {
-        const sequence = await SupabaseDB.getSequenceById(sequenceId)
-        if (sequence && sequence.isActive && sequence.isApproved) {
-          supabaseSequences.push(sequence)
-        }
-      }
-      
-      sequences = supabaseSequences
-    }
+      },
+    })
 
     if (sequences.length !== items.length) {
       return NextResponse.json({ error: 'Some sequences not found or inactive' }, { status: 400 })
@@ -68,48 +49,22 @@ export async function POST(request: NextRequest) {
     const feeCalculation = calcOrderFees(items)
 
     // Create order in database
-    let order
-    try {
-      order = await prisma.order.create({
-        data: {
-          userId: session.user.id,
-          status: 'PENDING',
-          subtotal: feeCalculation.subtotal,
-          platformFee: feeCalculation.totalPlatformFee,
-          total: feeCalculation.subtotal + feeCalculation.totalPlatformFee,
-          items: {
-            create: items.map((item, index) => ({
-              sequenceId: item.sequenceId,
-              price: item.price,
-              platformFee: feeCalculation.itemFees[index].platformFeeTotal,
-            })),
-          },
-        },
-      })
-    } catch (prismaError) {
-      console.error('Prisma error, falling back to Supabase:', prismaError)
-      
-      // Fallback to Supabase - create order
-      order = await SupabaseDB.createOrder({
+    const order = await prisma.order.create({
+      data: {
         userId: session.user.id,
         status: 'PENDING',
         subtotal: feeCalculation.subtotal,
         platformFee: feeCalculation.totalPlatformFee,
         total: feeCalculation.subtotal + feeCalculation.totalPlatformFee,
-        items: items.map((item, index) => ({
-          sequenceId: item.sequenceId,
-          price: item.price,
-          platformFee: feeCalculation.itemFees[index].platformFeeTotal,
-        })),
-      })
-      
-      if (!order) {
-        return NextResponse.json(
-          { error: 'Failed to create order' },
-          { status: 500 }
-        )
-      }
-    }
+        items: {
+          create: items.map((item, index) => ({
+            sequenceId: item.sequenceId,
+            price: item.price,
+            platformFee: feeCalculation.itemFees[index].platformFeeTotal,
+          })),
+        },
+      },
+    })
 
     // Create Stripe PaymentIntent
     const paymentIntent = await stripe.paymentIntents.create({
@@ -125,19 +80,10 @@ export async function POST(request: NextRequest) {
     })
 
     // Update order with Stripe payment ID
-    try {
-      await prisma.order.update({
-        where: { id: order.id },
-        data: { stripePaymentId: paymentIntent.id },
-      })
-    } catch (prismaError) {
-      console.error('Prisma error updating order, falling back to Supabase:', prismaError)
-      
-      // Fallback to Supabase - update order
-      await SupabaseDB.updateOrder(order.id, {
-        stripePaymentId: paymentIntent.id,
-      })
-    }
+    await prisma.order.update({
+      where: { id: order.id },
+      data: { stripePaymentId: paymentIntent.id },
+    })
 
     return NextResponse.json({
       clientSecret: paymentIntent.client_secret,

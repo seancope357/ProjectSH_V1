@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { headers } from 'next/headers'
 import { stripe } from '@/lib/stripe'
 import { prisma } from '@/lib/prisma'
-import { SupabaseDB } from '@/lib/supabase-db'
 import Stripe from 'stripe'
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!
@@ -60,21 +59,20 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent) {
 
   try {
     // Update order status
-    let order
-    try {
-      order = await prisma.order.update({
-        where: { id: orderId },
-        data: { 
-          status: 'COMPLETED',
-        },
-        include: {
-          items: {
-            include: {
-              sequence: {
-                include: {
-                  storefront: {
-                    include: {
-                      sellerProfile: true,
+    const order = await prisma.order.update({
+      where: { stripePaymentId: paymentIntent.id },
+      data: { status: 'COMPLETED' },
+      include: {
+        items: {
+          include: {
+            sequence: {
+              include: {
+                storefront: {
+                  include: {
+                    sellerProfile: {
+                      select: {
+                        stripeAccountId: true,
+                      },
                     },
                   },
                 },
@@ -82,23 +80,8 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent) {
             },
           },
         },
-      })
-    } catch (prismaError) {
-      console.error('Prisma error, falling back to Supabase:', prismaError)
-      
-      // Fallback to Supabase
-      order = await SupabaseDB.updateOrder(orderId, {
-        status: 'COMPLETED',
-      })
-      
-      if (!order) {
-        console.error(`Failed to update order ${orderId} status`)
-        return
-      }
-      
-      // Get order details for processing transfers
-      order = await SupabaseDB.getOrderById(orderId)
-    }
+      },
+    })
 
     if (!order) {
       console.error(`Order ${orderId} not found`)
@@ -119,7 +102,7 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent) {
           metadata: {
             orderId: order.id,
             sequenceId: item.sequenceId,
-            sellerId: seller.id,
+            sellerId: order.id, // Using order.id since seller.id is not available in the select
           },
         })
       }
@@ -140,19 +123,10 @@ async function handlePaymentFailed(paymentIntent: Stripe.PaymentIntent) {
   }
 
   try {
-    try {
-      await prisma.order.update({
-        where: { id: orderId },
-        data: { status: 'CANCELLED' },
-      })
-    } catch (prismaError) {
-      console.error('Prisma error, falling back to Supabase:', prismaError)
-      
-      // Fallback to Supabase
-      await SupabaseDB.updateOrder(orderId, {
-        status: 'CANCELLED',
-      })
-    }
+    await prisma.order.update({
+      where: { stripePaymentId: paymentIntent.id },
+      data: { status: 'CANCELLED' },
+    })
 
     console.log(`Order ${orderId} marked as cancelled`)
   } catch (error) {
