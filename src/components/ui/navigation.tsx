@@ -20,16 +20,17 @@ export function Navigation() {
                   Sequence<span className="text-blue-600 dark:text-blue-400">HUB</span>
                 </h1>
                 
-                {/* LED String Dots - Colorful gradient progression */}
+                {/* LED String Dots - Solid Red, White, and Blue (3 of each) - Rolling pulse effect */}
                 <div className="flex space-x-1 -mt-0.5">
-                  <div className="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></div>
-                  <div className="w-1.5 h-1.5 bg-orange-500 rounded-full animate-pulse delay-150"></div>
-                  <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full animate-pulse delay-300"></div>
-                  <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse delay-450"></div>
-                  <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse delay-600"></div>
-                  <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-pulse delay-750"></div>
-                  <div className="w-1.5 h-1.5 bg-purple-500 rounded-full animate-pulse delay-900"></div>
-                  <div className="w-1.5 h-1.5 bg-pink-500 rounded-full animate-pulse delay-1000"></div>
+                  <div className="w-1.5 h-1.5 bg-red-600 rounded-full animate-pulse" style={{animationDelay: '0ms'}}></div>
+                  <div className="w-1.5 h-1.5 bg-red-600 rounded-full animate-pulse" style={{animationDelay: '200ms'}}></div>
+                  <div className="w-1.5 h-1.5 bg-red-600 rounded-full animate-pulse" style={{animationDelay: '400ms'}}></div>
+                  <div className="w-1.5 h-1.5 bg-white border border-gray-300 rounded-full animate-pulse" style={{animationDelay: '600ms'}}></div>
+                  <div className="w-1.5 h-1.5 bg-white border border-gray-300 rounded-full animate-pulse" style={{animationDelay: '800ms'}}></div>
+                  <div className="w-1.5 h-1.5 bg-white border border-gray-300 rounded-full animate-pulse" style={{animationDelay: '1000ms'}}></div>
+                  <div className="w-1.5 h-1.5 bg-blue-600 rounded-full animate-pulse" style={{animationDelay: '1200ms'}}></div>
+                  <div className="w-1.5 h-1.5 bg-blue-600 rounded-full animate-pulse" style={{animationDelay: '1400ms'}}></div>
+                  <div className="w-1.5 h-1.5 bg-blue-600 rounded-full animate-pulse" style={{animationDelay: '1600ms'}}></div>
                 </div>
               </div>
             </Link>

@@ -60,9 +60,8 @@ export async function POST(request: NextRequest) {
       data: {
         name,
         email,
+        password: hashedPassword,
         role: userRole,
-        // Note: We don't store password for OAuth-only users
-        // This is for credential-based registration
       }
     })
 
