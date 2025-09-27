@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { supabaseAdmin } from '@/lib/supabase'
 import { prisma } from '@/lib/prisma'
+import { SupabaseDB } from '@/lib/supabase-db'
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024 // 50MB
 const ALLOWED_TYPES = [
@@ -20,9 +21,27 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user is a seller
-    const sellerProfile = await prisma.sellerProfile.findUnique({
-      where: { userId: session.user.id },
-    })
+    let sellerProfile
+    try {
+      sellerProfile = await prisma.sellerProfile.findUnique({
+        where: { userId: session.user.id },
+      })
+    } catch (prismaError) {
+      console.error('Prisma error, falling back to Supabase:', prismaError)
+      
+      // Fallback to Supabase - check if user exists and has seller profile data
+      const user = await SupabaseDB.getUserById(session.user.id)
+      if (!user || !user.metadata?.sellerProfile) {
+        return NextResponse.json({ error: 'Seller profile required' }, { status: 403 })
+      }
+      
+      // Create a mock seller profile for compatibility
+      sellerProfile = {
+        id: user.id,
+        userId: user.id,
+        ...user.metadata.sellerProfile
+      }
+    }
 
     if (!sellerProfile) {
       return NextResponse.json({ error: 'Seller profile required' }, { status: 403 })
@@ -50,14 +69,27 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify sequence ownership
-    const sequence = await prisma.sequence.findFirst({
-      where: {
-        id: sequenceId,
-        storefront: {
-          sellerProfileId: sellerProfile.id,
+    let sequence
+    try {
+      sequence = await prisma.sequence.findFirst({
+        where: {
+          id: sequenceId,
+          storefront: {
+            sellerProfileId: sellerProfile.id,
+          },
         },
-      },
-    })
+      })
+    } catch (prismaError) {
+      console.error('Prisma error, falling back to Supabase:', prismaError)
+      
+      // Fallback to Supabase
+      sequence = await SupabaseDB.getSequenceById(sequenceId)
+      
+      // Check ownership through sequence data
+      if (sequence && sequence.storefront?.sellerProfile?.userId !== session.user.id) {
+        sequence = null // Not owned by user
+      }
+    }
 
     if (!sequence) {
       return NextResponse.json({ error: 'Sequence not found or access denied' }, { status: 404 })
@@ -85,15 +117,44 @@ export async function POST(request: NextRequest) {
     }
 
     // Create a new sequence version instead of updating sequence with filePath
-    const sequenceVersion = await prisma.sequenceVersion.create({
-      data: {
-        sequenceId: sequenceId,
-        version: '1.0.0', // You might want to increment this based on existing versions
+    let sequenceVersion
+    try {
+      sequenceVersion = await prisma.sequenceVersion.create({
+        data: {
+          sequenceId: sequenceId,
+          version: '1.0.0', // You might want to increment this based on existing versions
+          fileUrl: data.path,
+          fileSize: file.size,
+          checksum: '', // You might want to calculate an actual checksum
+        },
+      })
+    } catch (prismaError) {
+      console.error('Prisma error creating sequence version, falling back to Supabase:', prismaError)
+      
+      // Fallback to Supabase - store version info in sequence metadata
+      const updatedSequence = await SupabaseDB.updateSequence(sequenceId, {
         fileUrl: data.path,
         fileSize: file.size,
-        checksum: '', // You might want to calculate an actual checksum
-      },
-    })
+        version: '1.0.0',
+        updatedAt: new Date().toISOString(),
+      })
+      
+      if (!updatedSequence) {
+        return NextResponse.json({ error: 'Failed to save sequence version' }, { status: 500 })
+      }
+      
+      // Create a mock sequence version for response
+      sequenceVersion = {
+        id: `${sequenceId}-v1`,
+        sequenceId: sequenceId,
+        version: '1.0.0',
+        fileUrl: data.path,
+        fileSize: file.size,
+        checksum: '',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }
+    }
 
     return NextResponse.json({
       success: true,

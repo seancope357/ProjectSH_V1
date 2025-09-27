@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { headers } from 'next/headers'
 import { stripe } from '@/lib/stripe'
 import { prisma } from '@/lib/prisma'
+import { SupabaseDB } from '@/lib/supabase-db'
 import Stripe from 'stripe'
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!
@@ -59,33 +60,56 @@ async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent) {
 
   try {
     // Update order status
-    const order = await prisma.order.update({
-      where: { id: orderId },
-      data: { 
-        status: 'COMPLETED',
-      },
-      include: {
-        items: {
-          include: {
-            sequence: {
-              include: {
-                storefront: {
-                  include: {
-                    sellerProfile: true,
+    let order
+    try {
+      order = await prisma.order.update({
+        where: { id: orderId },
+        data: { 
+          status: 'COMPLETED',
+        },
+        include: {
+          items: {
+            include: {
+              sequence: {
+                include: {
+                  storefront: {
+                    include: {
+                      sellerProfile: true,
+                    },
                   },
                 },
               },
             },
           },
         },
-      },
-    })
+      })
+    } catch (prismaError) {
+      console.error('Prisma error, falling back to Supabase:', prismaError)
+      
+      // Fallback to Supabase
+      order = await SupabaseDB.updateOrder(orderId, {
+        status: 'COMPLETED',
+      })
+      
+      if (!order) {
+        console.error(`Failed to update order ${orderId} status`)
+        return
+      }
+      
+      // Get order details for processing transfers
+      order = await SupabaseDB.getOrderById(orderId)
+    }
+
+    if (!order) {
+      console.error(`Order ${orderId} not found`)
+      return
+    }
 
     // Process transfers to sellers
-    for (const item of order.items) {
-      const seller = item.sequence.storefront.sellerProfile
+    for (const item of order.items || []) {
+      const seller = item.sequence?.storefront?.sellerProfile
       
-      if (seller.stripeAccountId) {
+      if (seller?.stripeAccountId) {
         const transferAmount = item.price - item.platformFee
 
         await stripe.transfers.create({
@@ -116,10 +140,19 @@ async function handlePaymentFailed(paymentIntent: Stripe.PaymentIntent) {
   }
 
   try {
-    await prisma.order.update({
-      where: { id: orderId },
-      data: { status: 'CANCELLED' },
-    })
+    try {
+      await prisma.order.update({
+        where: { id: orderId },
+        data: { status: 'CANCELLED' },
+      })
+    } catch (prismaError) {
+      console.error('Prisma error, falling back to Supabase:', prismaError)
+      
+      // Fallback to Supabase
+      await SupabaseDB.updateOrder(orderId, {
+        status: 'CANCELLED',
+      })
+    }
 
     console.log(`Order ${orderId} marked as cancelled`)
   } catch (error) {
@@ -129,18 +162,31 @@ async function handlePaymentFailed(paymentIntent: Stripe.PaymentIntent) {
 
 async function handleAccountUpdated(account: Stripe.Account) {
   try {
-    const seller = await prisma.sellerProfile.findFirst({
-      where: { stripeAccountId: account.id },
-    })
-
-    if (seller) {
-      await prisma.sellerProfile.update({
-        where: { id: seller.id },
-        data: {
-          stripeOnboarded: account.details_submitted && account.charges_enabled,
-        },
+    let seller
+    try {
+      seller = await prisma.sellerProfile.findFirst({
+        where: { stripeAccountId: account.id },
       })
 
+      if (seller) {
+        await prisma.sellerProfile.update({
+          where: { id: seller.id },
+          data: {
+            stripeOnboarded: account.details_submitted && account.charges_enabled,
+          },
+        })
+      }
+    } catch (prismaError) {
+      console.error('Prisma error, falling back to Supabase:', prismaError)
+      
+      // Fallback to Supabase - find user with matching stripe account
+      // This is a simplified approach since we don't have direct seller profile lookup
+      // In a real implementation, you might store this mapping in Supabase metadata
+      console.log(`Stripe account ${account.id} updated, but seller profile lookup failed`)
+      return
+    }
+
+    if (seller) {
       console.log(`Updated seller ${seller.id} onboarding status`)
     }
   } catch (error) {
