@@ -5,6 +5,7 @@ import { useAuth } from '@/components/providers/session-provider';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Navigation } from '@/components/ui/navigation';
 import { User, Store, ArrowRight } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 function RoleSelectionContent() {
   const { user } = useAuth();
@@ -23,12 +24,11 @@ function RoleSelectionContent() {
       return;
     }
 
-    // Note: Role checking would need to be implemented with Supabase user metadata
-    // For now, we'll allow access and implement role checking later
-    // if (user.user_metadata?.role && user.user_metadata.role !== 'USER') {
-    //   router.push(callbackUrl);
-    //   return;
-    // }
+    // Check if user already has a role set
+    if (user.user_metadata?.role && user.user_metadata.role !== 'USER') {
+      router.push(callbackUrl);
+      return;
+    }
   }, [user, router, callbackUrl]);
 
   const handleRoleSelection = async () => {
@@ -47,8 +47,8 @@ function RoleSelectionContent() {
       });
 
       if (response.ok) {
-        // Note: With Supabase, we would update user metadata here
-        // For now, we'll just redirect
+        // Refresh the user session to get updated metadata
+        await supabase.auth.refreshSession();
         
         // Redirect based on role
         if (selectedRole === 'SELLER') {

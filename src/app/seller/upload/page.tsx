@@ -60,27 +60,26 @@ export default function SellerUploadPage() {
     return null;
   }
 
-  // Note: Role checking would need to be implemented with Supabase user metadata
-  // For now, we'll allow access and implement role checking later
-  // if (user.user_metadata?.role !== 'SELLER') {
-  //   return (
-  //     <div className="min-h-screen bg-gray-50">
-  //       <Navigation />
-  //       <div className="flex items-center justify-center min-h-screen">
-  //         <div className="text-center">
-  //           <h1 className="text-2xl font-bold text-gray-900 mb-4">Access Denied</h1>
-  //           <p className="text-gray-600 mb-4">You need to be a seller to access this page.</p>
-  //           <button
-  //             onClick={() => router.push('/')}
-  //             className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-  //           >
-  //             Go Home
-  //           </button>
-  //         </div>
-  //       </div>
-  //     </div>
-  //   );
-  // }
+  // Check if user has seller or admin role
+  if (user.user_metadata?.role !== 'SELLER' && user.user_metadata?.role !== 'ADMIN') {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navigation />
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">Access Denied</h1>
+            <p className="text-gray-600 mb-4">You need to be a seller to access this page.</p>
+            <button
+              onClick={() => router.push('/')}
+              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+            >
+              Go Home
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;

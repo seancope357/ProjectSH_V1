@@ -53,8 +53,9 @@ In your Vercel project settings, add these environment variables:
 ```bash
 # App Configuration
 NEXT_PUBLIC_APP_URL=https://your-app.vercel.app
-NEXTAUTH_URL=https://your-app.vercel.app
-NEXTAUTH_SECRET=<generate with: openssl rand -base64 32>
+# NextAuth variables are no longer needed - using Supabase authentication
+# NEXTAUTH_URL=https://your-app.vercel.app
+# NEXTAUTH_SECRET=<generate with: openssl rand -base64 32>
 NODE_ENV=production
 
 # Supabase Configuration

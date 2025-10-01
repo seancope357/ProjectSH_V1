@@ -120,7 +120,7 @@ export default function CartPage() {
   const tax = subtotal * 0.08 // 8% tax
   const total = subtotal + tax
 
-  if (status === 'loading' || loading) {
+  if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-gray-50">
         <Navigation />

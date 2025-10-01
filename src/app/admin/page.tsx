@@ -53,12 +53,11 @@ export default function AdminDashboard() {
       return;
     }
     
-    // Note: In Supabase, we'll need to check user role from user metadata or database
-    // For now, we'll assume admin check will be implemented later
-    // if (user.user_metadata?.role !== 'ADMIN') {
-    //   router.push('/');
-    //   return;
-    // }
+    // Check if user has admin role
+    if (user.user_metadata?.role !== 'ADMIN') {
+      router.push('/');
+      return;
+    }
     
     fetchAdminData();
   }, [user, authLoading, router]);

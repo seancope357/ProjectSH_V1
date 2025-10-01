@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { db } from '@/lib/supabase-db'
 
 export async function GET(request: NextRequest) {
   try {
@@ -9,82 +9,60 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '12')
 
-    // Build where clause
-    const where: any = {
-      isActive: true,
-      isApproved: true,
-    }
-
+    // Build filters
+    const filters: any = {}
+    
     if (category) {
-      where.category = category
+      filters.category = category
     }
+    
+    // Get sequences using Supabase
+    const sequences = await db.sequences.findMany(filters)
 
-    // Build orderBy clause
-    let orderBy: any = { createdAt: 'desc' }
+    // Apply sorting and pagination in memory for now
+    // TODO: Move sorting to database level for better performance
+    let sortedSequences = [...sequences]
     
     switch (sort) {
       case 'price-low':
-        orderBy = { price: 'asc' }
+        sortedSequences.sort((a, b) => a.price - b.price)
         break
       case 'price-high':
-        orderBy = { price: 'desc' }
+        sortedSequences.sort((a, b) => b.price - a.price)
         break
       case 'popular':
-        orderBy = { downloadCount: 'desc' }
+        sortedSequences.sort((a, b) => (b.download_count || 0) - (a.download_count || 0))
         break
       case 'rating':
-        orderBy = { rating: 'desc' }
+        sortedSequences.sort((a, b) => (b.rating || 0) - (a.rating || 0))
         break
       default:
-        orderBy = { createdAt: 'desc' }
+        sortedSequences.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
     }
 
     const skip = (page - 1) * limit
-
-    const [sequences, total] = await Promise.all([
-      prisma.sequence.findMany({
-        where,
-        orderBy,
-        skip,
-        take: limit,
-        include: {
-          storefront: {
-            include: {
-              sellerProfile: {
-                select: {
-                  displayName: true,
-                },
-              },
-            },
-          },
-          _count: {
-            select: {
-              reviews: true,
-            },
-          },
-        },
-      }),
-      prisma.sequence.count({ where }),
-    ])
+    const paginatedSequences = sortedSequences.slice(skip, skip + limit)
+    const total = sequences.length
 
     // Format sequences for response
-    const formattedSequences = sequences.map(sequence => ({
+    const formattedSequences = paginatedSequences.map((sequence: any) => ({
       id: sequence.id,
       title: sequence.title,
       description: sequence.description,
       price: sequence.price,
-      category: sequence.category,
-      tags: sequence.tags,
+      category: sequence.category?.name || 'Uncategorized',
+      tags: sequence.tags || [],
       rating: sequence.rating || 0,
-      downloads: sequence.downloadCount || 0,
-      reviewCount: sequence._count.reviews,
-      createdAt: sequence.createdAt.toISOString(),
-      updatedAt: sequence.updatedAt.toISOString(),
-      previewUrl: sequence.previewUrl,
+      downloads: sequence.download_count || 0,
+      reviewCount: sequence.rating_count || 0,
+      previewUrl: sequence.preview_url,
+      thumbnailUrl: sequence.thumbnail_url,
       seller: {
-        name: sequence.storefront?.sellerProfile?.displayName || 'Unknown Seller',
-        storefront: sequence.storefront?.name || 'Unknown Store',
+        username: sequence.seller?.username || 'Unknown',
+        displayName: sequence.seller?.full_name || sequence.seller?.username || 'Unknown'
       },
+      createdAt: sequence.created_at,
+      updatedAt: sequence.updated_at
     }))
 
     return NextResponse.json({
@@ -93,13 +71,36 @@ export async function GET(request: NextRequest) {
         page,
         limit,
         total,
-        pages: Math.ceil(total / limit),
-      },
+        totalPages: Math.ceil(total / limit),
+        hasNext: page * limit < total,
+        hasPrev: page > 1
+      }
     })
   } catch (error) {
     console.error('Error fetching sequences:', error)
     return NextResponse.json(
       { error: 'Failed to fetch sequences' },
+      { status: 500 }
+    )
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    // TODO: Implement sequence creation with Supabase
+    // This will handle file upload, metadata storage, and seller verification
+    
+    const body = await request.json()
+    
+    // For now, return a placeholder response
+    return NextResponse.json(
+      { error: 'Sequence creation not yet implemented' },
+      { status: 501 }
+    )
+  } catch (error) {
+    console.error('Error creating sequence:', error)
+    return NextResponse.json(
+      { error: 'Failed to create sequence' },
       { status: 500 }
     )
   }

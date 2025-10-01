@@ -10,11 +10,33 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // TODO: Implement user role update with Supabase
-    return NextResponse.json(
-      { error: 'User role update functionality temporarily unavailable' },
-      { status: 503 }
-    )
+    const { role } = await request.json()
+    
+    if (!role || !['USER', 'SELLER'].includes(role)) {
+      return NextResponse.json({ error: 'Invalid role' }, { status: 400 })
+    }
+
+    // Update user metadata with the new role
+    const { data, error } = await supabase.auth.updateUser({
+      data: { 
+        role: role,
+        role_updated_at: new Date().toISOString()
+      }
+    })
+
+    if (error) {
+      console.error('Supabase user update error:', error)
+      return NextResponse.json(
+        { error: 'Failed to update user role' },
+        { status: 500 }
+      )
+    }
+
+    return NextResponse.json({ 
+      success: true, 
+      user: data.user,
+      message: `Role updated to ${role}` 
+    })
   } catch (error) {
     console.error('User role update error:', error)
     return NextResponse.json(

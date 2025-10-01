@@ -63,12 +63,11 @@ export default function SellerDashboard() {
       return
     }
 
-    // Note: Role checking would need to be implemented with Supabase user metadata
-    // For now, we'll allow access and implement role checking later
-    // if (user?.user_metadata?.role !== 'SELLER' && user?.user_metadata?.role !== 'ADMIN') {
-    //   router.push('/')
-    //   return
-    // }
+    // Check if user has seller or admin role
+    if (user && user.user_metadata?.role !== 'SELLER' && user.user_metadata?.role !== 'ADMIN') {
+      router.push('/')
+      return
+    }
 
     if (user) {
       fetchDashboardData()
@@ -136,7 +135,7 @@ export default function SellerDashboard() {
     filterStatus === 'all' || seq.status === filterStatus
   )
 
-  if (status === 'loading' || loading) {
+  if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-gray-50">
         <Navigation />

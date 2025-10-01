@@ -14,9 +14,11 @@
 - [ ] `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` - Stripe publishable key
 - [ ] `GOOGLE_CLIENT_ID` - Google OAuth client ID
 - [ ] `GOOGLE_CLIENT_SECRET` - Google OAuth client secret
-- [ ] `NEXTAUTH_URL` - Your app's URL
-- [ ] `NEXTAUTH_SECRET` - NextAuth secret (generate with `openssl rand -base64 32`)
 - [ ] `NEXT_PUBLIC_APP_URL` - Your app's public URL
+
+# NextAuth variables are no longer needed - using Supabase authentication
+# - [ ] `NEXTAUTH_URL` - Your app's URL  
+# - [ ] `NEXTAUTH_SECRET` - NextAuth secret (generate with `openssl rand -base64 32`)
 
 ### ✅ Supabase Configuration
 - [ ] Database schema deployed (run `npx prisma db push`)
@@ -146,10 +148,10 @@ npx prisma generate  # Ensure Prisma client is generated
 - Verify SSL requirements
 
 ### Authentication Issues
-- Check Google OAuth redirect URIs
-- Verify NEXTAUTH_URL matches your domain
-- Ensure NEXTAUTH_SECRET is set and secure
-- Check Supabase auth settings
+- Check Google OAuth redirect URIs in Supabase dashboard
+- Verify Supabase project URL and anon key are correct
+- Ensure proper OAuth provider configuration in Supabase
+- Check Supabase auth settings and policies
 
 ### Stripe Webhook Issues
 - Verify webhook URL is accessible
