@@ -1,60 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+import { createClient } from '@/lib/supabase-server'
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
+    const supabase = await createClient()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
     
-    if (!session?.user?.id) {
+    if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { searchParams } = new URL(request.url)
-    const page = parseInt(searchParams.get('page') || '1')
-    const limit = parseInt(searchParams.get('limit') || '10')
-    const offset = (page - 1) * limit
-
-    const [orders, total] = await Promise.all([
-       prisma.order.findMany({
-         where: { userId: session.user.id },
-         include: {
-           items: {
-             include: {
-               sequence: {
-                 select: {
-                   id: true,
-                   title: true,
-                   thumbnailUrl: true,
-                   price: true,
-                 },
-               },
-             },
-           },
-         },
-         orderBy: { createdAt: 'desc' },
-         skip: offset,
-         take: limit,
-       }),
-       prisma.order.count({
-         where: { userId: session.user.id },
-       }),
-     ])
-
-    return NextResponse.json({
-      orders,
-      pagination: {
-        page,
-        limit,
-        total,
-        totalPages: Math.ceil(total / limit),
-      },
-    })
-  } catch (error) {
-    console.error('Error fetching orders:', error)
+    // TODO: Implement order retrieval with Supabase
     return NextResponse.json(
-      { error: 'Failed to fetch orders' },
+      { error: 'Order retrieval functionality temporarily unavailable' },
+      { status: 503 }
+    )
+  } catch (error) {
+    console.error('Order retrieval error:', error)
+    return NextResponse.json(
+      { error: 'Failed to retrieve orders' },
       { status: 500 }
     )
   }

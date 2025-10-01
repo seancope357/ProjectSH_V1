@@ -1,11 +1,11 @@
 'use client'
 
 import { useState, useEffect, Suspense } from 'react'
-import { signIn, getSession } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Navigation } from '@/components/ui/navigation'
 import { Eye, EyeOff, Mail, Lock, AlertCircle, Github } from 'lucide-react'
+import { supabase } from '@/lib/supabase'
 
 function SignInPageContent() {
   const router = useRouter()
@@ -23,11 +23,13 @@ function SignInPageContent() {
 
   useEffect(() => {
     // Check if user is already signed in
-    getSession().then((session) => {
-      if (session) {
+    const checkUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
         router.push(callbackUrl)
       }
-    })
+    }
+    checkUser()
 
     // Handle OAuth errors
     if (errorParam) {
@@ -71,15 +73,14 @@ function SignInPageContent() {
     setError('')
 
     try {
-      const result = await signIn('credentials', {
+      const { data, error } = await supabase.auth.signInWithPassword({
         email: formData.email,
         password: formData.password,
-        redirect: false
       })
 
-      if (result?.error) {
-        setError('Invalid email or password')
-      } else if (result?.ok) {
+      if (error) {
+        setError(error.message)
+      } else if (data.user) {
         router.push(callbackUrl)
       }
     } catch (error) {
@@ -89,10 +90,20 @@ function SignInPageContent() {
     }
   }
 
-  const handleOAuthSignIn = async (provider: string) => {
+  const handleOAuthSignIn = async (provider: 'google' | 'github') => {
     setLoading(true)
     try {
-      await signIn(provider, { callbackUrl })
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}${callbackUrl}`
+        }
+      })
+      
+      if (error) {
+        setError(`Error signing in with ${provider}`)
+        setLoading(false)
+      }
     } catch (error) {
       setError(`Error signing in with ${provider}`)
       setLoading(false)

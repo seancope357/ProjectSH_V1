@@ -1,13 +1,13 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-import { useSession } from 'next-auth/react';
+import { useAuth } from '@/components/providers/session-provider';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Navigation } from '@/components/ui/navigation';
 import { User, Store, ArrowRight } from 'lucide-react';
 
 function RoleSelectionContent() {
-  const { data: session, update } = useSession();
+  const { user } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [selectedRole, setSelectedRole] = useState<'USER' | 'SELLER' | null>(null);
@@ -18,17 +18,18 @@ function RoleSelectionContent() {
 
   useEffect(() => {
     // If user is not authenticated, redirect to sign in
-    if (!session) {
+    if (!user) {
       router.push('/auth/signin');
       return;
     }
 
-    // If user already has a role other than USER, redirect to callback
-    if (session.user?.role && session.user.role !== 'USER') {
-      router.push(callbackUrl);
-      return;
-    }
-  }, [session, router, callbackUrl]);
+    // Note: Role checking would need to be implemented with Supabase user metadata
+    // For now, we'll allow access and implement role checking later
+    // if (user.user_metadata?.role && user.user_metadata.role !== 'USER') {
+    //   router.push(callbackUrl);
+    //   return;
+    // }
+  }, [user, router, callbackUrl]);
 
   const handleRoleSelection = async () => {
     if (!selectedRole) return;
@@ -46,8 +47,8 @@ function RoleSelectionContent() {
       });
 
       if (response.ok) {
-        // Update the session with new role
-        await update();
+        // Note: With Supabase, we would update user metadata here
+        // For now, we'll just redirect
         
         // Redirect based on role
         if (selectedRole === 'SELLER') {
@@ -66,7 +67,7 @@ function RoleSelectionContent() {
     }
   };
 
-  if (!session) {
+  if (!user) {
     return (
       <div className="min-h-screen bg-gray-50">
         <Navigation />

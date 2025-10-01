@@ -1,13 +1,13 @@
 'use client'
 
 import Link from 'next/link'
-import { useSession } from 'next-auth/react'
+import { useAuth } from '@/components/providers/session-provider'
 import { Navigation } from '@/components/ui/navigation'
 import { AuthButton } from '@/components/ui/auth-button'
 import { Search, Zap, Shield, Users, ArrowRight } from 'lucide-react'
 
 export default function HomePage() {
-  const { data: session } = useSession()
+  const { user } = useAuth()
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">

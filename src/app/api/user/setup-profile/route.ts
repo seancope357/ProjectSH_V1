@@ -1,21 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
+import { createClient } from '@/lib/supabase-server'
 
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions)
+    const supabase = await createClient()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
     
-    if (!session?.user?.id) {
+    if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const setupProfile = await prisma.userSetupProfile.findUnique({
-      where: { userId: session.user.id },
-    })
-
-    return NextResponse.json({ setupProfile })
+    // TODO: Implement setup profile functionality with Supabase
+    return NextResponse.json(
+      { error: 'Setup profile functionality temporarily unavailable' },
+      { status: 503 }
+    )
   } catch (error) {
     console.error('Failed to fetch setup profile:', error)
     return NextResponse.json(
@@ -27,9 +26,10 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
+    const supabase = await createClient()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
     
-    if (!session?.user?.id) {
+    if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -46,35 +46,11 @@ export async function POST(request: NextRequest) {
       preferences
     } = body
 
-    const setupProfile = await prisma.userSetupProfile.upsert({
-      where: { userId: session.user.id },
-      update: {
-        ledCount,
-        controllerType,
-        voltage,
-        maxCurrent,
-        protocol,
-        refreshRate,
-        difficulty,
-        props,
-        preferences,
-        updatedAt: new Date(),
-      },
-      create: {
-        userId: session.user.id,
-        ledCount,
-        controllerType,
-        voltage,
-        maxCurrent,
-        protocol,
-        refreshRate,
-        difficulty,
-        props,
-        preferences,
-      },
-    })
-
-    return NextResponse.json({ setupProfile })
+    // TODO: Implement setup profile functionality with Supabase
+    return NextResponse.json(
+      { error: 'Setup profile functionality temporarily unavailable' },
+      { status: 503 }
+    )
   } catch (error) {
     console.error('Failed to update setup profile:', error)
     return NextResponse.json(

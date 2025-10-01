@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import { Navigation } from '@/components/ui/navigation'
 import { Grid, List, Eye, Heart, Star, Download, Filter, Settings } from 'lucide-react'
-import { useSession } from 'next-auth/react'
+import { useAuth } from '@/components/providers/session-provider'
 
 interface Sequence {
   id: string
@@ -26,7 +26,7 @@ interface Sequence {
 function SequencesContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { data: session } = useSession()
+  const { user } = useAuth()
   
   const [sequences, setSequences] = useState<Sequence[]>([])
   const [loading, setLoading] = useState(true)
@@ -153,7 +153,7 @@ function SequencesContent() {
     saveToLocalStorage('favorites', Array.from(newFavorites))
     
     // If user is authenticated, also sync with server
-    if (session?.user) {
+    if (user) {
       try {
         const method = favorites.has(sequenceId) ? 'DELETE' : 'POST'
         await fetch(`/api/user/favorites/${sequenceId}`, { method })

@@ -1,13 +1,39 @@
 'use client'
 
 import Link from 'next/link'
-import { useSession, signIn, signOut } from 'next-auth/react'
 import { ShoppingCart, User, Menu, X } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { supabase } from '@/lib/supabase'
+import { User as SupabaseUser } from '@supabase/supabase-js'
 
 export function Navigation() {
-  const { data: session, status } = useSession()
+  const [user, setUser] = useState<SupabaseUser | null>(null)
+  const [loading, setLoading] = useState(true)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+
+  useEffect(() => {
+    // Get initial user
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      setUser(user)
+      setLoading(false)
+    }
+    getUser()
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setUser(session?.user ?? null)
+        setLoading(false)
+      }
+    )
+
+    return () => subscription.unsubscribe()
+  }, [])
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut()
+  }
 
   return (
     <nav className="bg-white dark:bg-gray-900 shadow-sm border-b border-gray-200 dark:border-gray-700 transition-colors relative z-50">
@@ -47,9 +73,9 @@ export function Navigation() {
           </div>
 
           <div className="hidden md:flex md:items-center md:space-x-4">
-            {status === 'loading' ? (
+            {loading ? (
               <div className="animate-pulse bg-gray-200 dark:bg-gray-700 h-8 w-20 rounded"></div>
-            ) : session ? (
+            ) : user ? (
               <>
                 <Link
                   href="/cart"
@@ -58,7 +84,7 @@ export function Navigation() {
                   <ShoppingCart className="h-6 w-6" />
                 </Link>
                 
-                {session.user.role === 'SELLER' && (
+                {user.user_metadata?.role === 'SELLER' && (
                   <Link
                     href="/seller"
                     className="text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 px-3 py-2 text-sm font-medium transition-colors"
@@ -67,7 +93,7 @@ export function Navigation() {
                   </Link>
                 )}
                 
-                {session.user.role === 'ADMIN' && (
+                {user.user_metadata?.role === 'ADMIN' && (
                   <Link
                     href="/admin"
                     className="text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 px-3 py-2 text-sm font-medium transition-colors"
@@ -94,7 +120,7 @@ export function Navigation() {
                       My Orders
                     </Link>
                     <button
-                      onClick={() => signOut()}
+                      onClick={handleSignOut}
                       className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                     >
                       Sign Out
@@ -137,7 +163,7 @@ export function Navigation() {
             </Link>
 
             
-            {session ? (
+            {user ? (
               <>
                 <Link
                   href="/cart"
@@ -161,7 +187,7 @@ export function Navigation() {
                   My Orders
                 </Link>
                 
-                {session.user.role === 'SELLER' && (
+                {user.user_metadata?.role === 'SELLER' && (
                   <Link
                     href="/seller"
                     className="text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 block px-3 py-2 text-base font-medium transition-colors"
@@ -171,7 +197,7 @@ export function Navigation() {
                   </Link>
                 )}
                 
-                {session.user.role === 'ADMIN' && (
+                {user.user_metadata?.role === 'ADMIN' && (
                   <Link
                     href="/admin"
                     className="text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 block px-3 py-2 text-base font-medium transition-colors"
@@ -183,7 +209,7 @@ export function Navigation() {
                 
                 <button
                   onClick={() => {
-                    signOut()
+                    handleSignOut()
                     setIsMenuOpen(false)
                   }}
                   className="text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 block px-3 py-2 text-base font-medium w-full text-left transition-colors"

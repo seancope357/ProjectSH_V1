@@ -1,10 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Navigation } from '@/components/ui/navigation';
+import { supabase } from '@/lib/supabase';
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -36,35 +36,23 @@ export default function RegisterPage() {
     }
 
     try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          password: formData.password,
-          role: formData.role,
-        }),
+      // Use Supabase for registration
+      const { data, error } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            name: formData.name,
+            role: formData.role,
+          }
+        }
       });
 
-      if (response.ok) {
-        // Auto sign in after successful registration
-        const result = await signIn('credentials', {
-          email: formData.email,
-          password: formData.password,
-          redirect: false,
-        });
-
-        if (result?.ok) {
-          router.push('/');
-        } else {
-          setError('Registration successful, but sign in failed. Please try signing in manually.');
-        }
+      if (error) {
+        setError(error.message);
       } else {
-        const data = await response.json();
-        setError(data.message || 'Registration failed');
+        // Registration successful
+        router.push('/auth/signin?message=Registration successful! Please check your email to verify your account.');
       }
     } catch (error) {
       setError('An error occurred during registration');
@@ -73,8 +61,17 @@ export default function RegisterPage() {
     }
   };
 
-  const handleOAuthSignIn = (provider: string) => {
-    signIn(provider, { callbackUrl: '/' });
+  const handleOAuthSignIn = async (provider: 'google' | 'github') => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`
+      }
+    });
+    
+    if (error) {
+      setError(error.message);
+    }
   };
 
   return (

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { headers } from 'next/headers'
 import { stripe } from '@/lib/stripe'
-import { prisma } from '@/lib/prisma'
 import Stripe from 'stripe'
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!
@@ -50,120 +49,28 @@ export async function POST(request: NextRequest) {
 }
 
 async function handlePaymentSuccess(paymentIntent: Stripe.PaymentIntent) {
-  const orderId = paymentIntent.metadata.orderId
-
-  if (!orderId) {
-    console.error('No orderId in payment intent metadata')
-    return
-  }
-
   try {
-    // Update order status
-    const order = await prisma.order.update({
-      where: { stripePaymentId: paymentIntent.id },
-      data: { status: 'COMPLETED' },
-      include: {
-        items: {
-          include: {
-            sequence: {
-              include: {
-                storefront: {
-                  include: {
-                    sellerProfile: {
-                      select: {
-                        stripeAccountId: true,
-                      },
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    })
-
-    if (!order) {
-      console.error(`Order ${orderId} not found`)
-      return
-    }
-
-    // Process transfers to sellers
-    for (const item of order.items || []) {
-      const seller = item.sequence?.storefront?.sellerProfile
-      
-      if (seller?.stripeAccountId) {
-        const transferAmount = item.price - item.platformFee
-
-        await stripe.transfers.create({
-          amount: transferAmount,
-          currency: 'usd',
-          destination: seller.stripeAccountId,
-          metadata: {
-            orderId: order.id,
-            sequenceId: item.sequenceId,
-            sellerId: order.id, // Using order.id since seller.id is not available in the select
-          },
-        })
-      }
-    }
-
-    console.log(`Order ${orderId} completed successfully`)
+    // TODO: Implement payment success handling with Supabase
+    console.log('Payment succeeded:', paymentIntent.id)
   } catch (error) {
-    console.error(`Failed to process successful payment for order ${orderId}:`, error)
+    console.error('Error handling payment success:', error)
   }
 }
 
 async function handlePaymentFailed(paymentIntent: Stripe.PaymentIntent) {
-  const orderId = paymentIntent.metadata.orderId
-
-  if (!orderId) {
-    console.error('No orderId in payment intent metadata')
-    return
-  }
-
   try {
-    await prisma.order.update({
-      where: { stripePaymentId: paymentIntent.id },
-      data: { status: 'CANCELLED' },
-    })
-
-    console.log(`Order ${orderId} marked as cancelled`)
+    // TODO: Implement payment failure handling with Supabase
+    console.log('Payment failed:', paymentIntent.id)
   } catch (error) {
-    console.error(`Failed to update failed order ${orderId}:`, error)
+    console.error('Error handling payment failure:', error)
   }
 }
 
 async function handleAccountUpdated(account: Stripe.Account) {
   try {
-    let seller
-    try {
-      seller = await prisma.sellerProfile.findFirst({
-        where: { stripeAccountId: account.id },
-      })
-
-      if (seller) {
-        await prisma.sellerProfile.update({
-          where: { id: seller.id },
-          data: {
-            stripeOnboarded: account.details_submitted && account.charges_enabled,
-          },
-        })
-      }
-    } catch (prismaError) {
-      console.error('Prisma error, falling back to Supabase:', prismaError)
-      
-      // Fallback to Supabase - find user with matching stripe account
-      // This is a simplified approach since we don't have direct seller profile lookup
-      // In a real implementation, you might store this mapping in Supabase metadata
-      console.log(`Stripe account ${account.id} updated, but seller profile lookup failed`)
-      return
-    }
-
-    if (seller) {
-      console.log(`Updated seller ${seller.id} onboarding status`)
-    }
+    // TODO: Implement account update handling with Supabase
+    console.log('Account updated:', account.id)
   } catch (error) {
-    console.error(`Failed to update seller account ${account.id}:`, error)
+    console.error('Error handling account update:', error)
   }
 }

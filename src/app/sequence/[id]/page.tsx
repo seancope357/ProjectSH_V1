@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
-import { useSession } from 'next-auth/react'
+import { useAuth } from '@/components/providers/session-provider'
 import Image from 'next/image'
 import { Navigation } from '@/components/ui/navigation'
 import { 
@@ -68,7 +68,7 @@ interface Review {
 
 export default function SequenceDetailsPage() {
   const params = useParams()
-  const { data: session } = useSession()
+  const { user } = useAuth()
   const [sequence, setSequence] = useState<Sequence | null>(null)
   const [reviews, setReviews] = useState<Review[]>([])
   const [loading, setLoading] = useState(true)
@@ -83,7 +83,7 @@ export default function SequenceDetailsPage() {
       fetchReviews()
       checkUserStatus()
     }
-  }, [params.id, session]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [params.id, user]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchSequence = async () => {
     try {
@@ -116,7 +116,7 @@ export default function SequenceDetailsPage() {
     const savedFavorites = JSON.parse(localStorage.getItem('favorites') || '[]')
     setIsFavorited(savedFavorites.includes(params.id))
 
-    if (!session) return
+    if (!user) return
 
     try {
       // Check if favorited on server (for authenticated users)
@@ -145,7 +145,7 @@ export default function SequenceDetailsPage() {
   }
 
   const handleAddToCart = async () => {
-    if (!session) {
+    if (!user) {
       // Redirect to login
       return
     }
@@ -167,7 +167,7 @@ export default function SequenceDetailsPage() {
 
   const handleToggleFavorite = async () => {
     // Handle local storage for non-authenticated users
-    if (!session) {
+    if (!user) {
       const savedFavorites = JSON.parse(localStorage.getItem('favorites') || '[]')
       const newFavorites = isFavorited 
         ? savedFavorites.filter((id: string) => id !== params.id)

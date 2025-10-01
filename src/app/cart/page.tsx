@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useSession } from 'next-auth/react'
+import { useAuth } from '@/components/providers/session-provider'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { Navigation } from '@/components/ui/navigation'
@@ -25,22 +25,22 @@ interface CartItem {
 }
 
 export default function CartPage() {
-  const { data: session, status } = useSession()
+  const { user, loading: authLoading } = useAuth()
   const router = useRouter()
   const [cartItems, setCartItems] = useState<CartItem[]>([])
   const [loading, setLoading] = useState(true)
   const [updating, setUpdating] = useState<string | null>(null)
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
+    if (!authLoading && !user) {
       router.push('/auth/signin')
       return
     }
     
-    if (session) {
+    if (user) {
       fetchCartItems()
     }
-  }, [session, status, router])
+  }, [user, authLoading, router])
 
   const fetchCartItems = async () => {
     try {
