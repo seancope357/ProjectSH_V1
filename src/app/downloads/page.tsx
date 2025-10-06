@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Navigation } from '@/components/ui/navigation'
 import { Download, Search, Calendar, FileDown } from 'lucide-react'
+import { ListRowSkeleton } from '@/components/ui/skeleton'
 
 type DownloadItem = {
   id: string
@@ -112,7 +113,15 @@ export default function DownloadsPage() {
             <h2 className="text-lg font-semibold text-gray-900">Available Downloads</h2>
           </div>
 
-          {loading && <div className="p-6 text-gray-600">Loading downloads...</div>}
+          {loading && (
+            <div className="divide-y divide-gray-200">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="bg-white">
+                  <ListRowSkeleton />
+                </div>
+              ))}
+            </div>
+          )}
           {error && <div className="p-6 text-red-600">{error}</div>}
 
           {!loading && !error && sorted.length === 0 && (

@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import { Navigation } from '@/components/ui/navigation'
 import { Grid, List, Eye, Heart, Star, Download, Filter, Settings } from 'lucide-react'
+import { SequenceCardSkeleton, ListRowSkeleton } from '@/components/ui/skeleton'
 import { useAuth } from '@/components/providers/session-provider'
 
 interface Sequence {
@@ -247,9 +248,23 @@ function SequencesContent() {
 
         {/* Loading State */}
         {loading && (
-          <div className="flex justify-center items-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-          </div>
+          <>
+            {viewMode === 'grid' ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <SequenceCardSkeleton key={i} />
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-4 mb-8">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="bg-white rounded-lg shadow-sm overflow-hidden">
+                    <ListRowSkeleton />
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
         )}
 
         {/* Sequences Grid/List */}
@@ -512,7 +527,18 @@ function SequencesContent() {
 
 export default function SequencesPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center">Loading...</div>}>
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50">
+        <Navigation />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <SequenceCardSkeleton key={i} />
+            ))}
+          </div>
+        </div>
+      </div>
+    }>
       <SequencesContent />
     </Suspense>
   )

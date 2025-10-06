@@ -5,9 +5,12 @@ import { useAuth } from '@/components/providers/session-provider'
 import { Navigation } from '@/components/ui/navigation'
 import { AuthButton } from '@/components/ui/auth-button'
 import { Search, Zap, Shield, Users, ArrowRight } from 'lucide-react'
+import { useFeatureFlags } from '@/components/providers/feature-flags'
 
 export default function HomePage() {
   const { user } = useAuth()
+  const { enableAnimations, reducedMotion } = useFeatureFlags()
+  const pulseClass = (!enableAnimations || reducedMotion) ? '' : 'animate-pulse'
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -18,10 +21,10 @@ export default function HomePage() {
         {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 via-transparent to-purple-500/20"></div>
         
-        {/* Animated Background Elements */}
+        {/* Animated Background Elements (guarded by motion-reduce and feature flag) */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-40 -right-32 w-80 h-80 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute -bottom-40 -left-32 w-80 h-80 bg-purple-300/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+          <div className={`absolute -top-40 -right-32 w-80 h-80 bg-white/10 rounded-full blur-3xl ${pulseClass}`}></div>
+          <div className={`absolute -bottom-40 -left-32 w-80 h-80 bg-purple-300/10 rounded-full blur-3xl ${pulseClass}`} style={{ animationDelay: (!enableAnimations || reducedMotion) ? undefined : '1000ms' }}></div>
         </div>
         
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-40">

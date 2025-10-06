@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { AuthSessionProvider } from "@/components/providers/session-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { FeatureFlagsProvider } from "@/components/providers/feature-flags";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -34,7 +35,9 @@ export default function RootLayout({
           storageKey="sequencehub-theme-v2"
         >
           <AuthSessionProvider>
-            {children}
+            <FeatureFlagsProvider>
+              {children}
+            </FeatureFlagsProvider>
           </AuthSessionProvider>
         </ThemeProvider>
       </body>

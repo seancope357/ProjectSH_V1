@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Navigation } from '@/components/ui/navigation'
 import { Package, Star, Calendar, Search, Eye, RefreshCw } from 'lucide-react'
+import { ListRowSkeleton } from '@/components/ui/skeleton'
 
 type OrderItem = {
   id: string
@@ -215,7 +216,13 @@ export default function OrdersPage() {
           
           <div className="divide-y divide-gray-200">
             {loading && (
-              <div className="p-6 text-gray-600">Loading orders...</div>
+              <>
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="bg-white">
+                    <ListRowSkeleton />
+                  </div>
+                ))}
+              </>
             )}
             {error && (
               <div className="p-6 text-red-600">{error}</div>
