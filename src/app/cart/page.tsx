@@ -112,8 +112,34 @@ export default function CartPage() {
     }
   }
 
-  const proceedToCheckout = () => {
-    router.push('/checkout')
+  const proceedToCheckout = async () => {
+    try {
+      const items = cartItems.map((item) => ({ sequenceId: item.sequence.id }))
+      const response = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items,
+          successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+          cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/cart`,
+        }),
+      })
+
+      if (!response.ok) {
+        console.error('Checkout failed')
+        return
+      }
+
+      const data = await response.json()
+      if (data.url) {
+        // Redirect to Stripe Checkout
+        window.location.href = data.url
+      } else {
+        console.error('No checkout URL returned')
+      }
+    } catch (error) {
+      console.error('Error during checkout:', error)
+    }
   }
 
   const subtotal = cartItems.reduce((sum, item) => sum + (item.sequence.price * item.quantity), 0)

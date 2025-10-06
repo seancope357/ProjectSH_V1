@@ -1,5 +1,36 @@
 # Deployment Checklist
 
+## Production Checklist
+
+Use this section to quickly validate your live configuration on Vercel.
+
+### Environment (set in Vercel → Project Settings → Environment Variables)
+- `NEXT_PUBLIC_APP_URL` = `https://project-sh-v1.vercel.app`
+- `NEXT_PUBLIC_SUPABASE_URL` = `https://tgceeslucxaczluzfpqe.supabase.co`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` = `<your-anon-key>`
+- `SUPABASE_SERVICE_ROLE_KEY` = `<your-service-role-key>`
+- `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` = `<your-publishable-key>`
+- `STRIPE_SECRET_KEY` = `<your-secret-key>`
+- `STRIPE_WEBHOOK_SECRET` = `<your-webhook-secret>`
+
+### Stripe Endpoints
+- Webhook endpoint: `https://project-sh-v1.vercel.app/api/webhooks/stripe`
+- Checkout success URL: `https://project-sh-v1.vercel.app/checkout/success?session_id={CHECKOUT_SESSION_ID}`
+- Checkout cancel URL: `https://project-sh-v1.vercel.app/cart`
+
+### Supabase Auth Settings
+- Site URL: `https://project-sh-v1.vercel.app`
+- Redirect URLs:
+  - `https://project-sh-v1.vercel.app/auth/callback`
+  - `http://localhost:3000/auth/callback` (development)
+
+### Post-Deploy Verification
+- Visit `/cart`, add item, click “Proceed to Checkout”
+- Complete Stripe payment; confirm redirect to `/checkout/success`
+- Check `/orders` shows the new order (`subtotal`, `tax`, `platform_fee`, `total`)
+- Verify `downloads` entries exist and `sequences.download_count` incremented
+- Confirm webhooks are received successfully in Stripe Dashboard
+
 ## Pre-Deployment Checklist
 
 ### ✅ Environment Variables
