@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase-server'
+import { db } from '@/lib/supabase-db'
 
 export async function GET(request: NextRequest) {
   try {
@@ -10,11 +11,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // TODO: Implement order retrieval with Supabase
-    return NextResponse.json(
-      { error: 'Order retrieval functionality temporarily unavailable' },
-      { status: 503 }
-    )
+    const orders = await db.orders.findMany(user.id)
+    return NextResponse.json({ orders })
   } catch (error) {
     console.error('Order retrieval error:', error)
     return NextResponse.json(

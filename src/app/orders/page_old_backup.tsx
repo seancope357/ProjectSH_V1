@@ -1,68 +1,71 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 import { Navigation } from '@/components/ui/navigation'
-import { Package, Star, Calendar, Search, Eye, RefreshCw } from 'lucide-react'
+import { Package, Download, Star, Calendar, Search, Eye, RefreshCw } from 'lucide-react'
 
-type OrderItem = {
-  id: string
-  sequence_id: string
-  price: number
-  seller_id: string
-  sequences?: {
-    id: string
-    title: string
-    price: number
-    thumbnail_url?: string | null
+const orderData = [
+  {
+    id: 'ORD-001',
+    sequenceName: 'Advanced Email Automation',
+    seller: 'AutomationPro',
+    price: 29.99,
+    date: '2024-01-20',
+    status: 'completed',
+    rating: 5,
+    category: 'Productivity'
+  },
+  {
+    id: 'ORD-002',
+    sequenceName: 'Gaming Macro Bundle',
+    seller: 'GameMaster',
+    price: 19.99,
+    date: '2024-01-18',
+    status: 'completed',
+    rating: 4,
+    category: 'Gaming'
+  },
+  {
+    id: 'ORD-003',
+    sequenceName: 'Design Workflow Optimizer',
+    seller: 'CreativeFlow',
+    price: 39.99,
+    date: '2024-01-15',
+    status: 'processing',
+    rating: null,
+    category: 'Creative'
+  },
+  {
+    id: 'ORD-004',
+    sequenceName: 'Data Analysis Scripts',
+    seller: 'DataWizard',
+    price: 49.99,
+    date: '2024-01-12',
+    status: 'completed',
+    rating: 5,
+    category: 'Development'
+  },
+  {
+    id: 'ORD-005',
+    sequenceName: 'Social Media Scheduler',
+    seller: 'SocialBot',
+    price: 24.99,
+    date: '2024-01-10',
+    status: 'refunded',
+    rating: null,
+    category: 'Marketing'
   }
-}
-
-type Order = {
-  id: string
-  created_at: string
-  status: string
-  subtotal: number
-  tax: number
-  platform_fee: number
-  total: number
-  order_items: OrderItem[]
-}
+]
 
 export default function OrdersPage() {
-  const [orders, setOrders] = useState<Order[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [sortBy, setSortBy] = useState('date')
-  const router = useRouter()
-
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        setLoading(true)
-        const res = await fetch('/api/orders')
-        if (!res.ok) {
-          const body = await res.json().catch(() => ({}))
-          throw new Error(body?.error || `Failed to load orders (${res.status})`)
-        }
-        const data = await res.json()
-        setOrders(data.orders || [])
-      } catch (e: any) {
-        setError(e.message || 'Failed to load orders')
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchOrders()
-  }, [])
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'completed':
         return 'bg-green-100 text-green-800'
-      case 'pending':
       case 'processing':
         return 'bg-yellow-100 text-yellow-800'
       case 'refunded':
@@ -76,7 +79,6 @@ export default function OrdersPage() {
     switch (status) {
       case 'completed':
         return <Package className="h-4 w-4" />
-      case 'pending':
       case 'processing':
         return <RefreshCw className="h-4 w-4" />
       case 'refunded':
@@ -86,41 +88,33 @@ export default function OrdersPage() {
     }
   }
 
-  const filteredOrders = useMemo(() => {
-    return orders.filter(order => {
-      const itemNames = order.order_items.map(i => i.sequences?.title || '').join(' ')
-      const matchesSearch = itemNames.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           order.id.toLowerCase().includes(searchTerm.toLowerCase())
-      const matchesStatus = statusFilter === 'all' || order.status === statusFilter
-      return matchesSearch && matchesStatus
-    })
-  }, [orders, searchTerm, statusFilter])
+  const filteredOrders = orderData.filter(order => {
+    const matchesSearch = order.sequenceName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         order.seller.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         order.id.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesStatus = statusFilter === 'all' || order.status === statusFilter
+    return matchesSearch && matchesStatus
+  })
 
-  const sortedOrders = useMemo(() => {
-    return [...filteredOrders].sort((a, b) => {
-      switch (sortBy) {
-        case 'date':
-          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-        case 'price':
-          return Number(b.total || 0) - Number(a.total || 0)
-        case 'name':
-          const aName = a.order_items[0]?.sequences?.title || ''
-          const bName = b.order_items[0]?.sequences?.title || ''
-          return aName.localeCompare(bName)
-        default:
-          return 0
-      }
-    })
-  }, [filteredOrders, sortBy])
+  const sortedOrders = [...filteredOrders].sort((a, b) => {
+    switch (sortBy) {
+      case 'date':
+        return new Date(b.date).getTime() - new Date(a.date).getTime()
+      case 'price':
+        return b.price - a.price
+      case 'name':
+        return a.sequenceName.localeCompare(b.sequenceName)
+      default:
+        return 0
+    }
+  })
 
-  const totalSpent = useMemo(() => {
-    return orders
-      .filter(order => order.status === 'completed')
-      .reduce((sum, order) => sum + Number(order.total || 0), 0)
-  }, [orders])
+  const totalSpent = orderData
+    .filter(order => order.status === 'completed')
+    .reduce((sum, order) => sum + order.price, 0)
 
-  const totalOrders = orders.length
-  const completedOrders = orders.filter(order => order.status === 'completed').length
+  const totalOrders = orderData.length
+  const completedOrders = orderData.filter(order => order.status === 'completed').length
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -153,7 +147,7 @@ export default function OrdersPage() {
                 <p className="text-sm font-medium text-gray-600">Completed</p>
                 <p className="text-2xl font-bold text-gray-900">{completedOrders}</p>
               </div>
-              <Package className="h-8 w-8 text-green-500" />
+              <Download className="h-8 w-8 text-green-500" />
             </div>
           </div>
           
@@ -190,7 +184,7 @@ export default function OrdersPage() {
               >
                 <option value="all">All Status</option>
                 <option value="completed">Completed</option>
-                <option value="pending">Pending</option>
+                <option value="processing">Processing</option>
                 <option value="refunded">Refunded</option>
               </select>
               
@@ -214,22 +208,12 @@ export default function OrdersPage() {
           </div>
           
           <div className="divide-y divide-gray-200">
-            {loading && (
-              <div className="p-6 text-gray-600">Loading orders...</div>
-            )}
-            {error && (
-              <div className="p-6 text-red-600">{error}</div>
-            )}
-            {!loading && !error && sortedOrders.map((order) => (
+            {sortedOrders.map((order) => (
               <div key={order.id} className="p-6 hover:bg-gray-50 transition-colors">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-lg font-medium text-gray-900">
-                        {order.order_items.length > 1
-                          ? `${order.order_items[0]?.sequences?.title || 'Sequence'} + ${order.order_items.length - 1} more`
-                          : order.order_items[0]?.sequences?.title || 'Sequence'}
-                      </h3>
+                      <h3 className="text-lg font-medium text-gray-900">{order.sequenceName}</h3>
                       <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
                         {getStatusIcon(order.status)}
                         {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
@@ -238,32 +222,60 @@ export default function OrdersPage() {
                     
                     <div className="flex items-center gap-6 text-sm text-gray-600">
                       <span>Order #{order.id}</span>
+                      <span>by {order.seller}</span>
+                      <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                        {order.category}
+                      </span>
                       <div className="flex items-center gap-1">
                         <Calendar className="h-4 w-4" />
-                        {new Date(order.created_at).toLocaleString()}
+                        {order.date}
                       </div>
                     </div>
+                    
+                    {order.rating && (
+                      <div className="flex items-center gap-1 mt-2">
+                        <span className="text-sm text-gray-600">Your rating:</span>
+                        {[...Array(5)].map((_, i) => (
+                          <Star
+                            key={i}
+                            className={`h-4 w-4 ${
+                              i < order.rating ? 'text-yellow-500 fill-current' : 'text-gray-300'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    )}
                   </div>
                   
                   <div className="text-right">
                     <div className="text-lg font-semibold text-gray-900 mb-2">
-                      ${Number(order.total || 0).toFixed(2)}
+                      ${order.price.toFixed(2)}
                     </div>
                     
                     <div className="flex gap-2">
                       {order.status === 'completed' && (
-                        <button
-                          onClick={() => router.push(`/orders/${order.id}`)}
-                          className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2 text-sm"
-                        >
-                          <Eye className="h-4 w-4" />
-                          View
-                        </button>
+                        <>
+                          <button className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2 text-sm">
+                            <Download className="h-4 w-4" />
+                            Download
+                          </button>
+                          <button className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2 text-sm">
+                            <Eye className="h-4 w-4" />
+                            View
+                          </button>
+                        </>
                       )}
-                      {order.status === 'pending' && (
+                      
+                      {order.status === 'processing' && (
                         <button className="bg-yellow-100 text-yellow-800 px-4 py-2 rounded-lg cursor-not-allowed text-sm">
                           Processing...
                         </button>
+                      )}
+                      
+                      {order.status === 'refunded' && (
+                        <span className="bg-red-100 text-red-800 px-4 py-2 rounded-lg text-sm">
+                          Refunded
+                        </span>
                       )}
                     </div>
                   </div>
@@ -272,14 +284,14 @@ export default function OrdersPage() {
             ))}
           </div>
           
-          {!loading && !error && sortedOrders.length === 0 && (
+          {sortedOrders.length === 0 && (
             <div className="p-12 text-center">
               <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-gray-900 mb-2">No orders found</h3>
               <p className="text-gray-600">
                 {searchTerm || statusFilter !== 'all' 
                   ? 'Try adjusting your search or filters'
-                  : 'You haven\'t made any purchases yet'
+                  : 'You haven&apos;t made any purchases yet'
                 }
               </p>
             </div>
