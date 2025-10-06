@@ -1,40 +1,87 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/supabase-db'
 
+function isUUID(value: string) {
+  // Simple UUID v4 check
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value)
+}
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const category = searchParams.get('category') || ''
+    const categoryParam = searchParams.get('category') || ''
     const sort = searchParams.get('sort') || 'newest'
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '12')
 
-    // Build filters
+    // Build filters — only pass category if it looks like a UUID (DB ID)
     const filters: any = {}
-    
-    if (category) {
-      filters.category = category
+    if (categoryParam && isUUID(categoryParam)) {
+      filters.category = categoryParam
     }
-    
-    // Get sequences using Supabase
-    const sequences = await db.sequences.findMany(filters)
+
+    // Try fetching from DB, fall back to mock if env/config issues
+    let sequences: any[] = []
+    try {
+      sequences = await db.sequences.findMany(filters)
+    } catch (dbError) {
+      console.warn('Supabase unavailable, serving mock sequences:', dbError)
+      sequences = [
+        {
+          id: '00000000-0000-4000-8000-000000000001',
+          title: 'Christmas Wonderland',
+          description: 'A magical Christmas light sequence with twinkling effects and smooth transitions.',
+          price: 12.99,
+          category: { name: 'Holiday & Seasonal' },
+          tags: ['christmas', 'twinkling', 'festive'],
+          rating: 4.8,
+          rating_count: 128,
+          download_count: 1250,
+          preview_url: '/images/sequence-preview-default.jpg',
+          thumbnail_url: '/images/sequence-preview-default.jpg',
+          seller: { username: 'lightmaster', full_name: 'LightMaster Pro' },
+          created_at: '2024-01-15T00:00:00.000Z',
+          updated_at: '2024-01-15T00:00:00.000Z'
+        },
+        {
+          id: '00000000-0000-4000-8000-000000000002',
+          title: 'Halloween Spooktacular',
+          description: 'Spooky sequence with eerie fades and strobe bursts.',
+          price: 9.99,
+          category: { name: 'Holiday & Seasonal' },
+          tags: ['halloween', 'strobe', 'spooky'],
+          rating: 4.6,
+          rating_count: 84,
+          download_count: 870,
+          preview_url: '/images/sequence-preview-default.jpg',
+          thumbnail_url: '/images/sequence-preview-default.jpg',
+          seller: { username: 'spookylights', full_name: 'Spooky Lights Co.' },
+          created_at: '2024-02-10T00:00:00.000Z',
+          updated_at: '2024-02-10T00:00:00.000Z'
+        }
+      ]
+    }
 
     // Apply sorting and pagination in memory for now
     // TODO: Move sorting to database level for better performance
     let sortedSequences = [...sequences]
-    
+
     switch (sort) {
       case 'price-low':
-        sortedSequences.sort((a, b) => a.price - b.price)
+        sortedSequences.sort((a, b) => (a.price || 0) - (b.price || 0))
         break
       case 'price-high':
-        sortedSequences.sort((a, b) => b.price - a.price)
+        sortedSequences.sort((a, b) => (b.price || 0) - (a.price || 0))
         break
       case 'popular':
+      case 'downloads':
         sortedSequences.sort((a, b) => (b.download_count || 0) - (a.download_count || 0))
         break
       case 'rating':
         sortedSequences.sort((a, b) => (b.rating || 0) - (a.rating || 0))
+        break
+      case 'oldest':
+        sortedSequences.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
         break
       default:
         sortedSequences.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
@@ -67,6 +114,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       sequences: formattedSequences,
+      total, // Frontend expects top-level total for pagination
       pagination: {
         page,
         limit,
