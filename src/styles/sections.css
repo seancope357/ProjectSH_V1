@@ -28,11 +28,17 @@ main header p {
 
 /* Section spacing and visual separation */
 section {
-  @apply relative;
+  @apply relative z-0;
 }
 
+/* Increase spacing to prevent subtle overlap/cropping at boundaries */
 section + section {
-  @apply mt-2 md:mt-3;
+  @apply mt-4 md:mt-6;
+}
+
+/* Ensure anchored targets don't sit under nav or adjacent sections */
+:is(h1, h2, h3, section)[id] {
+  scroll-margin-top: 5rem; /* offset for potential headers/sticky elements */
 }
 
 /* Section backgrounds for better visual separation */

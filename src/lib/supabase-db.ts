@@ -15,28 +15,27 @@ export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
 export const db = {
   // Sequences
   sequences: {
-    async findMany(filters?: { category?: string; status?: string; sellerId?: string }) {
+    async findMany(filters: { category?: string; status?: string; sellerId?: string } = {}) {
       let query = supabaseAdmin
         .from('sequences')
         .select(`
           *,
-          seller:profiles!sequences_seller_id_fkey(username, id),
-          category:categories!sequences_category_id_fkey(name, id)
+          category:categories(name),
+          seller:profiles!seller_id(username, full_name)
         `)
-      
-      if (filters?.category) {
+        .eq('is_active', true)
+        .eq('is_approved', true)
+
+      if (filters.category) {
         query = query.eq('category_id', filters.category)
       }
-      if (filters?.status) {
-        query = query.eq('status', filters.status)
-      }
-      if (filters?.sellerId) {
+      if (filters.sellerId) {
         query = query.eq('seller_id', filters.sellerId)
       }
-      
+
       const { data, error } = await query
       if (error) throw error
-      return data
+      return data || []
     },
 
     async findById(id: string) {
@@ -44,14 +43,30 @@ export const db = {
         .from('sequences')
         .select(`
           *,
-          seller:profiles!sequences_seller_id_fkey(username, id),
-          category:categories!sequences_category_id_fkey(name, id)
+          category:categories(name),
+          seller:profiles!seller_id(username, full_name)
         `)
         .eq('id', id)
         .single()
-      
+
       if (error) throw error
       return data
+    },
+
+    async findByIds(ids: string[]) {
+      const { data, error } = await supabaseAdmin
+        .from('sequences')
+        .select(`
+          *,
+          category:categories(name),
+          seller:profiles!seller_id(username, full_name)
+        `)
+        .in('id', ids)
+        .eq('is_active', true)
+        .eq('is_approved', true)
+
+      if (error) throw error
+      return data || []
     },
 
     async create(sequence: any) {
@@ -60,7 +75,7 @@ export const db = {
         .insert(sequence)
         .select()
         .single()
-      
+
       if (error) throw error
       return data
     },
@@ -72,7 +87,7 @@ export const db = {
         .eq('id', id)
         .select()
         .single()
-      
+
       if (error) throw error
       return data
     },
@@ -82,9 +97,10 @@ export const db = {
         .from('sequences')
         .delete()
         .eq('id', id)
-      
+
       if (error) throw error
-    }
+      return true
+    },
   },
 
   // Orders
@@ -94,30 +110,90 @@ export const db = {
         .from('orders')
         .select(`
           *,
-          order_items(
+          order_items (
             *,
-            sequence:sequences(title, price, seller:profiles!sequences_seller_id_fkey(username))
+            sequences (
+              id,
+              title,
+              price,
+              thumbnail_url
+            )
           )
         `)
-      
+        .order('created_at', { ascending: false })
+
       if (userId) {
         query = query.eq('user_id', userId)
       }
-      
+
       const { data, error } = await query
       if (error) throw error
+      return data || []
+    },
+
+    async findById(id: string) {
+      const { data, error } = await supabaseAdmin
+        .from('orders')
+        .select(`
+          *,
+          order_items (
+            *,
+            sequences (
+              id,
+              title,
+              price,
+              thumbnail_url
+            )
+          )
+        `)
+        .eq('id', id)
+        .single()
+
+      if (error) throw error
+      
+      // Transform order_items to items for compatibility
+      if (data && data.order_items) {
+        data.items = data.order_items.map((item: any) => ({
+          sequence_id: item.sequence_id,
+          price: item.price,
+          seller_id: item.seller_id,
+          sequence: item.sequences
+        }))
+      }
+      
       return data
     },
 
     async create(order: any) {
-      const { data, error } = await supabaseAdmin
+      const { items, ...orderData } = order
+      
+      // Create the order first
+      const { data: orderResult, error: orderError } = await supabaseAdmin
         .from('orders')
-        .insert(order)
+        .insert(orderData)
         .select()
         .single()
-      
-      if (error) throw error
-      return data
+
+      if (orderError) throw orderError
+
+      // Create order items
+      if (items && items.length > 0) {
+        const orderItems = items.map((item: any) => ({
+          order_id: orderResult.id,
+          sequence_id: item.sequence_id,
+          price: item.price,
+          seller_id: item.seller_id,
+          seller_payout: item.seller_payout,
+        }))
+
+        const { error: itemsError } = await supabaseAdmin
+          .from('order_items')
+          .insert(orderItems)
+
+        if (itemsError) throw itemsError
+      }
+
+      return orderResult
     },
 
     async update(id: string, updates: any) {
@@ -127,10 +203,10 @@ export const db = {
         .eq('id', id)
         .select()
         .single()
-      
+
       if (error) throw error
       return data
-    }
+    },
   },
 
   // Cart
@@ -207,6 +283,62 @@ export const db = {
   },
 
   // Profiles
+  downloads: {
+    async findMany(userId?: string) {
+      let query = supabaseAdmin
+        .from('downloads')
+        .select(`
+          *,
+          sequences (
+            id,
+            title,
+            thumbnail_url,
+            file_url
+          )
+        `)
+        .order('created_at', { ascending: false })
+
+      if (userId) {
+        query = query.eq('user_id', userId)
+      }
+
+      const { data, error } = await query
+      if (error) throw error
+      return data || []
+    },
+
+    async create(download: any) {
+      const { data, error } = await supabaseAdmin
+        .from('downloads')
+        .insert(download)
+        .select()
+        .single()
+
+      if (error) throw error
+      return data
+    },
+
+    async update(id: string, updates: any) {
+      const { data, error } = await supabaseAdmin
+        .from('downloads')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single()
+
+      if (error) throw error
+      return data
+    },
+
+    async incrementDownloadCount(id: string) {
+      const { data, error } = await supabaseAdmin
+        .rpc('increment_download_count', { download_id: id })
+
+      if (error) throw error
+      return data
+    },
+  },
+
   profiles: {
     async findById(id: string) {
       const { data, error } = await supabaseAdmin

@@ -34,9 +34,9 @@ This guide will help you set up your SequenceHUB marketplace with Vercel and Sup
 
 ### Step 4: Configure Authentication
 1. Go to Authentication → Settings
-2. Add your domain to **Site URL** (e.g., `https://your-app.vercel.app`)
+2. Add your domain to **Site URL** (e.g., `https://project-sh-v1.vercel.app`)
 3. Add redirect URLs under **Redirect URLs**:
-   - `https://your-app.vercel.app/auth/callback`
+   - `https://project-sh-v1.vercel.app/auth/callback`
    - `http://localhost:3000/auth/callback` (for development)
 
 ## 2. Vercel Setup
@@ -52,7 +52,7 @@ In your Vercel project settings, add these environment variables:
 
 ```bash
 # App Configuration
-NEXT_PUBLIC_APP_URL=https://your-app.vercel.app
+NEXT_PUBLIC_APP_URL=https://project-sh-v1.vercel.app
 # NextAuth variables are no longer needed - using Supabase authentication
 # NEXTAUTH_URL=https://your-app.vercel.app
 # NEXTAUTH_SECRET=<generate with: openssl rand -base64 32>
@@ -86,7 +86,7 @@ PLATFORM_FEE_FIXED_CENTS=50
 ### Step 3: Deploy
 1. Click "Deploy" in Vercel
 2. Wait for the build to complete
-3. Your app will be available at `https://your-app.vercel.app`
+3. Your app will be available at `https://project-sh-v1.vercel.app`
 
 ## 3. Database Migration
 
@@ -120,7 +120,7 @@ npx prisma db push
 3. Enable Google+ API
 4. Go to Credentials → Create Credentials → OAuth 2.0 Client IDs
 5. Add authorized redirect URIs:
-   - `https://your-app.vercel.app/api/auth/callback/google`
+   - `https://project-sh-v1.vercel.app/api/auth/callback/google`
    - `http://localhost:3000/api/auth/callback/google`
 6. Copy Client ID and Client Secret to your environment variables
 
@@ -129,7 +129,7 @@ npx prisma db push
 1. Go to [Stripe Dashboard](https://dashboard.stripe.com)
 2. Get your API keys from Developers → API keys
 3. Set up webhooks at Developers → Webhooks:
-   - Endpoint URL: `https://your-app.vercel.app/api/webhooks/stripe`
+   - Endpoint URL: `https://project-sh-v1.vercel.app/api/webhooks/stripe`
    - Events to send: `payment_intent.succeeded`, `account.updated`, etc.
 4. Copy the webhook signing secret
 

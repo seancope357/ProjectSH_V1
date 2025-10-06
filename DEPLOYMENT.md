@@ -28,7 +28,7 @@
 - [ ] Site URL and redirect URLs configured
 
 ### ✅ Stripe Configuration
-- [ ] Webhook endpoint configured: `https://your-app.vercel.app/api/webhooks/stripe`
+- [ ] Webhook endpoint configured: `https://project-sh-v1.vercel.app/api/webhooks/stripe`
 - [ ] Required webhook events enabled:
   - `payment_intent.succeeded`
   - `payment_intent.payment_failed`
@@ -40,7 +40,7 @@
 ### ✅ Google OAuth Configuration
 - [ ] OAuth consent screen configured
 - [ ] Authorized redirect URIs added:
-  - `https://your-app.vercel.app/api/auth/callback/google`
+  - `https://project-sh-v1.vercel.app/api/auth/callback/google`
 - [ ] Domain verification completed (if required)
 
 ## Deployment Steps
@@ -62,7 +62,7 @@ npx prisma generate
 npx prisma db push
 
 # Option 2: Run migration in Vercel function
-# Visit: https://your-app.vercel.app/api/migrate
+# Visit: https://project-sh-v1.vercel.app/api/migrate
 ```
 
 ### 3. Verify Deployment
