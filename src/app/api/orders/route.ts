@@ -12,7 +12,20 @@ export async function GET(request: NextRequest) {
     }
 
     const orders = await db.orders.findMany(user.id)
-    return NextResponse.json({ orders })
+
+    // Normalize order items shape: expose `items` consistently
+    const normalized = (orders || []).map((order: any) => {
+      const { order_items, ...rest } = order || {}
+      const items = (order_items || []).map((item: any) => ({
+        sequence_id: item.sequence_id,
+        price: item.price,
+        seller_id: item.seller_id,
+        sequence: item.sequences,
+      }))
+      return { ...rest, items }
+    })
+
+    return NextResponse.json({ orders: normalized })
   } catch (error) {
     console.error('Order retrieval error:', error)
     return NextResponse.json(

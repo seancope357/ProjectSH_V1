@@ -1,79 +1,181 @@
 "use client"
+
 import { useEffect, useState } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
+import { Navigation } from '@/components/ui/navigation'
+import { CheckCircle, Download, Receipt, Info, Calendar } from 'lucide-react'
+
+type SessionInfo = {
+  status: string
+  customerEmail?: string | null
+  amountTotal?: number | null
+  currency?: string | null
+  orderId?: string | null
+}
 
 export default function CheckoutSuccessPage() {
-  const searchParams = useSearchParams()
-  const router = useRouter()
-  const sessionId = searchParams.get('session_id')
-  const [status, setStatus] = useState<'loading' | 'succeeded' | 'pending' | 'failed' | 'unknown'>('loading')
+  const params = useSearchParams()
+  const sessionId = params.get('session_id')
+  const [loading, setLoading] = useState(!!sessionId)
   const [error, setError] = useState<string | null>(null)
+  const [session, setSession] = useState<SessionInfo | null>(null)
+  const [latestOrder, setLatestOrder] = useState<{
+    id: string
+    created_at: string
+    status: string
+    total: number
+    items: Array<{ sequence_id: string; price: number; seller_id: string; sequence?: { title?: string } }>
+  } | null>(null)
 
   useEffect(() => {
-    async function fetchSession() {
-      if (!sessionId) {
-        setStatus('unknown')
-        return
-      }
+    const fetchSession = async () => {
+      if (!sessionId) return
       try {
-        const res = await fetch(`/api/checkout?session_id=${sessionId}`)
-        if (!res.ok) throw new Error('Failed to retrieve session')
+        setLoading(true)
+        const res = await fetch(`/api/checkout?session_id=${encodeURIComponent(sessionId)}`)
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({}))
+          throw new Error(body?.error || `Failed to load session (${res.status})`)
+        }
         const data = await res.json()
-        // Stripe returns payment_status: 'paid' when completed
-        const paymentStatus = data.status
-        if (paymentStatus === 'paid') setStatus('succeeded')
-        else if (paymentStatus === 'unpaid') setStatus('pending')
-        else setStatus('unknown')
+        setSession(data)
       } catch (e: any) {
-        setError(e.message || 'Unknown error')
-        setStatus('failed')
+        setError(e.message || 'Failed to load session')
+      } finally {
+        setLoading(false)
       }
     }
     fetchSession()
   }, [sessionId])
 
+  useEffect(() => {
+    const fetchLatestOrder = async () => {
+      try {
+        const res = await fetch('/api/orders')
+        if (!res.ok) {
+          return
+        }
+        const data = await res.json()
+        const orders = Array.isArray(data.orders) ? data.orders : []
+        const completed = orders.filter((o: any) => o.status === 'completed')
+        if (completed.length > 0) {
+          // Orders API returns newest first; take the first
+          setLatestOrder(completed[0])
+        }
+      } catch {}
+    }
+    fetchLatestOrder()
+  }, [])
+
   return (
-    <div className="max-w-2xl mx-auto px-6 py-12">
-      <h1 className="text-2xl font-semibold mb-2">Payment Status</h1>
-      {status === 'loading' && (
-        <p className="text-gray-600">Checking your payment...</p>
-      )}
-      {status === 'succeeded' && (
-        <div className="space-y-4">
-          <p className="text-green-600">Payment completed. Your downloads are ready.</p>
-          <div className="flex gap-3">
-            <button
-              onClick={() => router.push('/orders')}
-              className="bg-blue-600 text-white px-4 py-2 rounded"
-            >
-              View Orders
-            </button>
-            <button
-              onClick={() => router.push('/sequences')}
-              className="border border-gray-300 px-4 py-2 rounded"
-            >
-              Continue Shopping
-            </button>
+    <div className="min-h-screen bg-gray-50">
+      <Navigation />
+
+      <div className="bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <h1 className="text-3xl font-bold text-gray-900">Payment Successful</h1>
+          <p className="mt-2 text-gray-600">Your purchase has been processed. Downloads are ready when the order completes.</p>
+        </div>
+      </div>
+
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="flex items-start gap-3">
+            <CheckCircle className="h-6 w-6 text-green-600 mt-1" />
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900">Thank you for your purchase!</h2>
+              {sessionId ? (
+                <p className="text-gray-600">We’re confirming your payment details. This page reflects your session status.</p>
+              ) : (
+                <p className="text-gray-600">No session detected. If you reached this page after checkout, your order should still be visible.</p>
+              )}
+            </div>
           </div>
+
+          {loading && <div className="mt-4 text-gray-600">Loading session details...</div>}
+          {error && <div className="mt-4 text-red-600">{error}</div>}
+
+          {!loading && !error && session && (
+            <div className="mt-6 space-y-2 text-gray-700">
+              <div className="flex items-center gap-2">
+                <Info className="h-4 w-4 text-gray-500" />
+                <span>Status: <span className="font-medium capitalize">{session.status || 'unknown'}</span></span>
+              </div>
+              {session.customerEmail && (
+                <div>Email: <span className="font-medium">{session.customerEmail}</span></div>
+              )}
+              {session.amountTotal && (
+                <div>Total: <span className="font-medium">{(session.amountTotal / 100).toFixed(2)} {session.currency?.toUpperCase()}</span></div>
+              )}
+            </div>
+          )}
+
+          <div className="mt-8 flex flex-wrap gap-3">
+            <a
+              href="/downloads"
+              className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+            >
+              <Download className="h-4 w-4" />
+              Go to Downloads
+            </a>
+            {session?.orderId && session?.status === 'paid' && (
+              <a
+                href={`/orders/${session.orderId}`}
+                className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-gray-800 hover:bg-gray-100"
+              >
+                <Receipt className="h-4 w-4" />
+                View Receipt
+              </a>
+            )}
+            <a
+              href="/orders"
+              className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-gray-800 hover:bg-gray-100"
+            >
+              <Receipt className="h-4 w-4" />
+              View Orders
+            </a>
+          </div>
+
+          {latestOrder && (
+            <div className="mt-8 border rounded-lg p-4">
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">Latest Completed Order</h3>
+                  <div className="mt-1 flex items-center gap-3 text-sm text-gray-600">
+                    <span>Order #{latestOrder.id}</span>
+                    <span className="flex items-center gap-1">
+                      <Calendar className="h-4 w-4" />
+                      {new Date(latestOrder.created_at).toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+                <span className="text-gray-900 font-semibold">${Number(latestOrder.total || 0).toFixed(2)}</span>
+              </div>
+              <p className="mt-2 text-sm text-gray-600">
+                {latestOrder.items?.length > 1
+                  ? `${latestOrder.items[0]?.sequence?.title || 'Sequence'} + ${latestOrder.items.length - 1} more`
+                  : latestOrder.items[0]?.sequence?.title || 'Sequence'}
+              </p>
+              <div className="mt-4 flex gap-2">
+                <a
+                  href={`/orders/${latestOrder.id}`}
+                  className="inline-flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-gray-800 hover:bg-gray-100"
+                >
+                  <Receipt className="h-4 w-4" />
+                  View Receipt
+                </a>
+                <a
+                  href="/downloads"
+                  className="inline-flex items-center gap-2 bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700"
+                >
+                  <Download className="h-4 w-4" />
+                  Go to Downloads
+                </a>
+              </div>
+            </div>
+          )}
         </div>
-      )}
-      {status === 'pending' && (
-        <p className="text-yellow-600">Payment pending. Please wait or check your email.</p>
-      )}
-      {status === 'unknown' && (
-        <p className="text-gray-600">Unable to confirm payment. You can check your orders.</p>
-      )}
-      {status === 'failed' && (
-        <div>
-          <p className="text-red-600">Failed to verify payment{error ? `: ${error}` : ''}.</p>
-          <button
-            onClick={() => router.push('/cart')}
-            className="mt-4 bg-red-600 text-white px-4 py-2 rounded"
-          >
-            Return to Cart
-          </button>
-        </div>
-      )}
+      </div>
     </div>
   )
 }

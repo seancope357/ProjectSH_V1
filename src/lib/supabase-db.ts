@@ -15,6 +15,33 @@ export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
 export const db = {
   // Sequences
   sequences: {
+    normalizeFileUrl(fileUrl?: string | null): string | null {
+      if (!fileUrl) return fileUrl ?? null
+      // Already normalized
+      if (fileUrl.startsWith('supabase://')) return fileUrl
+      // Absolute Supabase public URL
+      try {
+        if (fileUrl.startsWith('http')) {
+          const u = new URL(fileUrl)
+          const prefix = '/storage/v1/object/public/'
+          const idx = u.pathname.indexOf(prefix)
+          if (idx >= 0) {
+            const after = u.pathname.slice(idx + prefix.length)
+            const [bucket, ...rest] = after.split('/')
+            const path = rest.join('/')
+            if (bucket && path) return `supabase://${bucket}/${path}`
+          }
+          return fileUrl // external or non-public Supabase URL; leave unchanged
+        }
+      } catch {
+        // If URL parsing fails, fall through
+      }
+      // Relative bucket/path
+      const [bucket, ...rest] = fileUrl.split('/')
+      const path = rest.join('/')
+      if (bucket && path) return `supabase://${bucket}/${path}`
+      return fileUrl
+    },
     async findMany(filters: { category?: string; status?: string; sellerId?: string } = {}) {
       let query = supabaseAdmin
         .from('sequences')
@@ -70,6 +97,9 @@ export const db = {
     },
 
     async create(sequence: any) {
+      if (sequence && 'file_url' in sequence) {
+        sequence.file_url = db.sequences.normalizeFileUrl(sequence.file_url)
+      }
       const { data, error } = await supabaseAdmin
         .from('sequences')
         .insert(sequence)
@@ -81,6 +111,9 @@ export const db = {
     },
 
     async update(id: string, updates: any) {
+      if (updates && 'file_url' in updates) {
+        updates.file_url = db.sequences.normalizeFileUrl(updates.file_url)
+      }
       const { data, error } = await supabaseAdmin
         .from('sequences')
         .update(updates)

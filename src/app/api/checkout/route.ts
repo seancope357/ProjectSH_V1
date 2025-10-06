@@ -135,6 +135,8 @@ export async function GET(request: NextRequest) {
       customerEmail: session.customer_email,
       amountTotal: session.amount_total,
       currency: session.currency,
+      orderId: (session.metadata as any)?.orderId || null,
+      userId: (session.metadata as any)?.userId || null,
     })
   } catch (error) {
     console.error('Session retrieval error:', error)
