@@ -20,7 +20,9 @@ export default function AuthCallbackPage() {
         }
         if (user) {
           const callbackUrl = searchParams.get('callbackUrl') || '/'
-          router.replace(callbackUrl)
+          const role = user.user_metadata?.role
+          const target = (role === 'SELLER' || role === 'ADMIN') ? '/seller/dashboard' : callbackUrl
+          router.replace(target)
         } else {
           // If user is not present after redirect, guide to sign in
           setError('Authentication did not complete. Please try signing in again.')

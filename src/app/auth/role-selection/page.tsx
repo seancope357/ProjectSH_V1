@@ -26,7 +26,12 @@ function RoleSelectionContent() {
 
     // Check if user already has a role set
     if (user.user_metadata?.role && user.user_metadata.role !== 'USER') {
-      router.push(callbackUrl);
+      const role = user.user_metadata.role
+      if (role === 'SELLER' || role === 'ADMIN') {
+        router.push('/seller/dashboard')
+      } else {
+        router.push(callbackUrl)
+      }
       return;
     }
   }, [user, router, callbackUrl]);

@@ -26,7 +26,13 @@ function SignInPageContent() {
     const checkUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
-        router.push(callbackUrl)
+        // Redirect sellers/admins to seller dashboard
+        const role = user.user_metadata?.role
+        if (role === 'SELLER' || role === 'ADMIN') {
+          router.push('/seller/dashboard')
+        } else {
+          router.push(callbackUrl)
+        }
       }
     }
     checkUser()
@@ -81,7 +87,12 @@ function SignInPageContent() {
       if (error) {
         setError(error.message)
       } else if (data.user) {
-        router.push(callbackUrl)
+        const role = data.user.user_metadata?.role
+        if (role === 'SELLER' || role === 'ADMIN') {
+          router.push('/seller/dashboard')
+        } else {
+          router.push(callbackUrl)
+        }
       }
     } catch (error) {
       setError('An error occurred during sign in')
