@@ -33,11 +33,15 @@ export function FeatureFlagsProvider({ children }: { children: React.ReactNode }
     }
   }, [])
 
-  const value = useMemo<FeatureFlags>(() => ({
-    enableAnimations: getEnvFlag("NEXT_PUBLIC_ENABLE_ANIMATIONS", true),
-    enableShimmer: getEnvFlag("NEXT_PUBLIC_ENABLE_SHIMMER", true),
-    reducedMotion,
-  }), [reducedMotion])
+  const value = useMemo<FeatureFlags>(() => {
+    const forceAnimations = getEnvFlag("NEXT_PUBLIC_ENABLE_ANIMATIONS_FORCE", false)
+    return {
+      enableAnimations: getEnvFlag("NEXT_PUBLIC_ENABLE_ANIMATIONS", true),
+      enableShimmer: getEnvFlag("NEXT_PUBLIC_ENABLE_SHIMMER", true),
+      // If force flag is on, override reduced motion for debugging/showcase
+      reducedMotion: forceAnimations ? false : reducedMotion,
+    }
+  }, [reducedMotion])
 
   return (
     <FeatureFlagsContext.Provider value={value}>

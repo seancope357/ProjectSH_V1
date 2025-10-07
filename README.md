@@ -34,3 +34,32 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Environment
+
+Create an `.env.local` from `.env.example` and fill in:
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY` (server-side ops like seeding)
+- `STRIPE_SECRET_KEY` (optional; test key for development)
+
+## Health Check
+
+- Endpoint: `GET /api/health`
+- Returns app version, uptime, env presence (no secrets), Supabase connectivity, and Stripe configuration status.
+- Use it to quickly diagnose local setup problems.
+
+## Data Seeding (dev only)
+
+- Endpoint: `GET /api/auth/seed`
+- Seeds 3 sellers, 1 buyer, categories, sequences with thumbnails, reviews, a completed order, and downloads.
+- Requires `SUPABASE_SERVICE_ROLE_KEY` in `.env.local`.
+
+## Useful Scripts
+
+```bash
+npm run dev         # start Next.js dev server
+npm run dev:health  # open the health endpoint in browser (optional)
+npm run dev:seed    # hit the seed endpoint (optional)
+```

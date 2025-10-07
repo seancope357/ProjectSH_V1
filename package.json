@@ -6,7 +6,9 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "dev:health": "open http://localhost:3000/api/health",
+    "dev:seed": "open http://localhost:3000/api/auth/seed"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.3",

@@ -46,6 +46,123 @@ section[aria-label="Hero Banner"] {
   @apply relative overflow-hidden;
 }
 
+/* Subtle ambient animation for hero background */
+@keyframes hero-float-slow {
+  0% { transform: translate3d(0, 0, 0) scale(1) rotate(0deg); }
+  50% { transform: translate3d(16px, -12px, 0) scale(1.02) rotate(1.5deg); }
+  100% { transform: translate3d(-8px, 8px, 0) scale(0.99) rotate(-1deg); }
+}
+
+section[aria-label="Hero Banner"] .hero-ambient {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+section[aria-label="Hero Banner"] .hero-orb {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(64px);
+  opacity: 0.12; /* more visible */
+  will-change: transform;
+  animation: hero-float-slow var(--orb-duration, 22s) ease-in-out infinite alternate;
+  background: radial-gradient(120px circle at 30% 30%, rgba(255,255,255,0.25), rgba(255,255,255,0));
+}
+
+/* Individual orb placements and hues */
+section[aria-label="Hero Banner"] .hero-orb.a {
+  width: 28rem;
+  height: 28rem;
+  top: -18%;
+  right: -10%;
+  --orb-duration: 24s;
+}
+
+section[aria-label="Hero Banner"] .hero-orb.b {
+  width: 24rem;
+  height: 24rem;
+  bottom: -20%;
+  left: -12%;
+  --orb-duration: 26s;
+  animation-delay: 1000ms;
+  background: radial-gradient(110px circle at 70% 30%, rgba(147,197,253,0.3), rgba(147,197,253,0)); /* blue-300 tint */
+}
+
+section[aria-label="Hero Banner"] .hero-orb.c {
+  width: 20rem;
+  height: 20rem;
+  top: 10%;
+  left: 35%;
+  --orb-duration: 28s;
+  animation-delay: 1800ms;
+  background: radial-gradient(100px circle at 30% 70%, rgba(219,234,254,0.25), rgba(219,234,254,0)); /* indigo-100 tint */
+}
+
+/* Motion accessibility: respect reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  section[aria-label="Hero Banner"] .hero-orb {
+    animation: none !important;
+  }
+}
+
+/* Dramatic xLights-style beams */
+@keyframes hero-sweep {
+  0%   { transform: translateX(-32%) rotate(var(--beam-rot, 0deg)) scaleY(1); }
+  50%  { transform: translateX(28%) rotate(var(--beam-rot, 0deg)) scaleY(1.08); }
+  100% { transform: translateX(-18%) rotate(var(--beam-rot, 0deg)) scaleY(0.96); }
+}
+
+section[aria-label="Hero Banner"] .hero-waves {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  mix-blend-mode: screen;
+}
+
+section[aria-label="Hero Banner"] .hero-beam {
+  position: absolute;
+  left: -20%;
+  width: 140%;
+  height: 14rem;
+  border-radius: 9999px;
+  filter: blur(22px);
+  opacity: 0.28; /* stronger glow */
+  will-change: transform;
+  animation: hero-sweep var(--beam-duration, 10s) ease-in-out infinite alternate;
+}
+
+section[aria-label="Hero Banner"] .hero-beam.a {
+  top: 22%;
+  --beam-rot: 22deg;
+  --beam-duration: 11s;
+  background: linear-gradient(90deg, rgba(59,130,246,0), rgba(59,130,246,0.6), rgba(59,130,246,0)); /* blue-500 */
+}
+
+section[aria-label="Hero Banner"] .hero-beam.b {
+  top: 44%;
+  --beam-rot: 18deg;
+  --beam-duration: 12s;
+  animation-delay: 900ms;
+  background: linear-gradient(90deg, rgba(168,85,247,0), rgba(168,85,247,0.55), rgba(168,85,247,0)); /* purple-500 */
+}
+
+section[aria-label="Hero Banner"] .hero-beam.c {
+  top: 66%;
+  --beam-rot: 24deg;
+  --beam-duration: 13s;
+  animation-delay: 1600ms;
+  background: linear-gradient(90deg, rgba(99,102,241,0), rgba(99,102,241,0.55), rgba(99,102,241,0)); /* indigo-500 */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  section[aria-label="Hero Banner"] .hero-beam {
+    animation: none !important;
+  }
+}
+
 section[aria-label="Featured Sequences"],
 section[aria-label="Platform Features"] {
   @apply py-4 md:py-5;
