@@ -49,7 +49,7 @@ export default function HomePage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/sequences"
-                className="bg-white text-blue-600 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-50 transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                className="mi-cta bg-white text-blue-600 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-50 transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-xl"
               >
                 Browse Sequences
                 <ArrowRight className="ml-2 h-5 w-5" />
@@ -72,9 +72,9 @@ export default function HomePage() {
             </p>
           </header>
           
-          <div className="grid md:grid-cols-3 gap-8">
-            {/* Featured Sequence 1 */}
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+            <div className="grid md:grid-cols-3 gap-8">
+              {/* Featured Sequence 1 */}
+            <div className="mi-card bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
               <div className="aspect-video bg-gradient-to-br from-purple-500 to-pink-500 relative">
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-white text-center">
@@ -103,7 +103,7 @@ export default function HomePage() {
                 </div>
                 <Link
                   href="/sequence/1"
-                  className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors text-center block"
+                  className="mi-cta w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors text-center block"
                 >
                   View Details
                 </Link>
@@ -111,7 +111,7 @@ export default function HomePage() {
             </div>
 
             {/* Featured Sequence 2 */}
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+            <div className="mi-card bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
               <div className="aspect-video bg-gradient-to-br from-blue-500 to-teal-500 relative">
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-white text-center">
@@ -140,7 +140,7 @@ export default function HomePage() {
                 </div>
                 <Link
                   href="/sequence/2"
-                  className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors text-center block"
+                  className="mi-cta w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors text-center block"
                 >
                   View Details
                 </Link>
@@ -148,7 +148,7 @@ export default function HomePage() {
             </div>
 
             {/* Featured Sequence 3 */}
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+            <div className="mi-card bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
               <div className="aspect-video bg-gradient-to-br from-orange-500 to-red-500 relative">
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-white text-center">
@@ -177,7 +177,7 @@ export default function HomePage() {
                 </div>
                 <Link
                   href="/sequence/3"
-                  className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors text-center block"
+                  className="mi-cta w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors text-center block"
                 >
                   View Details
                 </Link>
@@ -188,7 +188,7 @@ export default function HomePage() {
           <div className="text-center mt-12">
             <Link
               href="/sequences"
-              className="bg-blue-600 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-colors inline-flex items-center"
+              className="mi-cta bg-blue-600 text-white px-8 py-3 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-colors inline-flex items-center"
             >
               View All Sequences
               <ArrowRight className="ml-2 h-5 w-5" />

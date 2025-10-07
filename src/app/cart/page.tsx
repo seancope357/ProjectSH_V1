@@ -180,7 +180,7 @@ export default function CartPage() {
             </p>
             <button
               onClick={() => router.push('/search')}
-              className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors"
+              className="mi-cta bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors"
             >
               Browse Sequences
             </button>
@@ -312,7 +312,7 @@ export default function CartPage() {
 
                 <button
                   onClick={proceedToCheckout}
-                  className="w-full bg-blue-500 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-600 transition-colors flex items-center justify-center gap-2"
+                  className="mi-cta w-full bg-blue-500 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-600 transition-colors flex items-center justify-center gap-2"
                 >
                   <CreditCard className="w-5 h-5" />
                   Proceed to Checkout
@@ -328,7 +328,7 @@ export default function CartPage() {
                 {/* Continue Shopping */}
                 <button
                   onClick={() => router.push('/search')}
-                  className="w-full mt-4 border border-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="mi-cta-secondary w-full mt-4 border border-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-50 transition-colors"
                 >
                   Continue Shopping
                 </button>

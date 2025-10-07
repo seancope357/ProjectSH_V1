@@ -184,7 +184,7 @@ function SequencesContent() {
         </header>
 
         {/* Filters and Controls */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
+        <div className="mi-card bg-white rounded-lg shadow-sm p-6 mb-8">
           <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
             {/* Left side filters */}
             <div className="flex flex-wrap gap-4 items-center">
@@ -196,7 +196,7 @@ function SequencesContent() {
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent mi-cta-secondary"
                 >
                   {categories.map((cat) => (
                     <option key={cat.value} value={cat.value}>
@@ -214,7 +214,7 @@ function SequencesContent() {
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent mi-cta-secondary"
                 >
                   {sortOptions.map((option) => (
                     <option key={option.value} value={option.value}>
@@ -275,7 +275,7 @@ function SequencesContent() {
                 {sequences.map((sequence) => (
                   <div
                     key={sequence.id}
-                    className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer overflow-hidden"
+                    className="mi-card bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer overflow-hidden"
                     onClick={() => handleSequenceClick(sequence.id)}
                   >
                     {/* Image */}
@@ -300,7 +300,7 @@ function SequencesContent() {
                           e.stopPropagation()
                           toggleFavorite(sequence.id)
                         }}
-                        className="absolute top-2 right-2 p-2 bg-white/80 rounded-full hover:bg-white transition-colors"
+                        className="absolute top-2 right-2 p-2 bg-white/80 rounded-full hover:bg-white transition-colors mi-cta-secondary"
                       >
                         <Heart
                           className={`w-4 h-4 ${
@@ -367,7 +367,7 @@ function SequencesContent() {
                 {sequences.map((sequence) => (
                   <div
                     key={sequence.id}
-                    className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer p-6 flex gap-6"
+                    className="mi-card bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer p-6 flex gap-6"
                     onClick={() => handleSequenceClick(sequence.id)}
                   >
                     {/* Image */}
@@ -402,7 +402,7 @@ function SequencesContent() {
                               e.stopPropagation()
                               toggleFavorite(sequence.id)
                             }}
-                            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                            className="p-2 hover:bg-gray-100 rounded-full transition-colors mi-cta-secondary"
                           >
                             <Heart
                               className={`w-5 h-5 ${
@@ -460,7 +460,7 @@ function SequencesContent() {
                 <button
                   onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                   disabled={currentPage === 1}
-                  className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                  className="mi-cta-secondary px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
                 >
                   Previous
                 </button>
@@ -472,7 +472,7 @@ function SequencesContent() {
                       <button
                         key={page}
                         onClick={() => setCurrentPage(page)}
-                        className={`px-3 py-2 rounded-lg ${
+                        className={`mi-cta-secondary px-3 py-2 rounded-lg ${
                           currentPage === page
                             ? 'bg-blue-500 text-white'
                             : 'border border-gray-300 hover:bg-gray-50'
@@ -487,7 +487,7 @@ function SequencesContent() {
                 <button
                   onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                   disabled={currentPage === totalPages}
-                  className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                  className="mi-cta-secondary px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
                 >
                   Next
                 </button>

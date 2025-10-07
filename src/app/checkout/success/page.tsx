@@ -113,7 +113,7 @@ export default function CheckoutSuccessPage() {
           <div className="mt-8 flex flex-wrap gap-3">
             <a
               href="/downloads"
-              className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+              className="mi-cta inline-flex items-center gap-2 bg-blue-600 text-white hover:bg-blue-700"
             >
               <Download className="h-4 w-4" />
               Go to Downloads
@@ -121,7 +121,7 @@ export default function CheckoutSuccessPage() {
             {session?.orderId && session?.status === 'paid' && (
               <a
                 href={`/orders/${session.orderId}`}
-                className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-gray-800 hover:bg-gray-100"
+                className="mi-cta-secondary inline-flex items-center gap-2 border border-gray-300 text-gray-800 hover:bg-gray-100"
               >
                 <Receipt className="h-4 w-4" />
                 View Receipt
@@ -129,7 +129,7 @@ export default function CheckoutSuccessPage() {
             )}
             <a
               href="/orders"
-              className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-gray-800 hover:bg-gray-100"
+              className="mi-cta-secondary inline-flex items-center gap-2 border border-gray-300 text-gray-800 hover:bg-gray-100"
             >
               <Receipt className="h-4 w-4" />
               View Orders
@@ -159,14 +159,14 @@ export default function CheckoutSuccessPage() {
               <div className="mt-4 flex gap-2">
                 <a
                   href={`/orders/${latestOrder.id}`}
-                  className="inline-flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-gray-800 hover:bg-gray-100"
+                  className="mi-cta-secondary inline-flex items-center gap-2 border border-gray-300 text-gray-800 hover:bg-gray-100"
                 >
                   <Receipt className="h-4 w-4" />
                   View Receipt
                 </a>
                 <a
                   href="/downloads"
-                  className="inline-flex items-center gap-2 bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700"
+                  className="mi-cta inline-flex items-center gap-2 bg-blue-600 text-white hover:bg-blue-700"
                 >
                   <Download className="h-4 w-4" />
                   Go to Downloads
