@@ -190,7 +190,7 @@ export default function SellerDashboard() {
           <div className="space-y-6">
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div className="bg-white rounded-lg shadow-md p-6">
+              <div className="mi-card bg-white rounded-lg shadow-md p-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-500">Total Revenue</p>
@@ -202,7 +202,7 @@ export default function SellerDashboard() {
                 </div>
               </div>
 
-              <div className="bg-white rounded-lg shadow-md p-6">
+              <div className="mi-card bg-white rounded-lg shadow-md p-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-500">Total Sales</p>
@@ -214,7 +214,7 @@ export default function SellerDashboard() {
                 </div>
               </div>
 
-              <div className="bg-white rounded-lg shadow-md p-6">
+              <div className="mi-card bg-white rounded-lg shadow-md p-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-500">Sequences</p>
@@ -226,7 +226,7 @@ export default function SellerDashboard() {
                 </div>
               </div>
 
-              <div className="bg-white rounded-lg shadow-md p-6">
+              <div className="mi-card bg-white rounded-lg shadow-md p-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-500">Avg. Rating</p>
@@ -240,7 +240,7 @@ export default function SellerDashboard() {
             </div>
 
             {/* Recent Sales */}
-            <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="mi-card bg-white rounded-lg shadow-md p-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">
                 Recent Sales
               </h2>
@@ -313,7 +313,7 @@ export default function SellerDashboard() {
 
               <button
                 onClick={() => router.push('/seller/upload')}
-                className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2"
+                className="mi-cta bg-blue-600 text-white hover:bg-blue-700"
               >
                 <Plus className="w-4 h-4" />
                 Upload New Sequence
@@ -323,7 +323,7 @@ export default function SellerDashboard() {
             {/* Sequences Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredSequences.map((sequence) => (
-                <div key={sequence.id} className="bg-white rounded-lg shadow-md overflow-hidden">
+                <div key={sequence.id} className="mi-card bg-white rounded-lg shadow-md overflow-hidden">
                   {/* Preview */}
                   <div className="aspect-video bg-gray-200">
                     {sequence.previewUrl ? (
@@ -388,21 +388,21 @@ export default function SellerDashboard() {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => router.push(`/sequence/${sequence.id}`)}
-                        className="flex-1 bg-gray-100 text-gray-700 py-2 px-3 rounded text-sm hover:bg-gray-200 transition-colors flex items-center justify-center gap-1"
+                        className="flex-1 mi-cta-secondary border border-gray-300 text-gray-800 hover:bg-gray-100"
                       >
                         <Eye className="w-4 h-4" />
                         View
                       </button>
                       <button
                         onClick={() => router.push(`/seller/edit/${sequence.id}`)}
-                        className="flex-1 bg-blue-100 text-blue-700 py-2 px-3 rounded text-sm hover:bg-blue-200 transition-colors flex items-center justify-center gap-1"
+                        className="flex-1 mi-cta bg-blue-600 text-white hover:bg-blue-700"
                       >
                         <Edit className="w-4 h-4" />
                         Edit
                       </button>
                       <button
                         onClick={() => handleDeleteSequence(sequence.id)}
-                        className="bg-red-100 text-red-700 py-2 px-3 rounded text-sm hover:bg-red-200 transition-colors"
+                        className="mi-cta-secondary text-red-700 border border-red-300 hover:bg-red-50"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -412,7 +412,7 @@ export default function SellerDashboard() {
                     {sequence.status === 'draft' && (
                       <button
                         onClick={() => handleStatusChange(sequence.id, 'published')}
-                        className="w-full mt-2 bg-green-500 text-white py-2 px-3 rounded text-sm hover:bg-green-600 transition-colors"
+                        className="w-full mt-2 mi-cta bg-green-600 text-white hover:bg-green-700"
                       >
                         Publish
                       </button>
@@ -423,7 +423,7 @@ export default function SellerDashboard() {
             </div>
 
             {filteredSequences.length === 0 && (
-              <div className="bg-white rounded-lg shadow-md p-12 text-center">
+              <div className="mi-card bg-white rounded-lg shadow-md p-12 text-center">
                 <Upload className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                 <h2 className="text-2xl font-semibold text-gray-900 mb-2">
                   No sequences found
@@ -436,7 +436,7 @@ export default function SellerDashboard() {
                 </p>
                 <button
                   onClick={() => router.push('/seller/upload')}
-                  className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors"
+                  className="mi-cta bg-blue-600 text-white hover:bg-blue-700"
                 >
                   Upload Your First Sequence
                 </button>
@@ -448,7 +448,7 @@ export default function SellerDashboard() {
         {/* Analytics Tab */}
         {activeTab === 'analytics' && stats && (
           <div className="space-y-6">
-            <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="mi-card bg-white rounded-lg shadow-md p-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">
                 Monthly Revenue Trend
               </h2>
@@ -477,7 +477,7 @@ export default function SellerDashboard() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-white rounded-lg shadow-md p-6">
+              <div className="mi-card bg-white rounded-lg shadow-md p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">
                   Performance Metrics
                 </h3>
@@ -499,7 +499,7 @@ export default function SellerDashboard() {
                 </div>
               </div>
 
-              <div className="bg-white rounded-lg shadow-md p-6">
+              <div className="mi-card bg-white rounded-lg shadow-md p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">
                   Top Categories
                 </h3>
