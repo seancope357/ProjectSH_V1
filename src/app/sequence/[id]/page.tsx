@@ -76,6 +76,7 @@ export default function SequenceDetailsPage() {
   const [isFavorited, setIsFavorited] = useState(false)
   const [isInCart, setIsInCart] = useState(false)
   const [isPurchased, setIsPurchased] = useState(false)
+  
 
   useEffect(() => {
     if (params.id) {
@@ -84,6 +85,8 @@ export default function SequenceDetailsPage() {
       checkUserStatus()
     }
   }, [params.id, user]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  
 
   const fetchSequence = async () => {
     try {
@@ -244,8 +247,8 @@ export default function SequenceDetailsPage() {
     <div className="min-h-screen bg-gray-50">
       <Navigation />
       
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-7">
           {/* Main Content */}
           <div className="lg:col-span-2">
             {/* Preview Section */}
@@ -283,7 +286,7 @@ export default function SequenceDetailsPage() {
             </div>
 
             {/* Title and Actions */}
-            <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div className="bg-white rounded-lg shadow-md p-5 md:p-6 mb-6">
               <div className="flex items-start justify-between mb-4">
                 <div>
                   <h1 className="text-3xl font-bold text-gray-900 mb-2">
@@ -547,7 +550,7 @@ export default function SequenceDetailsPage() {
           {/* Sidebar */}
           <div className="lg:col-span-1">
             {/* Purchase Card */}
-            <div className="bg-white rounded-lg shadow-md p-6 mb-6 sticky top-4">
+            <div className="bg-white rounded-lg shadow-md p-5 md:p-6 mb-6 sticky top-6">
               <div className="text-center mb-6">
                 <div className="text-3xl font-bold text-blue-600 mb-2">
                   ${sequence.price.toFixed(2)}
@@ -594,10 +597,11 @@ export default function SequenceDetailsPage() {
             </div>
 
             {/* Seller Info */}
-            <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="bg-white rounded-lg shadow-md p-5 md:p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">
                 About the Seller
               </h3>
+              
               
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center">

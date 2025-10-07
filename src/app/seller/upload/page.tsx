@@ -1,422 +1,309 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import { useAuth } from '@/components/providers/session-provider';
-import { useRouter } from 'next/navigation';
-import { Navigation } from '@/components/ui/navigation';
+import React, { useCallback, useEffect, useRef, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { Navigation } from '@/components/ui/navigation'
+import { useAuth } from '@/components/providers/session-provider'
+import { Upload, CheckCircle, AlertCircle, X } from 'lucide-react'
 
-interface SequenceFormData {
-  title: string;
-  description: string;
-  instructions: string;
-  category: string;
-  tags: string;
-  price: string;
-  duration: string;
-  ledCount: string;
-  difficulty: 'beginner' | 'intermediate' | 'advanced';
-  previewImage: File | null;
-  sequenceFile: File | null;
-}
+type Status = 'idle' | 'validating' | 'uploading' | 'success' | 'error'
 
 export default function SellerUploadPage() {
-  const { user, loading: authLoading } = useAuth();
-  const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  
-  const [formData, setFormData] = useState<SequenceFormData>({
-    title: '',
-    description: '',
-    instructions: '',
-    category: '',
-    tags: '',
-    price: '',
-    duration: '',
-    ledCount: '',
-    difficulty: 'beginner',
-    previewImage: null,
-    sequenceFile: null,
-  });
+  const { user } = useAuth()
+  const router = useRouter()
+  const [file, setFile] = useState<File | null>(null)
+  const [title, setTitle] = useState('')
+  const [description, setDescription] = useState('')
+  const [price, setPrice] = useState('9.99')
+  const [tagsInput, setTagsInput] = useState('')
+  const [tagsList, setTagsList] = useState<string[]>([])
+  const [hotTags, setHotTags] = useState<string[]>([])
+  const [tagError, setTagError] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [status, setStatus] = useState<Status>('idle')
+  const [progress, setProgress] = useState<number>(0)
+  const inputRef = useRef<HTMLInputElement | null>(null)
 
-  // Redirect if not authenticated or not a seller
-  if (status === 'loading') {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <Navigation />
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading...</p>
-          </div>
-        </div>
-      </div>
-    );
+  useEffect(() => {
+    if (!user) return
+    // Fetch hot tag suggestions from market insights
+    ;(async () => {
+      try {
+        const res = await fetch('/api/market/trending')
+        if (!res.ok) return
+        const data = await res.json()
+        const names: string[] = Array.isArray(data?.hotTags) ? data.hotTags.map((t: any) => t.name) : []
+        setHotTags(names)
+      } catch {}
+    })()
+  }, [user])
+
+  const onSelectFile = useCallback((files: FileList | null) => {
+    if (!files || files.length === 0) return
+    const f = files[0]
+    setError(null)
+    setFile(f)
+  }, [])
+
+  const onDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault()
+    onSelectFile(e.dataTransfer.files)
   }
 
-  if (!user) {
-    router.push('/auth/signin');
-    return null;
+  const validate = (): string | null => {
+    if (!file) return 'Please select a file to upload.'
+    if (!title.trim() || !description.trim()) return 'Title and description are required.'
+    const allowed = ['video/mp4', 'application/zip', 'application/octet-stream', 'application/x-zip-compressed']
+    if (!allowed.includes(file.type)) return `Unsupported file type: ${file.type}`
+    const maxMB = 200
+    if (file.size / (1024 * 1024) > maxMB) return `File too large. Max ${maxMB}MB.`
+    const p = parseFloat(price)
+    if (Number.isNaN(p) || p < 0) return 'Price must be a non-negative number.'
+    // Validate existing tags before submit
+    for (const t of tagsList) {
+      const err = validateTagCandidate(t)
+      if (err) return `Invalid tag "${t}": ${err}`
+    }
+    return null
   }
 
-  // Check if user has seller or admin role
-  if (user.user_metadata?.role !== 'SELLER' && user.user_metadata?.role !== 'ADMIN') {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <Navigation />
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">Access Denied</h1>
-            <p className="text-gray-600 mb-4">You need to be a seller to access this page.</p>
-            <button
-              onClick={() => router.push('/')}
-              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-            >
-              Go Home
-            </button>
-          </div>
-        </div>
-      </div>
-    );
+  // Tag helpers
+  const normalizeTag = (t: string) => t.trim().toLowerCase().replace(/\s+/g, '-')
+  const TAG_MIN = 2
+  const TAG_MAX = 24
+  const validateTagCandidate = (cand: string): string | null => {
+    if (!cand) return 'Tag is empty.'
+    if (cand.length < TAG_MIN || cand.length > TAG_MAX) return `Tag must be ${TAG_MIN}-${TAG_MAX} characters.`
+    if (!/^[a-z0-9-]+$/.test(cand)) return 'Only letters, numbers, and hyphens are allowed.'
+    if (cand.startsWith('-') || cand.endsWith('-')) return 'No leading or trailing hyphens.'
+    if (cand.includes('--')) return 'Avoid consecutive hyphens.'
+    return null
   }
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, files } = e.target;
-    if (files && files[0]) {
-      setFormData(prev => ({ ...prev, [name]: files[0] }));
+  const addTagsFromInput = (input: string) => {
+    const raw = input
+      .split(',')
+      .map(normalizeTag)
+      .filter(Boolean)
+    if (!raw.length) return
+    const errors: string[] = []
+    const valids: string[] = []
+    raw.forEach((cand) => {
+      const err = validateTagCandidate(cand)
+      if (err) errors.push(`"${cand}": ${err}`)
+      else valids.push(cand)
+    })
+    if (valids.length) {
+      setTagsList((prev) => {
+        const set = new Set(prev)
+        valids.forEach((t) => set.add(t))
+        return Array.from(set).slice(0, 12)
+      })
     }
-  };
+    if (errors.length) {
+      setTagError(`Invalid ${errors.length > 1 ? 'tags' : 'tag'}: ${errors.join(', ')}`)
+    } else {
+      setTagError(null)
+      setTagsInput('')
+    }
+  }
+  const removeTag = (t: string) => setTagsList((prev) => prev.filter((x) => x !== t))
+  const handleTagKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' || e.key === ',' || e.key === 'Tab') {
+      e.preventDefault()
+      addTagsFromInput(tagsInput)
+    }
+  }
+  useEffect(() => {
+    // Clear inline error while user edits
+    if (tagError) setTagError(null)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tagsInput])
+  const suggested = hotTags
+    .filter((t) => t.toLowerCase().includes(tagsInput.trim().toLowerCase()))
+    .filter((t) => !tagsList.includes(normalizeTag(t)))
+    .slice(0, 8)
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setSuccess('');
-    setLoading(true);
-
-    // Validation
-    if (!formData.title || !formData.description || !formData.category || !formData.price) {
-      setError('Please fill in all required fields');
-      setLoading(false);
-      return;
+  const doUpload = async () => {
+    setStatus('validating')
+    const err = validate()
+    if (err) {
+      setError(err)
+      setStatus('error')
+      return
     }
 
-    if (!formData.sequenceFile) {
-      setError('Please upload a sequence file');
-      setLoading(false);
-      return;
-    }
+    setStatus('uploading')
+    setProgress(0)
 
-    if (parseFloat(formData.price) <= 0) {
-      setError('Price must be greater than 0');
-      setLoading(false);
-      return;
-    }
+    const form = new FormData()
+    if (file) form.append('file', file)
+    form.append('title', title)
+    form.append('description', description)
+    form.append('price', price)
+    form.append('tags', tagsList.join(','))
 
-    try {
-      const uploadFormData = new FormData();
-      uploadFormData.append('title', formData.title);
-      uploadFormData.append('description', formData.description);
-      uploadFormData.append('instructions', formData.instructions);
-      uploadFormData.append('category', formData.category);
-      uploadFormData.append('tags', formData.tags);
-      uploadFormData.append('price', formData.price);
-      uploadFormData.append('duration', formData.duration);
-      uploadFormData.append('ledCount', formData.ledCount);
-      uploadFormData.append('difficulty', formData.difficulty);
-      uploadFormData.append('sequenceFile', formData.sequenceFile);
-      
-      if (formData.previewImage) {
-        uploadFormData.append('previewImage', formData.previewImage);
+    // Use XMLHttpRequest for progress feedback
+    const xhr = new XMLHttpRequest()
+    xhr.open('POST', '/api/upload/sequence', true)
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable) {
+        const pct = Math.round((e.loaded / e.total) * 100)
+        setProgress(pct)
       }
-
-      const response = await fetch('/api/sequences/upload', {
-        method: 'POST',
-        body: uploadFormData,
-      });
-
-      if (response.ok) {
-        setSuccess('Sequence uploaded successfully!');
-        // Reset form
-        setFormData({
-          title: '',
-          description: '',
-          instructions: '',
-          category: '',
-          tags: '',
-          price: '',
-          duration: '',
-          ledCount: '',
-          difficulty: 'beginner',
-          previewImage: null,
-          sequenceFile: null,
-        });
-        // Reset file inputs
-        const fileInputs = document.querySelectorAll('input[type="file"]') as NodeListOf<HTMLInputElement>;
-        fileInputs.forEach(input => input.value = '');
-      } else {
-        const data = await response.json();
-        setError(data.message || 'Failed to upload sequence');
-      }
-    } catch {
-      setError('An error occurred while uploading the sequence');
-    } finally {
-      setLoading(false);
     }
-  };
-
-  const categories = [
-    'Holiday & Seasonal',
-    'Music Sync',
-    'Abstract Patterns',
-    'Nature & Weather',
-    'Gaming & Entertainment',
-    'Architectural',
-    'Party & Events',
-    'Minimalist',
-    'Other'
-  ];
+    xhr.onreadystatechange = () => {
+      if (xhr.readyState === 4) {
+        try {
+          const resp = JSON.parse(xhr.responseText)
+          if (xhr.status >= 200 && xhr.status < 300) {
+            setStatus('success')
+            setProgress(100)
+            // Redirect to sequence page
+            if (resp?.id) router.push(`/sequence/${resp.id}`)
+          } else {
+            setError(resp?.error || 'Upload failed')
+            setStatus('error')
+          }
+        } catch (e) {
+          setError('Unexpected response from server')
+          setStatus('error')
+        }
+      }
+    }
+    xhr.onerror = () => {
+      setError('Network error during upload')
+      setStatus('error')
+    }
+    xhr.send(form)
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />
-      
-      <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-        <div className="bg-white shadow rounded-lg">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h1 className="text-2xl font-bold text-gray-900">Upload New Sequence</h1>
-            <p className="mt-1 text-sm text-gray-600">
-              Share your LED sequence with the community and start earning
-            </p>
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">Upload New Sequence</h1>
+        <p className="text-gray-600 mb-6">Select your file, add details, and publish when ready.</p>
+
+        {/* File selection */}
+        <div
+          className="border-2 border-dashed rounded-lg p-6 bg-white hover:bg-gray-50 transition"
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={onDrop}
+        >
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <Upload className="h-6 w-6 text-blue-600" />
+              <div>
+                <div className="font-medium text-gray-900">Drag & drop your file here</div>
+                <div className="text-sm text-gray-600">MP4 or ZIP up to 200MB</div>
+              </div>
+            </div>
+            <button
+              className="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              onClick={() => inputRef.current?.click()}
+            >
+              Choose File
+            </button>
           </div>
-          
-          <form onSubmit={handleSubmit} className="p-6 space-y-6">
-            {error && (
-              <div className="rounded-md bg-red-50 p-4">
-                <div className="text-sm text-red-700">{error}</div>
-              </div>
-            )}
-            
-            {success && (
-              <div className="rounded-md bg-green-50 p-4">
-                <div className="text-sm text-green-700">{success}</div>
-              </div>
-            )}
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label htmlFor="title" className="block text-sm font-medium text-gray-700">
-                  Title *
-                </label>
-                <input
-                  type="text"
-                  id="title"
-                  name="title"
-                  required
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
-                  placeholder="Enter sequence title"
-                  value={formData.title}
-                  onChange={handleInputChange}
-                />
-              </div>
-              
-              <div>
-                <label htmlFor="category" className="block text-sm font-medium text-gray-700">
-                  Category *
-                </label>
-                <select
-                  id="category"
-                  name="category"
-                  required
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
-                  value={formData.category}
-                  onChange={handleInputChange}
-                >
-                  <option value="">Select a category</option>
-                  {categories.map(category => (
-                    <option key={category} value={category}>{category}</option>
+          <input
+            ref={inputRef}
+            type="file"
+            accept=".mp4,.zip"
+            className="hidden"
+            onChange={(e) => onSelectFile(e.target.files)}
+          />
+
+          {file && (
+            <div className="mt-4 text-sm text-gray-700">
+              Selected: <span className="font-medium">{file.name}</span> ({(file.size / (1024*1024)).toFixed(1)} MB)
+            </div>
+          )}
+        </div>
+
+        {/* Details form */}
+        <div className="mt-6 bg-white rounded-lg p-6 border space-y-4">
+          <div>
+            <label className="block text-sm text-gray-700 mb-1">Title</label>
+            <input className="w-full border rounded px-3 py-2" value={title} onChange={e => setTitle(e.target.value)} />
+          </div>
+          <div>
+            <label className="block text-sm text-gray-700 mb-1">Description</label>
+            <textarea className="w-full border rounded px-3 py-2" rows={4} value={description} onChange={e => setDescription(e.target.value)} />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm text-gray-700 mb-1">Price (USD)</label>
+              <input className="w-full border rounded px-3 py-2" value={price} onChange={e => setPrice(e.target.value)} />
+            </div>
+            <div>
+              <label className="block text-sm text-gray-700 mb-1">Tags</label>
+              <div className={`border rounded px-3 py-2 ${tagError ? 'border-red-400' : ''}`}>
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {tagsList.map((t) => (
+                    <span key={t} className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded-full">
+                      #{t}
+                      <button type="button" onClick={() => removeTag(t)} aria-label={`Remove ${t}`} className="text-gray-500 hover:text-gray-700">
+                        <X className="h-3 w-3" />
+                      </button>
+                    </span>
                   ))}
-                </select>
-              </div>
-            </div>
-            
-            <div>
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-                Description *
-              </label>
-              <textarea
-                id="description"
-                name="description"
-                rows={4}
-                required
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
-                placeholder="Describe your sequence..."
-                value={formData.description}
-                onChange={handleInputChange}
-              />
-            </div>
-            
-            <div>
-              <label htmlFor="instructions" className="block text-sm font-medium text-gray-700">
-                xLights Import Instructions
-              </label>
-              <textarea
-                id="instructions"
-                name="instructions"
-                rows={6}
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
-                placeholder="Provide specific instructions for importing this sequence into xLights (e.g., model requirements, special setup steps, prop configurations, etc.)"
-                value={formData.instructions}
-                onChange={handleInputChange}
-              />
-              <p className="mt-1 text-xs text-gray-500">
-                Help buyers understand any specific requirements or steps needed to use your sequence in xLights
-              </p>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div>
-                <label htmlFor="price" className="block text-sm font-medium text-gray-700">
-                  Price (USD) *
-                </label>
+                </div>
                 <input
-                  type="number"
-                  id="price"
-                  name="price"
-                  step="0.01"
-                  min="0.01"
-                  required
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
-                  placeholder="9.99"
-                  value={formData.price}
-                  onChange={handleInputChange}
+                  className="w-full outline-none"
+                  placeholder={`Type a tag (${TAG_MIN}-${TAG_MAX} chars, a-z 0-9 -) and press Enter`}
+                  value={tagsInput}
+                  onChange={(e) => setTagsInput(e.target.value)}
+                  onKeyDown={handleTagKeyDown}
+                  onBlur={() => addTagsFromInput(tagsInput)}
                 />
-              </div>
-              
-              <div>
-                <label htmlFor="duration" className="block text-sm font-medium text-gray-700">
-                  Duration (seconds)
-                </label>
-                <input
-                  type="number"
-                  id="duration"
-                  name="duration"
-                  min="1"
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
-                  placeholder="60"
-                  value={formData.duration}
-                  onChange={handleInputChange}
-                />
-              </div>
-              
-              <div>
-                <label htmlFor="ledCount" className="block text-sm font-medium text-gray-700">
-                  LED Count
-                </label>
-                <input
-                  type="number"
-                  id="ledCount"
-                  name="ledCount"
-                  min="1"
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
-                  placeholder="100"
-                  value={formData.ledCount}
-                  onChange={handleInputChange}
-                />
+                {tagError && (
+                  <div className="mt-2 text-xs text-red-600">{tagError}</div>
+                )}
+                {suggested.length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {suggested.map((s) => (
+                      <button
+                        key={s}
+                        type="button"
+                        className="px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded-full hover:bg-blue-100"
+                        onClick={() => addTagsFromInput(s)}
+                      >
+                        #{s}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label htmlFor="difficulty" className="block text-sm font-medium text-gray-700">
-                  Difficulty Level
-                </label>
-                <select
-                  id="difficulty"
-                  name="difficulty"
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
-                  value={formData.difficulty}
-                  onChange={handleInputChange}
-                >
-                  <option value="beginner">Beginner</option>
-                  <option value="intermediate">Intermediate</option>
-                  <option value="advanced">Advanced</option>
-                </select>
+          </div>
+        </div>
+
+        {/* Feedback / actions */}
+        <div className="mt-6 flex items-center justify-between">
+          <div className="text-sm">
+            {status === 'error' && (
+              <div className="flex items-center gap-2 text-red-600"><AlertCircle className="h-4 w-4" />{error}</div>
+            )}
+            {status === 'success' && (
+              <div className="flex items-center gap-2 text-green-600"><CheckCircle className="h-4 w-4" />Upload complete! Redirecting…</div>
+            )}
+            {status === 'uploading' && (
+              <div className="text-gray-700">
+                <div className="mb-1">Uploading… {progress}%</div>
+                <div className="w-64 h-2 bg-gray-200 rounded overflow-hidden">
+                  <div className="h-2 bg-blue-600" style={{ width: `${progress}%` }} />
+                </div>
               </div>
-              
-              <div>
-                <label htmlFor="tags" className="block text-sm font-medium text-gray-700">
-                  Tags
-                </label>
-                <input
-                  type="text"
-                  id="tags"
-                  name="tags"
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
-                  placeholder="christmas, music, colorful (comma separated)"
-                  value={formData.tags}
-                  onChange={handleInputChange}
-                />
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label htmlFor="previewImage" className="block text-sm font-medium text-gray-700">
-                  Preview Image
-                </label>
-                <input
-                  type="file"
-                  id="previewImage"
-                  name="previewImage"
-                  accept="image/*"
-                  className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                  onChange={handleFileChange}
-                />
-                <p className="mt-1 text-xs text-gray-500">PNG, JPG, GIF up to 5MB</p>
-              </div>
-              
-              <div>
-                <label htmlFor="sequenceFile" className="block text-sm font-medium text-gray-700">
-                  Sequence File *
-                </label>
-                <input
-                  type="file"
-                  id="sequenceFile"
-                  name="sequenceFile"
-                  accept=".seq,.json,.xml,.txt"
-                  required
-                  className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                  onChange={handleFileChange}
-                />
-                <p className="mt-1 text-xs text-gray-500">Supported formats: .seq, .json, .xml, .txt</p>
-              </div>
-            </div>
-            
-            <div className="flex justify-end space-x-4">
-              <button
-                type="button"
-                onClick={() => router.push('/seller/dashboard')}
-                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={loading}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loading ? 'Uploading...' : 'Upload Sequence'}
-              </button>
-            </div>
-          </form>
+            )}
+          </div>
+          <div className="flex items-center gap-3">
+            <button className="px-4 py-2 bg-gray-100 text-gray-800 rounded hover:bg-gray-200" onClick={() => router.push('/seller/dashboard')}>Cancel</button>
+            <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700" onClick={doUpload} disabled={status === 'uploading'}>
+              {status === 'uploading' ? 'Uploading…' : 'Upload Sequence'}
+            </button>
+          </div>
         </div>
       </div>
     </div>
-  );
+  )
 }

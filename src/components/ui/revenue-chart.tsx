@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useMemo, useRef, useState } from 'react'
+import React, { useId, useMemo, useRef, useState } from 'react'
 
 export type ChartGranularity = 'daily' | 'weekly' | 'monthly' | 'quarterly'
 
@@ -56,6 +56,7 @@ export function RevenueChart({
 
   const containerRef = useRef<HTMLDivElement>(null)
   const [hoverX, setHoverX] = useState<number | null>(null)
+  const a11yId = useId()
 
   const series = useMemo(() => {
     const normalize = (s?: TrendSeries) => {
@@ -163,7 +164,15 @@ export function RevenueChart({
           {trendDelta >= 0 ? '▲' : '▼'} {formatCurrency(Math.abs(trendDelta), currency)}
         </div>
       </div>
-      <svg viewBox={`0 0 ${width} ${vbHeight}`} className="w-full h-auto">
+      <svg
+        viewBox={`0 0 ${width} ${vbHeight}`}
+        className="w-full h-auto"
+        role="img"
+        aria-labelledby={`${a11yId}-title`}
+        aria-describedby={`${a11yId}-desc`}
+      >
+        <title id={`${a11yId}-title`}>{series.primary?.label ? `${series.primary.label} trend` : 'Revenue trend'}</title>
+        <desc id={`${a11yId}-desc`}>{`Time series chart showing ${yLabel} over ${xLabel}. Use mouse to inspect values.`}</desc>
         {/* Background */}
         <rect x={0} y={0} width={width} height={vbHeight} fill="#ffffff" />
 
@@ -175,7 +184,7 @@ export function RevenueChart({
 
         {/* X ticks */}
         {xTicks.map((t, i) => (
-          <g key={i}>
+          <g key={i} aria-hidden="true">
             <line x1={xScale(t)} y1={padding.top + plotH} x2={xScale(t)} y2={padding.top + plotH + 4} stroke="#9CA3AF" />
             <text x={xScale(t)} y={padding.top + plotH + 16} textAnchor="middle" fontSize={10} fill="#6B7280">
               {formatTick(t)}
@@ -184,10 +193,10 @@ export function RevenueChart({
         ))}
 
         {/* Y labels (min/max) */}
-        <text x={padding.left - 6} y={padding.top + plotH} textAnchor="end" fontSize={10} fill="#6B7280">
+        <text x={padding.left - 6} y={padding.top + plotH} textAnchor="end" fontSize={10} fill="#6B7280" aria-hidden="true">
           {formatCurrency(domain.minY, currency)}
         </text>
-        <text x={padding.left - 6} y={padding.top} textAnchor="end" fontSize={10} fill="#6B7280">
+        <text x={padding.left - 6} y={padding.top} textAnchor="end" fontSize={10} fill="#6B7280" aria-hidden="true">
           {formatCurrency(domain.maxY, currency)}
         </text>
 
@@ -244,8 +253,8 @@ export function RevenueChart({
         />
 
         {/* Axis labels */}
-        <text x={padding.left + plotW / 2} y={vbHeight - 2} textAnchor="middle" fontSize={11} fill="#374151">{xLabel}</text>
-        <text x={2} y={padding.top + plotH / 2} transform={`rotate(-90 2 ${padding.top + plotH / 2})`} textAnchor="middle" fontSize={11} fill="#374151">{yLabel}</text>
+        <text x={padding.left + plotW / 2} y={vbHeight - 2} textAnchor="middle" fontSize={11} fill="#374151" aria-hidden="true">{xLabel}</text>
+        <text x={2} y={padding.top + plotH / 2} transform={`rotate(-90 2 ${padding.top + plotH / 2})`} textAnchor="middle" fontSize={11} fill="#374151" aria-hidden="true">{yLabel}</text>
       </svg>
     </div>
   )

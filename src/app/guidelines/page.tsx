@@ -5,22 +5,22 @@ import { CheckCircle, AlertTriangle, XCircle, Info } from 'lucide-react'
 
 export default function GuidelinesPage() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       <Navigation />
       
       {/* Header */}
-      <div className="bg-white shadow-sm">
+      <div className="bg-gradient-to-r from-indigo-600 to-violet-600">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <h1 className="text-3xl font-bold text-gray-900">Community Guidelines</h1>
-          <p className="mt-2 text-gray-600">Rules and best practices for SequenceHUB</p>
+          <h1 className="text-3xl font-bold text-white">Community Guidelines</h1>
+          <p className="mt-2 text-indigo-100">Rules and best practices for SequenceHUB</p>
         </div>
       </div>
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Introduction */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+        <div className="bg-white/90 backdrop-blur-sm rounded-xl ring-1 ring-gray-200 shadow-sm p-6 mb-8">
           <div className="flex items-start gap-3">
-            <Info className="h-6 w-6 text-blue-500 mt-1" />
+            <Info aria-hidden="true" className="h-6 w-6 text-indigo-600 mt-1" />
             <div>
               <h2 className="text-xl font-semibold text-gray-900 mb-2">Welcome to SequenceHUB</h2>
               <p className="text-gray-600">
@@ -32,9 +32,9 @@ export default function GuidelinesPage() {
         </div>
 
         {/* Content Guidelines */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+        <div className="bg-white/90 backdrop-blur-sm rounded-xl ring-1 ring-gray-200 shadow-sm p-6 mb-8">
           <h2 className="text-2xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
-            <CheckCircle className="h-6 w-6 text-green-500" />
+            <CheckCircle aria-hidden="true" className="h-6 w-6 text-green-600" />
             Content Guidelines
           </h2>
           
@@ -67,9 +67,9 @@ export default function GuidelinesPage() {
         </div>
 
         {/* Quality Standards */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+        <div className="bg-white/90 backdrop-blur-sm rounded-xl ring-1 ring-gray-200 shadow-sm p-6 mb-8">
           <h2 className="text-2xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
-            <AlertTriangle className="h-6 w-6 text-yellow-500" />
+            <AlertTriangle aria-hidden="true" className="h-6 w-6 text-yellow-500" />
             Quality Standards
           </h2>
           
@@ -99,9 +99,9 @@ export default function GuidelinesPage() {
         </div>
 
         {/* Community Behavior */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+        <div className="bg-white/90 backdrop-blur-sm rounded-xl ring-1 ring-gray-200 shadow-sm p-6 mb-8">
           <h2 className="text-2xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
-            <CheckCircle className="h-6 w-6 text-green-500" />
+            <CheckCircle aria-hidden="true" className="h-6 w-6 text-green-600" />
             Community Behavior
           </h2>
           
@@ -111,12 +111,12 @@ export default function GuidelinesPage() {
               <p className="text-gray-600">Treat all community members with respect and kindness.</p>
             </div>
             
-            <div className="border-l-4 border-blue-500 pl-4">
+            <div className="border-l-4 border-indigo-600 pl-4">
               <h3 className="font-medium text-gray-900">Be Helpful</h3>
               <p className="text-gray-600">Share knowledge, answer questions, and support fellow users.</p>
             </div>
             
-            <div className="border-l-4 border-purple-500 pl-4">
+            <div className="border-l-4 border-violet-600 pl-4">
               <h3 className="font-medium text-gray-900">Be Constructive</h3>
               <p className="text-gray-600">Provide constructive feedback and suggestions for improvement.</p>
             </div>
@@ -129,9 +129,9 @@ export default function GuidelinesPage() {
         </div>
 
         {/* Enforcement */}
-        <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="bg-white/90 backdrop-blur-sm rounded-xl ring-1 ring-gray-200 shadow-sm p-6">
           <h2 className="text-2xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
-            <XCircle className="h-6 w-6 text-red-500" />
+            <XCircle aria-hidden="true" className="h-6 w-6 text-red-500" />
             Enforcement
           </h2>
           

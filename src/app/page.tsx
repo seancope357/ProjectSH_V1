@@ -74,7 +74,7 @@ export default function HomePage() {
           
             <div className="grid md:grid-cols-3 gap-8">
               {/* Featured Sequence 1 */}
-            <div className="mi-card bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+            <div className="mi-card bg-white/90 backdrop-blur-sm rounded-xl ring-1 ring-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
               <div className="aspect-video bg-gradient-to-br from-purple-500 to-pink-500 relative">
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-white text-center">
@@ -111,7 +111,7 @@ export default function HomePage() {
             </div>
 
             {/* Featured Sequence 2 */}
-            <div className="mi-card bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+            <div className="mi-card bg-white/90 backdrop-blur-sm rounded-xl ring-1 ring-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
               <div className="aspect-video bg-gradient-to-br from-blue-500 to-teal-500 relative">
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-white text-center">
@@ -148,7 +148,7 @@ export default function HomePage() {
             </div>
 
             {/* Featured Sequence 3 */}
-            <div className="mi-card bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+            <div className="mi-card bg-white/90 backdrop-blur-sm rounded-xl ring-1 ring-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
               <div className="aspect-video bg-gradient-to-br from-orange-500 to-red-500 relative">
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-white text-center">
@@ -212,7 +212,7 @@ export default function HomePage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div className="text-center">
               <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Search className="h-8 w-8 text-blue-600" />
+                <Search aria-hidden="true" className="h-8 w-8 text-blue-600" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">Smart Search</h3>
               <p className="text-gray-600">
@@ -222,7 +222,7 @@ export default function HomePage() {
             
             <div className="text-center">
               <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Zap className="h-8 w-8 text-green-600" />
+                <Zap aria-hidden="true" className="h-8 w-8 text-green-600" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">Instant Download</h3>
               <p className="text-gray-600">
@@ -232,7 +232,7 @@ export default function HomePage() {
             
             <div className="text-center">
               <div className="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Shield className="h-8 w-8 text-purple-600" />
+                <Shield aria-hidden="true" className="h-8 w-8 text-purple-600" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">High Quality Content</h3>
               <p className="text-gray-600">
@@ -242,7 +242,7 @@ export default function HomePage() {
             
             <div className="text-center">
               <div className="bg-orange-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Users className="h-8 w-8 text-orange-600" />
+                <Users aria-hidden="true" className="h-8 w-8 text-orange-600" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">Creator Community</h3>
               <p className="text-gray-600">

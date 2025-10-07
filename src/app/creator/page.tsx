@@ -77,18 +77,18 @@ export default function CreatorHubPage() {
     (user?.email ? user.email.split('@')[0] : 'Creator')
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       <Navigation />
 
       {/* Header */}
-      <div className="bg-white shadow-sm">
+      <div className="bg-gradient-to-r from-indigo-600 to-violet-600">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Creator Hub</h1>
-            <p className="mt-2 text-gray-600">Personalized tips, trends, and tools for Xlights creators</p>
+            <h1 className="text-3xl font-bold text-white">Creator Hub</h1>
+            <p className="mt-2 text-indigo-100">Personalized tips, trends, and tools for Xlights creators</p>
           </div>
-          <div className="flex items-center gap-2 text-gray-700">
-            <Zap className="h-6 w-6 text-blue-600" />
+          <div className="flex items-center gap-2 text-white/90">
+            <Zap aria-hidden="true" className="h-6 w-6 text-white/95" />
             <span className="font-medium">Welcome, {displayName}</span>
           </div>
         </div>
@@ -96,19 +96,19 @@ export default function CreatorHubPage() {
 
       <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-8">
         {/* Your Performance */}
-        <section className="bg-white rounded-lg shadow p-6">
+        <section className="bg-white/90 backdrop-blur-sm rounded-xl ring-1 ring-gray-200 shadow-sm p-6">
           <div className="flex items-center gap-2 mb-4">
-            <TrendingUp className="h-5 w-5 text-blue-600" />
+            <TrendingUp aria-hidden="true" className="h-5 w-5 text-indigo-600" />
             <h2 className="text-xl font-semibold text-gray-900">Your Performance (30 days)</h2>
           </div>
           {/* Granularity switch */}
           <div className="mb-3">
-            <div className="inline-flex rounded border overflow-hidden">
+            <div className="inline-flex rounded-full bg-gray-100 p-0.5">
               {(['daily','weekly','monthly','quarterly'] as const).map(g => (
                 <button
                   key={g}
                   onClick={() => setGranularity(g)}
-                  className={`px-3 py-1 text-sm ${granularity === g ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'} border-r last:border-r-0`}
+                  className={`px-3 py-1 text-sm rounded-full ${granularity === g ? 'bg-indigo-600 text-white shadow-sm' : 'bg-transparent text-gray-700 hover:bg-white'}`}
                 >
                   {g.charAt(0).toUpperCase() + g.slice(1)}
                 </button>
@@ -120,21 +120,21 @@ export default function CreatorHubPage() {
           ) : creator ? (
             <div className="space-y-6">
               <div className="grid sm:grid-cols-3 gap-4">
-                <div className="p-4 border rounded">
+                <div className="p-4 rounded-xl ring-1 ring-gray-200 bg-white hover:shadow-md transition">
                   <div className="text-sm text-gray-600">Revenue</div>
                   <div className="text-2xl font-semibold text-gray-900">${creator.totals.revenue.toFixed(2)}</div>
                   {creator.totals.estimated && (
                     <div className="text-xs text-gray-500">Estimated based on downloads</div>
                   )}
                 </div>
-                <div className="p-4 border rounded">
+                <div className="p-4 rounded-xl ring-1 ring-gray-200 bg-white hover:shadow-md transition">
                   <div className="text-sm text-gray-600">Sales</div>
                   <div className="text-2xl font-semibold text-gray-900">{creator.totals.sales}</div>
                   {creator.totals.estimated && (
                     <div className="text-xs text-gray-500">Estimated based on downloads</div>
                   )}
                 </div>
-                <div className="p-4 border rounded">
+                <div className="p-4 rounded-xl ring-1 ring-gray-200 bg-white hover:shadow-md transition">
                   <div className="text-sm text-gray-600">Active Sequences</div>
                   <div className="text-2xl font-semibold text-gray-900">{creator.totals.sequences}</div>
                 </div>
@@ -147,7 +147,7 @@ export default function CreatorHubPage() {
                   primary={{
                     label: 'Revenue',
                     points: (creator.timeseries?.points || []).map(p => ({ date: p.date, value: p.revenue })),
-                    color: '#2563EB',
+                    color: '#4F46E5',
                   }}
                   granularity={creator.timeseries?.granularity || granularity}
                   currency="USD"
@@ -166,7 +166,7 @@ export default function CreatorHubPage() {
                   <div className="grid md:grid-cols-2 gap-4">
                     {creator.topSequences.map((s) => (
                       <Link key={s.id} href={`/sequence/${s.id}`} className="block">
-                        <div className="p-4 border rounded hover:border-blue-400 transition">
+                        <div className="p-4 rounded-xl ring-1 ring-gray-200 hover:ring-indigo-300 hover:shadow-md transition">
                           <div className="flex items-center justify-between">
                             <div>
                               <div className="font-medium text-gray-900">{s.title}</div>
@@ -197,31 +197,31 @@ export default function CreatorHubPage() {
         </section>
 
         {/* Tips & Guidance */}
-        <section className="bg-white rounded-lg shadow p-6">
+        <section className="bg-white/90 backdrop-blur-sm rounded-xl ring-1 ring-gray-200 shadow-sm p-6">
           <div className="flex items-center gap-2 mb-4">
-            <Lightbulb className="h-5 w-5 text-amber-500" />
+            <Lightbulb aria-hidden="true" className="h-5 w-5 text-amber-500" />
             <h2 className="text-xl font-semibold text-gray-900">Quick Tips</h2>
           </div>
           <ul className="grid md:grid-cols-2 gap-4 text-gray-700">
-            <li className="p-4 bg-amber-50 rounded">
+            <li className="p-4 rounded-xl bg-gradient-to-br from-amber-50 to-amber-100 ring-1 ring-amber-200">
               <span className="font-medium">Lean into seasonal demand:</span> Christmas, Halloween, and New Year themes dominate downloads.
             </li>
-            <li className="p-4 bg-amber-50 rounded">
+            <li className="p-4 rounded-xl bg-gradient-to-br from-amber-50 to-amber-100 ring-1 ring-amber-200">
               <span className="font-medium">Optimize previews:</span> High-quality audio/visual previews significantly boost conversion.
             </li>
-            <li className="p-4 bg-amber-50 rounded">
+            <li className="p-4 rounded-xl bg-gradient-to-br from-amber-50 to-amber-100 ring-1 ring-amber-200">
               <span className="font-medium">Tag smartly:</span> Use descriptive tags like "fast", "epic", "synth", "chorus" to improve discovery.
             </li>
-            <li className="p-4 bg-amber-50 rounded">
+            <li className="p-4 rounded-xl bg-gradient-to-br from-amber-50 to-amber-100 ring-1 ring-amber-200">
               <span className="font-medium">Price with intent:</span> Balance price vs. downloads; consider $9.99–$14.99 for mainstream tracks.
             </li>
           </ul>
         </section>
 
         {/* Market Insights */}
-        <section className="bg-white rounded-lg shadow p-6">
+        <section className="bg-white/90 backdrop-blur-sm rounded-xl ring-1 ring-gray-200 shadow-sm p-6">
           <div className="flex items-center gap-2 mb-4">
-            <TrendingUp className="h-5 w-5 text-green-600" />
+            <TrendingUp aria-hidden="true" className="h-5 w-5 text-green-600" />
             <h2 className="text-xl font-semibold text-gray-900">What’s Hot</h2>
           </div>
 
@@ -234,7 +234,7 @@ export default function CreatorHubPage() {
                 <h3 className="text-lg font-semibold text-gray-900 mb-3">Top Categories</h3>
                 <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
                   {insights.topCategories.map((c) => (
-                    <div key={c.name} className="p-4 border rounded">
+                    <div key={c.name} className="p-4 rounded-xl ring-1 ring-gray-200 bg-white hover:ring-indigo-300 hover:shadow-md transition">
                       <div className="text-gray-900 font-medium">{c.name}</div>
                       <div className="text-gray-600 text-sm">{c.count} sequences</div>
                     </div>
@@ -248,7 +248,7 @@ export default function CreatorHubPage() {
                 <div className="grid md:grid-cols-2 gap-4">
                   {insights.topByDownloads.slice(0, 6).map((s) => (
                     <Link key={s.id} href={`/sequence/${s.id}`} className="block">
-                      <div className="p-4 border rounded hover:border-blue-400 transition">
+                      <div className="p-4 rounded-xl ring-1 ring-gray-200 hover:ring-indigo-300 hover:shadow-md transition">
                         <div className="flex items-center justify-between">
                           <div>
                             <div className="font-medium text-gray-900">{s.title}</div>
@@ -269,7 +269,7 @@ export default function CreatorHubPage() {
                 <h3 className="text-lg font-semibold text-gray-900 mb-3">Hot Tags</h3>
                 <div className="flex flex-wrap gap-2">
                   {insights.hotTags.map((t) => (
-                    <span key={t.name} className="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-800">
+                    <span key={t.name} className="px-3 py-1 bg-indigo-50 text-indigo-700 ring-1 ring-indigo-100 rounded-full text-sm hover:bg-indigo-100 transition">
                       #{t.name}
                     </span>
                   ))}
@@ -282,29 +282,29 @@ export default function CreatorHubPage() {
         </section>
 
         {/* Licensing CTA */}
-        <section className="bg-white rounded-lg shadow p-6">
+        <section className="relative overflow-hidden rounded-xl p-6 bg-gradient-to-r from-violet-600 to-indigo-600 text-white">
           <div className="flex items-center gap-2 mb-4">
-            <Music className="h-5 w-5 text-purple-600" />
-            <h2 className="text-xl font-semibold text-gray-900">Song Licensing</h2>
+            <Music aria-hidden="true" className="h-5 w-5 text-white" />
+            <h2 className="text-xl font-semibold text-white">Song Licensing</h2>
           </div>
-          <p className="text-gray-700 mb-4">
+          <p className="text-indigo-100 mb-4">
             Want to use commercial tracks in your Xlights sequences? Ensure you have proper rights.
             Explore licensing partners and pick a plan that fits your use.
           </p>
           <div className="flex items-center gap-3">
-            <Link href="/licensing" className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700">Explore Licensing Options</Link>
-            <div className="flex items-center text-gray-600 text-sm gap-1">
-              <ShieldCheck className="h-4 w-4" />
+            <Link href="/licensing" className="px-4 py-2 bg-white text-indigo-700 rounded hover:bg-indigo-50">Explore Licensing Options</Link>
+            <div className="flex items-center text-white/85 text-sm gap-1">
+              <ShieldCheck aria-hidden="true" className="h-4 w-4 text-white" />
               <span>Stay compliant with usage rights</span>
             </div>
           </div>
         </section>
 
         {/* Notes */}
-        <section className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <section className="bg-indigo-50 border border-indigo-200 rounded-xl p-4">
           <div className="flex items-center gap-2">
-            <Info className="h-4 w-4 text-blue-600" />
-            <p className="text-sm text-blue-800">
+            <Info aria-hidden="true" className="h-4 w-4 text-indigo-600" />
+            <p className="text-sm text-indigo-800">
               Insights are based on marketplace activity and may update periodically.
               For more detailed analytics, use the Seller Dashboard.
             </p>
