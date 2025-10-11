@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-db'
-import { stripe } from '@/lib/stripe'
 import fs from 'fs'
 import path from 'path'
 
@@ -12,11 +11,12 @@ export async function GET() {
     NEXT_PUBLIC_SUPABASE_URL: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
     NEXT_PUBLIC_SUPABASE_ANON_KEY: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     SUPABASE_SERVICE_ROLE_KEY: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
-    STRIPE_SECRET_KEY: !!process.env.STRIPE_SECRET_KEY,
   }
 
   // Try a lightweight DB check
-  let dbStatus: { ok: boolean; latency_ms?: number; error?: string } = { ok: false }
+  let dbStatus: { ok: boolean; latency_ms?: number; error?: string } = {
+    ok: false,
+  }
   try {
     const t0 = Date.now()
     const { data, error } = await supabaseAdmin
@@ -27,16 +27,6 @@ export async function GET() {
     dbStatus = { ok: true, latency_ms: Date.now() - t0 }
   } catch (e: any) {
     dbStatus = { ok: false, error: e?.message || 'db check failed' }
-  }
-
-  // Stripe basic readiness – avoid network calls; just ensure key is present and parsable
-  let stripeStatus: { configured: boolean; apiVersion?: string } = { configured: false }
-  try {
-    if (process.env.STRIPE_SECRET_KEY) {
-      stripeStatus = { configured: true, apiVersion: (stripe as any)._api?.version || 'unknown' }
-    }
-  } catch {
-    stripeStatus = { configured: false }
   }
 
   // Read version from package.json (best-effort)
@@ -56,7 +46,6 @@ export async function GET() {
     env,
     services: {
       supabase: dbStatus,
-      stripe: stripeStatus,
     },
   }
 

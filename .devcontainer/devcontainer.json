@@ -1,0 +1,20 @@
+{
+  "name": "ProjectSH Dev",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "args": {
+      "NODE_VERSION": "20"
+    }
+  },
+  "workspaceFolder": "/workspace",
+  "postCreateCommand": "npm ci && npx prisma generate",
+  "forwardPorts": [3000, 3001],
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "editor.formatOnSave": true
+      },
+      "extensions": ["esbenp.prettier-vscode", "dbaeumer.vscode-eslint"]
+    }
+  }
+}

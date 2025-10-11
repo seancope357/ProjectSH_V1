@@ -1,11 +1,11 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
   // Enable experimental features for better performance
   experimental: {
-    optimizePackageImports: ['@supabase/supabase-js', 'stripe'],
+    optimizePackageImports: ['@supabase/supabase-js'],
   },
-  
+
   // Image optimization for external sources
   images: {
     remotePatterns: [
@@ -23,7 +23,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  
+
   // Security headers
   async headers() {
     return [
@@ -44,11 +44,11 @@ const nextConfig: NextConfig = {
           },
         ],
       },
-    ];
+    ]
   },
-  
+
   // Optimize for Vercel deployment
   output: 'standalone',
-};
+}
 
-export default nextConfig;
+export default nextConfig

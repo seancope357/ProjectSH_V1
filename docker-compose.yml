@@ -1,0 +1,16 @@
+version: "3.8"
+
+services:
+  web:
+    image: node:20-bullseye
+    working_dir: /app
+    volumes:
+      - .:/app
+    command: npm run dev
+    ports:
+      - "3000:3000"
+      - "3001:3001"
+    environment:
+      - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+      - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}

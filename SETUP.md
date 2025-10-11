@@ -7,18 +7,19 @@ This guide will help you set up your SequenceHUB marketplace with Vercel and Sup
 - Node.js 18+ installed
 - A Vercel account
 - A Supabase account
-- A Stripe account (for payments)
 - A Google Cloud account (for OAuth)
 
 ## 1. Supabase Setup
 
 ### Step 1: Create a Supabase Project
+
 1. Go to [supabase.com](https://supabase.com) and sign in
 2. Click "New Project"
 3. Choose your organization and enter project details
 4. Wait for the project to be created
 
 ### Step 2: Get Supabase Credentials
+
 1. In your Supabase dashboard, go to Settings → API
 2. Copy the following values:
    - **Project URL** → `NEXT_PUBLIC_SUPABASE_URL`
@@ -26,6 +27,7 @@ This guide will help you set up your SequenceHUB marketplace with Vercel and Sup
    - **service_role** key → `SUPABASE_SERVICE_ROLE_KEY`
 
 ### Step 3: Set up Database
+
 1. In Supabase dashboard, go to Settings → Database
 2. Copy the **Connection string** → `DATABASE_URL`
 3. Also copy the **Connection pooling** URLs for production:
@@ -33,6 +35,7 @@ This guide will help you set up your SequenceHUB marketplace with Vercel and Sup
    - **Direct connection** → `POSTGRES_URL_NON_POOLING`
 
 ### Step 4: Configure Authentication
+
 1. Go to Authentication → Settings
 2. Add your domain to **Site URL** (e.g., `https://project-sh-v1.vercel.app`)
 3. Add redirect URLs under **Redirect URLs**:
@@ -42,12 +45,14 @@ This guide will help you set up your SequenceHUB marketplace with Vercel and Sup
 ## 2. Vercel Setup
 
 ### Step 1: Connect Repository
+
 1. Go to [vercel.com](https://vercel.com) and sign in
 2. Click "New Project"
 3. Import your GitHub repository
 4. Vercel will auto-detect it's a Next.js project
 
 ### Step 2: Configure Environment Variables
+
 In your Vercel project settings, add these environment variables:
 
 ```bash
@@ -73,17 +78,13 @@ POSTGRES_URL_NON_POOLING=postgresql://postgres:password@host:5432/postgres?sslmo
 GOOGLE_CLIENT_ID=your-google-client-id
 GOOGLE_CLIENT_SECRET=your-google-client-secret
 
-# Stripe Configuration
-STRIPE_SECRET_KEY=sk_live_your-stripe-secret-key
-STRIPE_WEBHOOK_SECRET=whsec_your-webhook-secret
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_your-publishable-key
-
 # Platform Fee Configuration
 PLATFORM_FEE_PERCENT=15
 PLATFORM_FEE_FIXED_CENTS=50
 ```
 
 ### Step 3: Deploy
+
 1. Click "Deploy" in Vercel
 2. Wait for the build to complete
 3. Your app will be available at `https://project-sh-v1.vercel.app`
@@ -93,6 +94,7 @@ PLATFORM_FEE_FIXED_CENTS=50
 After deployment, you need to set up your database schema:
 
 ### Option 1: Using Vercel CLI
+
 ```bash
 # Install Vercel CLI
 npm i -g vercel
@@ -110,6 +112,7 @@ npx prisma db push
 ```
 
 ### Option 2: Using Supabase SQL Editor
+
 1. Go to your Supabase dashboard → SQL Editor
 2. Run the Prisma migration SQL (generated from `prisma db push`)
 
@@ -124,14 +127,9 @@ npx prisma db push
    - `http://localhost:3000/api/auth/callback/google`
 6. Copy Client ID and Client Secret to your environment variables
 
-## 5. Stripe Setup
+## 5. Payments (Disabled)
 
-1. Go to [Stripe Dashboard](https://dashboard.stripe.com)
-2. Get your API keys from Developers → API keys
-3. Set up webhooks at Developers → Webhooks:
-   - Endpoint URL: `https://project-sh-v1.vercel.app/api/webhooks/stripe`
-   - Events to send: `payment_intent.succeeded`, `account.updated`, etc.
-4. Copy the webhook signing secret
+Payments and webhooks are currently disabled in this build. All Stripe-dependent code has been removed for stability.
 
 ## 6. Testing Your Setup
 
@@ -139,7 +137,7 @@ npx prisma db push
 2. Try signing up/signing in
 3. Test creating a seller account
 4. Test uploading sequences
-5. Test the purchase flow
+5. Review checkout behavior (should indicate payments are disabled)
 
 ## 7. Local Development
 
@@ -149,6 +147,7 @@ For local development:
 2. Copy `.env.example` to `.env.local`
 3. Fill in your environment variables
 4. Run:
+
 ```bash
 npm install
 npx prisma generate
@@ -162,7 +161,7 @@ npm run dev
 
 1. **Database connection errors**: Check your DATABASE_URL format
 2. **Authentication not working**: Verify redirect URLs in Google OAuth and Supabase
-3. **Stripe webhooks failing**: Ensure webhook URL is correct and accessible
+3. **Payments disabled**: Checkout is intentionally disabled in this build
 4. **Build failures**: Check that all environment variables are set in Vercel
 
 ### Getting Help:
@@ -177,5 +176,5 @@ npm run dev
 - Never commit `.env` files to version control
 - Use strong, unique secrets for production
 - Regularly rotate API keys
-- Monitor your Stripe dashboard for unusual activity
+<!-- Stripe dashboard monitoring removed: Stripe not in use -->
 - Set up proper CORS policies in Supabase

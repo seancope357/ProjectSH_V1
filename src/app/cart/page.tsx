@@ -5,7 +5,14 @@ import { useAuth } from '@/components/providers/session-provider'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { Navigation } from '@/components/ui/navigation'
-import { Trash2, Plus, Minus, ShoppingBag, CreditCard, ArrowRight } from 'lucide-react'
+import {
+  Trash2,
+  Plus,
+  Minus,
+  ShoppingBag,
+  CreditCard,
+  ArrowRight,
+} from 'lucide-react'
 
 interface CartItem {
   id: string
@@ -36,7 +43,7 @@ export default function CartPage() {
       router.push('/auth/signin')
       return
     }
-    
+
     if (user) {
       fetchCartItems()
     }
@@ -64,7 +71,7 @@ export default function CartPage() {
       const response = await fetch(`/api/cart/${itemId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ quantity: newQuantity })
+        body: JSON.stringify({ quantity: newQuantity }),
       })
 
       if (response.ok) {
@@ -85,7 +92,7 @@ export default function CartPage() {
     setUpdating(itemId)
     try {
       const response = await fetch(`/api/cart/${itemId}`, {
-        method: 'DELETE'
+        method: 'DELETE',
       })
 
       if (response.ok) {
@@ -101,7 +108,7 @@ export default function CartPage() {
   const clearCart = async () => {
     try {
       const response = await fetch('/api/cart', {
-        method: 'DELETE'
+        method: 'DELETE',
       })
 
       if (response.ok) {
@@ -113,36 +120,14 @@ export default function CartPage() {
   }
 
   const proceedToCheckout = async () => {
-    try {
-      const items = cartItems.map((item) => ({ sequenceId: item.sequence.id }))
-      const response = await fetch('/api/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          items,
-          successUrl: `${process.env.NEXT_PUBLIC_APP_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-          cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/cart`,
-        }),
-      })
-
-      if (!response.ok) {
-        console.error('Checkout failed')
-        return
-      }
-
-      const data = await response.json()
-      if (data.url) {
-        // Redirect to Stripe Checkout
-        window.location.href = data.url
-      } else {
-        console.error('No checkout URL returned')
-      }
-    } catch (error) {
-      console.error('Error during checkout:', error)
-    }
+    // Payments are currently disabled; route to checkout page for summary only
+    router.push('/checkout')
   }
 
-  const subtotal = cartItems.reduce((sum, item) => sum + (item.sequence.price * item.quantity), 0)
+  const subtotal = cartItems.reduce(
+    (sum, item) => sum + item.sequence.price * item.quantity,
+    0
+  )
   const tax = subtotal * 0.08 // 8% tax
   const total = subtotal + tax
 
@@ -160,12 +145,13 @@ export default function CartPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />
-      
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Shopping Cart</h1>
           <p className="text-gray-600 mt-2">
-            {cartItems.length} {cartItems.length === 1 ? 'item' : 'items'} in your cart
+            {cartItems.length} {cartItems.length === 1 ? 'item' : 'items'} in
+            your cart
           </p>
         </div>
 
@@ -205,7 +191,7 @@ export default function CartPage() {
                 </div>
 
                 <div className="divide-y divide-gray-200">
-                  {cartItems.map((item) => (
+                  {cartItems.map(item => (
                     <div key={item.id} className="p-6">
                       <div className="flex items-start gap-4">
                         {/* Preview Image */}
@@ -240,8 +226,12 @@ export default function CartPage() {
                         <div className="flex items-center gap-3">
                           <div className="flex items-center border border-gray-300 rounded-lg">
                             <button
-                              onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                              disabled={item.quantity <= 1 || updating === item.id}
+                              onClick={() =>
+                                updateQuantity(item.id, item.quantity - 1)
+                              }
+                              disabled={
+                                item.quantity <= 1 || updating === item.id
+                              }
                               className="p-2 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                               <Minus className="w-4 h-4" />
@@ -250,7 +240,9 @@ export default function CartPage() {
                               {updating === item.id ? '...' : item.quantity}
                             </span>
                             <button
-                              onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                              onClick={() =>
+                                updateQuantity(item.id, item.quantity + 1)
+                              }
                               disabled={updating === item.id}
                               className="p-2 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
@@ -261,7 +253,8 @@ export default function CartPage() {
                           {/* Price */}
                           <div className="text-right min-w-[5rem]">
                             <div className="font-semibold text-gray-900">
-                              ${(item.sequence.price * item.quantity).toFixed(2)}
+                              $
+                              {(item.sequence.price * item.quantity).toFixed(2)}
                             </div>
                             {item.quantity > 1 && (
                               <div className="text-sm text-gray-500">
@@ -320,8 +313,8 @@ export default function CartPage() {
                 </button>
 
                 <div className="mt-4 text-xs text-gray-500 text-center">
-                  <p>✓ Secure checkout with Stripe</p>
-                  <p>✓ Instant download after payment</p>
+                  <p>✓ Secure account via Supabase</p>
+                  <p>✓ Checkout temporarily disabled</p>
                   <p>✓ 30-day money-back guarantee</p>
                 </div>
 

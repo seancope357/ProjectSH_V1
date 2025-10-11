@@ -8,7 +8,12 @@
     "start": "next start",
     "lint": "eslint",
     "dev:health": "open http://localhost:3000/api/health",
-    "dev:seed": "open http://localhost:3000/api/auth/seed"
+    "dev:seed": "open http://localhost:3000/api/auth/seed",
+    "dev:inspect": "NODE_OPTIONS='--inspect' next dev --turbopack -p 3001",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage",
+    "prepare": "husky install"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.3",
@@ -20,7 +25,6 @@
     "next": "15.5.3",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "stripe": "^18.5.0",
     "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
@@ -34,6 +38,12 @@
     "prettier": "^3.6.2",
     "tailwindcss": "^4",
     "typescript": "^5",
-    "vercel": "^48.1.6"
+    "vercel": "^48.1.6",
+    "vitest": "^2.1.4",
+    "@testing-library/react": "^16.0.0",
+    "@testing-library/jest-dom": "^6.4.6",
+    "jsdom": "^24.0.0",
+    "husky": "^9.1.6",
+    "lint-staged": "^15.2.10"
   }
 }

@@ -39,15 +39,15 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 Create an `.env.local` from `.env.example` and fill in:
 
+-
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY` (server-side ops like seeding)
-- `STRIPE_SECRET_KEY` (optional; test key for development)
 
 ## Health Check
 
 - Endpoint: `GET /api/health`
-- Returns app version, uptime, env presence (no secrets), Supabase connectivity, and Stripe configuration status.
+- Returns app version, uptime, env presence (no secrets), and Supabase connectivity.
 - Use it to quickly diagnose local setup problems.
 
 ## Data Seeding (dev only)

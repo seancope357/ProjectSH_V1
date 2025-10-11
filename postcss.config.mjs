@@ -1,5 +1,9 @@
-const config = {
-  plugins: ["@tailwindcss/postcss"],
-};
+const isTest = process.env.NODE_ENV === 'test'
 
-export default config;
+export default {
+  plugins: isTest
+    ? {}
+    : {
+        '@tailwindcss/postcss': {},
+      },
+}

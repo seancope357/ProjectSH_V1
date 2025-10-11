@@ -1,14 +1,3 @@
 {
-  "mcpServers": {
-    "Stripe": {
-      "command": "npx -y @stripe/mcp",
-      "args": [
-        "--tools=all",
-        "--api-key=${STRIPE_SECRET_KEY}"
-      ],
-      "env": {
-        "STRIPE_SECRET_KEY": ""
-      }
-    }
-  }
+  "mcpServers": {}
 }
