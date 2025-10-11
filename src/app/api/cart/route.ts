@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/supabase-db'
 import { createClient } from '@/lib/supabase-server'
 
 export async function GET() {
@@ -13,7 +12,21 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const items = await db.cart.findByUserId(user.id)
+    const { data, error: qErr } = await supabase
+      .from('cart_items')
+      .select(
+        `
+        *,
+        sequence:sequences(
+          *,
+          seller:profiles!sequences_seller_id_fkey(username)
+        )
+      `
+      )
+      .eq('user_id', user.id)
+
+    if (qErr) throw qErr
+    const items = data || []
     return NextResponse.json({ items })
   } catch (e: any) {
     console.error('Cart GET failed:', e)
@@ -44,24 +57,26 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    try {
-      const item = await db.cart.addItem({
-        user_id: user.id,
-        sequence_id: sequenceId,
-        quantity: 1,
-      })
-      return NextResponse.json({ item }, { status: 201 })
-    } catch (insertError: any) {
-      // Handle uniqueness conflicts gracefully
-      const message = insertError?.message || ''
+    const { data: item, error: insErr } = await supabase
+      .from('cart_items')
+      .insert({ user_id: user.id, sequence_id: sequenceId, quantity: 1 })
+      .select()
+      .single()
+
+    if (insErr) {
+      const message = (insErr?.message || '').toLowerCase()
+      const code = (insErr as any)?.code || ''
       if (
-        message.toLowerCase().includes('duplicate') ||
-        message.toLowerCase().includes('unique')
+        message.includes('duplicate') ||
+        message.includes('unique') ||
+        code === '23505'
       ) {
         return NextResponse.json({ ok: true })
       }
-      throw insertError
+      throw insErr
     }
+
+    return NextResponse.json({ item }, { status: 201 })
   } catch (e: any) {
     console.error('Cart POST failed:', e)
     return NextResponse.json(
@@ -82,7 +97,11 @@ export async function DELETE() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    await db.cart.clearCart(user.id)
+    const { error: delErr } = await supabase
+      .from('cart_items')
+      .delete()
+      .eq('user_id', user.id)
+    if (delErr) throw delErr
     return NextResponse.json({ ok: true })
   } catch (e: any) {
     console.error('Cart DELETE failed:', e)

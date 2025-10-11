@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { db } from '@/lib/supabase-db'
 import { createClient } from '@/lib/supabase-server'
 
 export async function PATCH(
@@ -25,8 +24,15 @@ export async function PATCH(
       )
     }
 
-    // Update quantity — relies on row existing and RLS/service role safety handled in db layer
-    const item = await db.cart.updateQuantity(params.id, quantity)
+    const { data: item, error: upErr } = await supabase
+      .from('cart_items')
+      .update({ quantity })
+      .eq('id', params.id)
+      .eq('user_id', user.id)
+      .select()
+      .single()
+
+    if (upErr) throw upErr
     return NextResponse.json({ item })
   } catch (e: any) {
     console.error('Cart item PATCH failed:', e)
@@ -51,7 +57,12 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    await db.cart.removeItem(params.id)
+    const { error: delErr } = await supabase
+      .from('cart_items')
+      .delete()
+      .eq('id', params.id)
+      .eq('user_id', user.id)
+    if (delErr) throw delErr
     return NextResponse.json({ ok: true })
   } catch (e: any) {
     console.error('Cart item DELETE failed:', e)

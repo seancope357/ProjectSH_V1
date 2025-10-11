@@ -14,19 +14,21 @@ export function Navigation() {
   useEffect(() => {
     // Get initial user
     const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
       setUser(user)
       setLoading(false)
     }
     getUser()
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setUser(session?.user ?? null)
-        setLoading(false)
-      }
-    )
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user ?? null)
+      setLoading(false)
+    })
 
     return () => subscription.unsubscribe()
   }, [])
@@ -42,25 +44,81 @@ export function Navigation() {
           <div className="flex items-center">
             <Link href="/" className="flex-shrink-0">
               <div className="flex flex-col items-center">
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-700 dark:from-blue-400 dark:via-purple-400 dark:to-blue-500 bg-clip-text text-transparent">
-                  Sequence<span className="text-blue-600 dark:text-blue-400">HUB</span>
-                </h1>
-                
-                {/* LED String Dots - Solid Red, White, and Blue (3 of each) - Rolling pulse effect */}
-                <div className="flex space-x-1 -mt-0.5">
-                  <div className="w-1.5 h-1.5 bg-red-600 rounded-full animate-pulse" style={{animationDelay: '0ms'}}></div>
-                  <div className="w-1.5 h-1.5 bg-red-600 rounded-full animate-pulse" style={{animationDelay: '200ms'}}></div>
-                  <div className="w-1.5 h-1.5 bg-red-600 rounded-full animate-pulse" style={{animationDelay: '400ms'}}></div>
-                  <div className="w-1.5 h-1.5 bg-white border border-gray-300 rounded-full animate-pulse" style={{animationDelay: '600ms'}}></div>
-                  <div className="w-1.5 h-1.5 bg-white border border-gray-300 rounded-full animate-pulse" style={{animationDelay: '800ms'}}></div>
-                  <div className="w-1.5 h-1.5 bg-white border border-gray-300 rounded-full animate-pulse" style={{animationDelay: '1000ms'}}></div>
-                  <div className="w-1.5 h-1.5 bg-blue-600 rounded-full animate-pulse" style={{animationDelay: '1200ms'}}></div>
-                  <div className="w-1.5 h-1.5 bg-blue-600 rounded-full animate-pulse" style={{animationDelay: '1400ms'}}></div>
-                  <div className="w-1.5 h-1.5 bg-blue-600 rounded-full animate-pulse" style={{animationDelay: '1600ms'}}></div>
+                <div className="inline-block">
+                  <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-700 dark:from-blue-400 dark:via-purple-400 dark:to-blue-500 bg-clip-text text-transparent">
+                    Sequence
+                    <span className="text-blue-600 dark:text-blue-400">
+                      HUB
+                    </span>
+                  </h1>
+
+                  {/* LED String Dots - Alternating Red, White, Blue; extended to span text width */}
+                  <div className="flex justify-between w-full -mt-0.5">
+                    <div
+                      className="w-1.5 h-1.5 bg-red-600 rounded-full animate-pulse"
+                      style={{ animationDelay: '0ms' }}
+                    ></div>
+                    <div
+                      className="w-1.5 h-1.5 bg-white border border-gray-300 dark:border-gray-600 rounded-full animate-pulse"
+                      style={{ animationDelay: '150ms' }}
+                    ></div>
+                    <div
+                      className="w-1.5 h-1.5 bg-blue-600 rounded-full animate-pulse"
+                      style={{ animationDelay: '300ms' }}
+                    ></div>
+                    <div
+                      className="w-1.5 h-1.5 bg-red-600 rounded-full animate-pulse"
+                      style={{ animationDelay: '450ms' }}
+                    ></div>
+                    <div
+                      className="w-1.5 h-1.5 bg-white border border-gray-300 dark:border-gray-600 rounded-full animate-pulse"
+                      style={{ animationDelay: '600ms' }}
+                    ></div>
+                    <div
+                      className="w-1.5 h-1.5 bg-blue-600 rounded-full animate-pulse"
+                      style={{ animationDelay: '750ms' }}
+                    ></div>
+                    <div
+                      className="w-1.5 h-1.5 bg-red-600 rounded-full animate-pulse"
+                      style={{ animationDelay: '900ms' }}
+                    ></div>
+                    <div
+                      className="w-1.5 h-1.5 bg-white border border-gray-300 dark:border-gray-600 rounded-full animate-pulse"
+                      style={{ animationDelay: '1050ms' }}
+                    ></div>
+                    <div
+                      className="w-1.5 h-1.5 bg-blue-600 rounded-full animate-pulse"
+                      style={{ animationDelay: '1200ms' }}
+                    ></div>
+                    <div
+                      className="w-1.5 h-1.5 bg-red-600 rounded-full animate-pulse"
+                      style={{ animationDelay: '1350ms' }}
+                    ></div>
+                    <div
+                      className="w-1.5 h-1.5 bg-white border border-gray-300 dark:border-gray-600 rounded-full animate-pulse"
+                      style={{ animationDelay: '1500ms' }}
+                    ></div>
+                    <div
+                      className="w-1.5 h-1.5 bg-blue-600 rounded-full animate-pulse"
+                      style={{ animationDelay: '1650ms' }}
+                    ></div>
+                    <div
+                      className="w-1.5 h-1.5 bg-red-600 rounded-full animate-pulse"
+                      style={{ animationDelay: '1800ms' }}
+                    ></div>
+                    <div
+                      className="w-1.5 h-1.5 bg-white border border-gray-300 dark:border-gray-600 rounded-full animate-pulse"
+                      style={{ animationDelay: '1950ms' }}
+                    ></div>
+                    <div
+                      className="w-1.5 h-1.5 bg-blue-600 rounded-full animate-pulse"
+                      style={{ animationDelay: '2100ms' }}
+                    ></div>
+                  </div>
                 </div>
               </div>
             </Link>
-            
+
             <div className="hidden md:ml-6 md:flex md:space-x-8">
               <Link
                 href="/sequences"
@@ -82,7 +140,6 @@ export function Navigation() {
               >
                 Licensing
               </Link>
-
             </div>
           </div>
 
@@ -97,7 +154,7 @@ export function Navigation() {
                 >
                   <ShoppingCart className="h-6 w-6" />
                 </Link>
-                
+
                 {user.user_metadata?.role === 'SELLER' && (
                   <Link
                     href="/seller"
@@ -106,7 +163,7 @@ export function Navigation() {
                     Seller Dashboard
                   </Link>
                 )}
-                
+
                 {user.user_metadata?.role === 'ADMIN' && (
                   <Link
                     href="/admin"
@@ -115,7 +172,7 @@ export function Navigation() {
                     Admin Panel
                   </Link>
                 )}
-                
+
                 <div className="relative group">
                   <button className="flex items-center text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 p-2 transition-colors">
                     <User className="h-6 w-6" />
@@ -158,41 +215,44 @@ export function Navigation() {
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 p-2 transition-colors"
             >
-              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              {isMenuOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
             </button>
           </div>
         </div>
       </div>
 
       {/* Mobile menu */}
-          {isMenuOpen && (
-            <div className="md:hidden relative z-[55]">
-              <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 transition-colors">
-                <Link
-                  href="/sequences"
-                  className="text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 block px-3 py-2 text-base font-medium transition-colors"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Browse Sequences
-                </Link>
+      {isMenuOpen && (
+        <div className="md:hidden relative z-[55]">
+          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 transition-colors">
+            <Link
+              href="/sequences"
+              className="text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 block px-3 py-2 text-base font-medium transition-colors"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Browse Sequences
+            </Link>
 
-                <Link
-                  href="/creator"
-                  className="text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 block px-3 py-2 text-base font-medium transition-colors"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Creator Hub
-                </Link>
+            <Link
+              href="/creator"
+              className="text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 block px-3 py-2 text-base font-medium transition-colors"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Creator Hub
+            </Link>
 
-                <Link
-                  href="/licensing"
-                  className="text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 block px-3 py-2 text-base font-medium transition-colors"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Licensing
-                </Link>
+            <Link
+              href="/licensing"
+              className="text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 block px-3 py-2 text-base font-medium transition-colors"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Licensing
+            </Link>
 
-            
             {user ? (
               <>
                 <Link
@@ -216,7 +276,7 @@ export function Navigation() {
                 >
                   My Orders
                 </Link>
-                
+
                 {user.user_metadata?.role === 'SELLER' && (
                   <Link
                     href="/seller"
@@ -226,7 +286,7 @@ export function Navigation() {
                     Seller Dashboard
                   </Link>
                 )}
-                
+
                 {user.user_metadata?.role === 'ADMIN' && (
                   <Link
                     href="/admin"
@@ -236,7 +296,7 @@ export function Navigation() {
                     Admin Panel
                   </Link>
                 )}
-                
+
                 <button
                   onClick={() => {
                     handleSignOut()
