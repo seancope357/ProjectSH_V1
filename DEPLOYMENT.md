@@ -39,8 +39,6 @@ Use this section to quickly validate your live configuration on Vercel.
 - [ ] `DATABASE_URL` - PostgreSQL connection string
 - [ ] `POSTGRES_PRISMA_URL` - Pooled connection for Prisma
 - [ ] `POSTGRES_URL_NON_POOLING` - Direct connection
-- [ ] `GOOGLE_CLIENT_ID` - Google OAuth client ID
-- [ ] `GOOGLE_CLIENT_SECRET` - Google OAuth client secret
 - [ ] `NEXT_PUBLIC_APP_URL` - Your app's public URL
 
 # NextAuth variables are no longer needed - using Supabase authentication
@@ -54,17 +52,10 @@ Use this section to quickly validate your live configuration on Vercel.
 - [ ] Database schema deployed (run `npx prisma db push`)
 - [ ] Row Level Security (RLS) policies configured
 - [ ] Storage buckets created for sequence files
-- [ ] Authentication providers enabled (Google OAuth)
+
 - [ ] Site URL and redirect URLs configured
 
 <!-- Stripe configuration removed: payments are disabled in this build -->
-
-### ✅ Google OAuth Configuration
-
-- [ ] OAuth consent screen configured
-- [ ] Authorized redirect URIs added:
-  - `https://project-sh-v1.vercel.app/api/auth/callback/google`
-- [ ] Domain verification completed (if required)
 
 ## Deployment Steps
 
@@ -93,7 +84,7 @@ npx prisma db push
 ### 3. Verify Deployment
 
 - [ ] App loads without errors
-- [ ] Authentication works (Google OAuth)
+- [ ] Authentication works
 - [ ] Database connections work
 - [ ] File uploads work
 - [ ] Checkout is disabled as expected
@@ -179,7 +170,6 @@ npx prisma generate  # Ensure Prisma client is generated
 
 ### Authentication Issues
 
-- Check Google OAuth redirect URIs in Supabase dashboard
 - Verify Supabase project URL and anon key are correct
 - Ensure proper OAuth provider configuration in Supabase
 - Check Supabase auth settings and policies

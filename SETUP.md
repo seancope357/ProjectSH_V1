@@ -7,7 +7,6 @@ This guide will help you set up your SequenceHUB marketplace with Vercel and Sup
 - Node.js 18+ installed
 - A Vercel account
 - A Supabase account
-- A Google Cloud account (for OAuth)
 
 ## 1. Supabase Setup
 
@@ -74,9 +73,7 @@ DATABASE_URL=postgresql://postgres:password@host:6543/postgres?sslmode=require&s
 POSTGRES_PRISMA_URL=postgresql://postgres:password@host:6543/postgres?sslmode=require&pgbouncer=true
 POSTGRES_URL_NON_POOLING=postgresql://postgres:password@host:5432/postgres?sslmode=require
 
-# Google OAuth Configuration
-GOOGLE_CLIENT_ID=your-google-client-id
-GOOGLE_CLIENT_SECRET=your-google-client-secret
+
 
 # Platform Fee Configuration
 PLATFORM_FEE_PERCENT=15
@@ -116,17 +113,6 @@ npx prisma db push
 1. Go to your Supabase dashboard → SQL Editor
 2. Run the Prisma migration SQL (generated from `prisma db push`)
 
-## 4. Google OAuth Setup
-
-1. Go to [Google Cloud Console](https://console.cloud.google.com)
-2. Create a new project or select existing one
-3. Enable Google+ API
-4. Go to Credentials → Create Credentials → OAuth 2.0 Client IDs
-5. Add authorized redirect URIs:
-   - `https://project-sh-v1.vercel.app/api/auth/callback/google`
-   - `http://localhost:3000/api/auth/callback/google`
-6. Copy Client ID and Client Secret to your environment variables
-
 ## 5. Payments (Disabled)
 
 Payments and webhooks are currently disabled in this build. All Stripe-dependent code has been removed for stability.
@@ -160,7 +146,7 @@ npm run dev
 ### Common Issues:
 
 1. **Database connection errors**: Check your DATABASE_URL format
-2. **Authentication not working**: Verify redirect URLs in Google OAuth and Supabase
+2. **Authentication not working**: Verify redirect URLs in Supabase
 3. **Payments disabled**: Checkout is intentionally disabled in this build
 4. **Build failures**: Check that all environment variables are set in Vercel
 

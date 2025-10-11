@@ -45,8 +45,10 @@ export function Navigation() {
             <Link href="/" className="flex-shrink-0">
               <div className="flex flex-col items-center">
                 <div className="inline-block">
-                  <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-700 dark:from-blue-400 dark:via-purple-400 dark:to-blue-500 bg-clip-text text-transparent">
-                    Sequence
+                  <h1 className="text-2xl font-bold">
+                    <span className="text-purple-600 dark:text-purple-400">
+                      Sequence
+                    </span>
                     <span className="text-blue-600 dark:text-blue-400">
                       HUB
                     </span>
