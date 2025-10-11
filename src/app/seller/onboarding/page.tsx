@@ -15,9 +15,11 @@ import {
   User,
   Globe,
   FileText,
+  Info,
+  ListChecks,
 } from 'lucide-react'
 
-type Step = 1 | 2 | 3 | 4 | 5
+type Step = 1 | 2 | 3 | 4 | 5 | 6 | 7
 
 export default function SellerOnboardingPage() {
   const { user } = useAuth()
@@ -35,6 +37,22 @@ export default function SellerOnboardingPage() {
     bio: '' as string,
     website_url: '' as string,
     stripe_onboarding_complete: false,
+    // Defaults captured during onboarding for sequence metadata
+    default_sequence_meta: {
+      format: 'fseq' as 'fseq' | 'zip' | 'mp4',
+      frame_rate: 40 as number,
+      duration_sec: 0 as number,
+      layout_model: '' as string,
+      controllers: '' as string,
+      xlights_version: '' as string,
+    },
+    deliverables_checklist: {
+      has_readme: false,
+      thumbnail_present: false,
+      maps_documented: false,
+      zip_bundle_prepared: false,
+      audio_instructions_included: false,
+    },
   })
 
   useEffect(() => {
@@ -53,7 +71,7 @@ export default function SellerOnboardingPage() {
     loadProfile()
   }, [user])
 
-  const clampStep = (n: number): Step => Math.min(5, Math.max(1, n)) as Step
+  const clampStep = (n: number): Step => Math.min(7, Math.max(1, n)) as Step
   const nextStep = () => setStep(s => clampStep(s + 1))
   const prevStep = () => setStep(s => clampStep(s - 1))
 
@@ -118,9 +136,11 @@ export default function SellerOnboardingPage() {
   const steps = [
     { id: 1, label: 'Basic Info' },
     { id: 2, label: 'Profile Photo' },
-    { id: 3, label: 'Seller Details' },
-    { id: 4, label: 'Payout Setup' },
-    { id: 5, label: 'Review' },
+    { id: 3, label: 'Sequence Metadata' },
+    { id: 4, label: 'Deliverables' },
+    { id: 5, label: 'Seller Details' },
+    { id: 6, label: 'Payout Setup' },
+    { id: 7, label: 'Review' },
   ]
 
   return (
@@ -141,7 +161,7 @@ export default function SellerOnboardingPage() {
       {/* Progress */}
       <nav className="bg-white sticky top-0 z-30 border-b border-gray-200">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-          <div className="grid grid-cols-5 gap-2">
+          <div className="grid grid-cols-7 gap-2">
             {steps.map(s => (
               <div
                 key={s.id}
@@ -276,11 +296,237 @@ export default function SellerOnboardingPage() {
           </section>
         )}
 
-        {/* Step 3: Seller Details */}
+        {/* Step 3: Sequence Metadata */}
         {step === 3 && (
           <section className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center gap-3 mb-6">
-              <FileText className="h-5 w-5 text-gray-600" />
+              <Info className="h-5 w-5 text-gray-600" />
+              <h2 className="text-lg font-semibold">
+                Sequence Metadata Defaults
+              </h2>
+            </div>
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Primary Format
+                  </label>
+                  <select
+                    value={profile.default_sequence_meta.format}
+                    onChange={e =>
+                      setProfile(p => ({
+                        ...p,
+                        default_sequence_meta: {
+                          ...p.default_sequence_meta,
+                          format: e.target.value as any,
+                        },
+                      }))
+                    }
+                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  >
+                    <option value="fseq">FSEQ</option>
+                    <option value="zip">ZIP Bundle</option>
+                    <option value="mp4">MP4 Preview</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Frame Rate (FPS)
+                  </label>
+                  <input
+                    type="number"
+                    min={1}
+                    value={profile.default_sequence_meta.frame_rate}
+                    onChange={e =>
+                      setProfile(p => ({
+                        ...p,
+                        default_sequence_meta: {
+                          ...p.default_sequence_meta,
+                          frame_rate: Number(e.target.value),
+                        },
+                      }))
+                    }
+                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg"
+                    placeholder="e.g., 40"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Estimated Duration (sec)
+                  </label>
+                  <input
+                    type="number"
+                    min={0}
+                    value={profile.default_sequence_meta.duration_sec}
+                    onChange={e =>
+                      setProfile(p => ({
+                        ...p,
+                        default_sequence_meta: {
+                          ...p.default_sequence_meta,
+                          duration_sec: Number(e.target.value),
+                        },
+                      }))
+                    }
+                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg"
+                    placeholder="e.g., 180"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Layout / Model
+                  </label>
+                  <input
+                    type="text"
+                    value={profile.default_sequence_meta.layout_model}
+                    onChange={e =>
+                      setProfile(p => ({
+                        ...p,
+                        default_sequence_meta: {
+                          ...p.default_sequence_meta,
+                          layout_model: e.target.value,
+                        },
+                      }))
+                    }
+                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg"
+                    placeholder="e.g., MegaTree 16x100; Matrix 64x32"
+                  />
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Controllers / Protocols
+                  </label>
+                  <input
+                    type="text"
+                    value={profile.default_sequence_meta.controllers}
+                    onChange={e =>
+                      setProfile(p => ({
+                        ...p,
+                        default_sequence_meta: {
+                          ...p.default_sequence_meta,
+                          controllers: e.target.value,
+                        },
+                      }))
+                    }
+                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg"
+                    placeholder="e.g., E1.31, xLights, FPP, Kulp"
+                  />
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    xLights Version
+                  </label>
+                  <input
+                    type="text"
+                    value={profile.default_sequence_meta.xlights_version}
+                    onChange={e =>
+                      setProfile(p => ({
+                        ...p,
+                        default_sequence_meta: {
+                          ...p.default_sequence_meta,
+                          xlights_version: e.target.value,
+                        },
+                      }))
+                    }
+                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg"
+                    placeholder="e.g., 2024.34"
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="mt-6 flex justify-between">
+              <button
+                onClick={prevStep}
+                className="text-gray-600 flex items-center gap-2"
+              >
+                <ArrowLeft className="h-4 w-4" /> Back
+              </button>
+              <button
+                onClick={nextStep}
+                disabled={
+                  !profile.default_sequence_meta.format ||
+                  !profile.default_sequence_meta.frame_rate
+                }
+                className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50"
+              >
+                Continue <ArrowRight className="h-4 w-4" />
+              </button>
+            </div>
+          </section>
+        )}
+
+        {/* Step 4: Deliverables Checklist */}
+        {step === 4 && (
+          <section className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center gap-3 mb-6">
+              <ListChecks className="h-5 w-5 text-gray-600" />
+              <h2 className="text-lg font-semibold">Deliverables Checklist</h2>
+            </div>
+            <div className="space-y-3">
+              {[
+                { key: 'has_readme', label: 'README or instructions included' },
+                {
+                  key: 'thumbnail_present',
+                  label: 'Thumbnail/preview image provided',
+                },
+                { key: 'maps_documented', label: 'Models/mapping documented' },
+                {
+                  key: 'zip_bundle_prepared',
+                  label: 'ZIP bundle prepared (assets + sequence)',
+                },
+                {
+                  key: 'audio_instructions_included',
+                  label: 'Audio licensing instructions included',
+                },
+              ].map(item => (
+                <label
+                  key={item.key}
+                  className="flex items-center gap-3 text-sm"
+                >
+                  <input
+                    type="checkbox"
+                    checked={(profile.deliverables_checklist as any)[item.key]}
+                    onChange={e =>
+                      setProfile(p => ({
+                        ...p,
+                        deliverables_checklist: {
+                          ...p.deliverables_checklist,
+                          [item.key]: e.target.checked,
+                        },
+                      }))
+                    }
+                  />
+                  <span>{item.label}</span>
+                </label>
+              ))}
+            </div>
+            <div className="mt-6 flex justify-between">
+              <button
+                onClick={prevStep}
+                className="text-gray-600 flex items-center gap-2"
+              >
+                <ArrowLeft className="h-4 w-4" /> Back
+              </button>
+              <button
+                onClick={nextStep}
+                disabled={
+                  !(
+                    profile.deliverables_checklist.has_readme &&
+                    profile.deliverables_checklist.thumbnail_present
+                  )
+                }
+                className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50"
+              >
+                Continue <ArrowRight className="h-4 w-4" />
+              </button>
+            </div>
+          </section>
+        )}
+
+        {/* Step 5: Seller Details */}
+        {step === 5 && (
+          <section className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center gap-3 mb-6">
+              <Shield className="h-5 w-5 text-gray-600" />
               <h2 className="text-lg font-semibold">Seller Details</h2>
             </div>
             <div className="space-y-4">
@@ -334,8 +580,8 @@ export default function SellerOnboardingPage() {
           </section>
         )}
 
-        {/* Step 4: Payout Setup */}
-        {step === 4 && (
+        {/* Step 6: Payout Setup */}
+        {step === 6 && (
           <section className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center gap-3 mb-6">
               <Shield className="h-5 w-5 text-gray-600" />
@@ -372,8 +618,8 @@ export default function SellerOnboardingPage() {
           </section>
         )}
 
-        {/* Step 5: Review & Complete */}
-        {step === 5 && (
+        {/* Step 7: Review & Complete */}
+        {step === 7 && (
           <section className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center gap-3 mb-6">
               <CheckCircle className="h-5 w-5 text-green-600" />
@@ -387,6 +633,21 @@ export default function SellerOnboardingPage() {
               <div>
                 <span className="font-medium">Username:</span>{' '}
                 {profile.username || '—'}
+              </div>
+              <div>
+                <span className="font-medium">Defaults:</span>{' '}
+                {profile.default_sequence_meta.format?.toUpperCase()} •{' '}
+                {profile.default_sequence_meta.frame_rate} FPS •{' '}
+                {profile.default_sequence_meta.xlights_version || 'xLights n/a'}
+              </div>
+              <div>
+                <span className="font-medium">Deliverables:</span>{' '}
+                {
+                  Object.entries(profile.deliverables_checklist).filter(
+                    ([, v]) => !!v
+                  ).length
+                }
+                /5 checked
               </div>
               <div>
                 <span className="font-medium">Bio:</span> {profile.bio || '—'}
