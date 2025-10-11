@@ -1,46 +1,50 @@
-'use client';
+'use client'
 
-import { useState, useEffect, Suspense } from 'react';
-import { useAuth } from '@/components/providers/session-provider';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { Navigation } from '@/components/ui/navigation';
-import { User, Store, ArrowRight } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { useState, useEffect, Suspense } from 'react'
+import { useAuth } from '@/components/providers/session-provider'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { Navigation } from '@/components/ui/navigation'
+import { User, Store, ArrowRight } from 'lucide-react'
+import { supabase } from '@/lib/supabase'
 
 function RoleSelectionContent() {
-  const { user } = useAuth();
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const [selectedRole, setSelectedRole] = useState<'USER' | 'SELLER' | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const { user } = useAuth()
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const [selectedRole, setSelectedRole] = useState<'USER' | 'SELLER' | null>(
+    null
+  )
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
-  const callbackUrl = searchParams.get('callbackUrl') || '/';
+  const callbackUrl = searchParams.get('callbackUrl') || '/'
 
   useEffect(() => {
     // If user is not authenticated, redirect to sign in
     if (!user) {
-      router.push('/auth/signin');
-      return;
+      router.push('/auth/signin')
+      return
     }
 
     // Check if user already has a role set
     if (user.user_metadata?.role && user.user_metadata.role !== 'USER') {
       const role = user.user_metadata.role
-      if (role === 'SELLER' || role === 'ADMIN') {
+      if (role === 'ADMIN') {
         router.push('/seller/dashboard')
+      } else if (role === 'SELLER') {
+        router.push('/seller/onboarding')
       } else {
         router.push(callbackUrl)
       }
-      return;
+      return
     }
-  }, [user, router, callbackUrl]);
+  }, [user, router, callbackUrl])
 
   const handleRoleSelection = async () => {
-    if (!selectedRole) return;
+    if (!selectedRole) return
 
-    setLoading(true);
-    setError('');
+    setLoading(true)
+    setError('')
 
     try {
       const response = await fetch('/api/user/role', {
@@ -49,28 +53,28 @@ function RoleSelectionContent() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ role: selectedRole }),
-      });
+      })
 
       if (response.ok) {
         // Refresh the user session to get updated metadata
-        await supabase.auth.refreshSession();
-        
+        await supabase.auth.refreshSession()
+
         // Redirect based on role
         if (selectedRole === 'SELLER') {
-          router.push('/seller/dashboard');
+          router.push('/seller/onboarding')
         } else {
-          router.push(callbackUrl);
+          router.push(callbackUrl)
         }
       } else {
-        const data = await response.json();
-        setError(data.error || 'Failed to update role');
+        const data = await response.json()
+        setError(data.error || 'Failed to update role')
       }
     } catch (error) {
-      setError('An error occurred while updating your role');
+      setError('An error occurred while updating your role')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   if (!user) {
     return (
@@ -83,13 +87,13 @@ function RoleSelectionContent() {
           </div>
         </div>
       </div>
-    );
+    )
   }
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />
-      
+
       <div className="flex min-h-screen items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="w-full max-w-2xl space-y-8">
           <div className="text-center">
@@ -118,14 +122,20 @@ function RoleSelectionContent() {
               onClick={() => setSelectedRole('USER')}
             >
               <div className="text-center">
-                <div className={`mx-auto flex h-16 w-16 items-center justify-center rounded-full ${
-                  selectedRole === 'USER' ? 'bg-blue-500' : 'bg-gray-100'
-                }`}>
-                  <User className={`h-8 w-8 ${
-                    selectedRole === 'USER' ? 'text-white' : 'text-gray-600'
-                  }`} />
+                <div
+                  className={`mx-auto flex h-16 w-16 items-center justify-center rounded-full ${
+                    selectedRole === 'USER' ? 'bg-blue-500' : 'bg-gray-100'
+                  }`}
+                >
+                  <User
+                    className={`h-8 w-8 ${
+                      selectedRole === 'USER' ? 'text-white' : 'text-gray-600'
+                    }`}
+                  />
                 </div>
-                <h3 className="mt-4 text-xl font-semibold text-gray-900">Buyer</h3>
+                <h3 className="mt-4 text-xl font-semibold text-gray-900">
+                  Buyer
+                </h3>
                 <p className="mt-2 text-sm text-gray-600">
                   Browse and purchase LED light sequences from talented creators
                 </p>
@@ -155,14 +165,20 @@ function RoleSelectionContent() {
               onClick={() => setSelectedRole('SELLER')}
             >
               <div className="text-center">
-                <div className={`mx-auto flex h-16 w-16 items-center justify-center rounded-full ${
-                  selectedRole === 'SELLER' ? 'bg-green-500' : 'bg-gray-100'
-                }`}>
-                  <Store className={`h-8 w-8 ${
-                    selectedRole === 'SELLER' ? 'text-white' : 'text-gray-600'
-                  }`} />
+                <div
+                  className={`mx-auto flex h-16 w-16 items-center justify-center rounded-full ${
+                    selectedRole === 'SELLER' ? 'bg-green-500' : 'bg-gray-100'
+                  }`}
+                >
+                  <Store
+                    className={`h-8 w-8 ${
+                      selectedRole === 'SELLER' ? 'text-white' : 'text-gray-600'
+                    }`}
+                  />
                 </div>
-                <h3 className="mt-4 text-xl font-semibold text-gray-900">Seller</h3>
+                <h3 className="mt-4 text-xl font-semibold text-gray-900">
+                  Seller
+                </h3>
                 <p className="mt-2 text-sm text-gray-600">
                   Upload and sell your LED light sequences to the community
                 </p>
@@ -209,18 +225,22 @@ function RoleSelectionContent() {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 export default function RoleSelectionPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black mx-auto"></div>
-        <p className="mt-2 text-gray-600">Loading...</p>
-      </div>
-    </div>}>
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black mx-auto"></div>
+            <p className="mt-2 text-gray-600">Loading...</p>
+          </div>
+        </div>
+      }
+    >
       <RoleSelectionContent />
     </Suspense>
-  );
+  )
 }

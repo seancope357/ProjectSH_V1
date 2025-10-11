@@ -15,7 +15,9 @@ export async function updateSession(request: NextRequest) {
           return request.cookies.getAll()
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
+          cookiesToSet.forEach(({ name, value }) =>
+            request.cookies.set(name, value)
+          )
           supabaseResponse = NextResponse.next({
             request,
           })
@@ -44,6 +46,43 @@ export async function updateSession(request: NextRequest) {
     const url = request.nextUrl.clone()
     url.pathname = '/auth/signin'
     return NextResponse.redirect(url)
+  }
+
+  // Seller onboarding gating
+  if (user) {
+    const isSellerRole = user.user_metadata?.role === 'SELLER'
+    const isAdminRole = user.user_metadata?.role === 'ADMIN'
+    const isSellerArea = request.nextUrl.pathname.startsWith('/seller')
+    const isOnboardingPage =
+      request.nextUrl.pathname.startsWith('/seller/onboarding')
+
+    if (isSellerArea && (isSellerRole || isAdminRole)) {
+      // Load seller profile minimal fields to determine onboarding completeness
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('full_name, username, bio, stripe_onboarding_complete')
+        .eq('id', user.id)
+        .single()
+
+      // Consider onboarding complete only if key fields exist and Stripe step marked complete
+      const hasRequiredProfile =
+        !!profile?.full_name && !!profile?.username && !!profile?.bio
+      const stripeComplete = !!profile?.stripe_onboarding_complete
+      const onboardingComplete =
+        !profileError && hasRequiredProfile && stripeComplete
+
+      if (!onboardingComplete && !isOnboardingPage) {
+        const url = request.nextUrl.clone()
+        url.pathname = '/seller/onboarding'
+        return NextResponse.redirect(url)
+      }
+
+      if (onboardingComplete && isOnboardingPage) {
+        const url = request.nextUrl.clone()
+        url.pathname = '/seller/dashboard'
+        return NextResponse.redirect(url)
+      }
+    }
   }
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is. If you're

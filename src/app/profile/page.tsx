@@ -21,6 +21,9 @@ import {
   Home,
   ShoppingBag,
   Zap,
+  Bell,
+  Shield,
+  Lock,
 } from 'lucide-react'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { useAuth } from '@/components/providers/session-provider'
@@ -94,6 +97,18 @@ export default function ProfilePage() {
     downloads: 1250,
     rating: 4.8,
     views: 5420,
+  }
+
+  // Account settings state (stubbed client-side for now)
+  const [settings, setSettings] = useState({
+    emailNotifications: true,
+    profileVisibility: 'public' as 'public' | 'private',
+    twoFactorAuth: false,
+  })
+
+  const handleSaveSettings = () => {
+    // TODO: integrate with backend API when available
+    alert('Settings saved')
   }
 
   const recentSequences = [
@@ -180,6 +195,35 @@ export default function ProfilePage() {
         </div>
       </section>
 
+      {/* Sticky Sub-navigation */}
+      <nav
+        className="bg-white border-b border-gray-200 sticky top-0 z-30"
+        aria-label="Profile Section Navigation"
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-6 overflow-x-auto py-3 text-sm">
+            <a
+              href="#overview"
+              className="text-gray-700 hover:text-blue-600 font-medium"
+            >
+              Overview
+            </a>
+            <a
+              href="#settings"
+              className="text-gray-700 hover:text-blue-600 font-medium"
+            >
+              Account Settings
+            </a>
+            <a
+              href="#activity"
+              className="text-gray-700 hover:text-blue-600 font-medium"
+            >
+              Activity
+            </a>
+          </div>
+        </div>
+      </nav>
+
       {/* Main Content Section */}
       <section className="bg-gray-50 py-8" aria-label="Profile Content">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -211,7 +255,7 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          <div className="grid lg:grid-cols-3 gap-8">
+          <div id="overview" className="grid lg:grid-cols-3 gap-8">
             {/* Profile Information Section */}
             <aside className="lg:col-span-1" aria-label="Profile Information">
               <section
@@ -378,6 +422,7 @@ export default function ProfilePage() {
 
               {/* Settings Section */}
               <section
+                id="settings"
                 className="bg-white rounded-lg shadow-md p-6"
                 aria-label="User Settings"
               >
@@ -390,6 +435,94 @@ export default function ProfilePage() {
 
                 <div className="space-y-4">
                   <div className="flex items-center justify-between py-3 border-b border-gray-200">
+                    <div className="flex items-center gap-3">
+                      <Bell className="h-5 w-5 text-gray-500" />
+                      <div>
+                        <h4 className="text-sm font-medium text-gray-900">
+                          Email Notifications
+                        </h4>
+                        <p className="text-sm text-gray-600">
+                          Receive updates about your activity
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() =>
+                        setSettings(s => ({
+                          ...s,
+                          emailNotifications: !s.emailNotifications,
+                        }))
+                      }
+                      className={`px-3 py-1 rounded-full text-sm font-medium ${settings.emailNotifications ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'}`}
+                    >
+                      {settings.emailNotifications ? 'Enabled' : 'Disabled'}
+                    </button>
+                  </div>
+
+                  <div className="flex items-center justify-between py-3 border-b border-gray-200">
+                    <div className="flex items-center gap-3">
+                      <Lock className="h-5 w-5 text-gray-500" />
+                      <div>
+                        <h4 className="text-sm font-medium text-gray-900">
+                          Profile Visibility
+                        </h4>
+                        <p className="text-sm text-gray-600">
+                          Control who can view your profile
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() =>
+                          setSettings(s => ({
+                            ...s,
+                            profileVisibility: 'public',
+                          }))
+                        }
+                        className={`px-3 py-1 rounded-full text-sm font-medium ${settings.profileVisibility === 'public' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'}`}
+                      >
+                        Public
+                      </button>
+                      <button
+                        onClick={() =>
+                          setSettings(s => ({
+                            ...s,
+                            profileVisibility: 'private',
+                          }))
+                        }
+                        className={`px-3 py-1 rounded-full text-sm font-medium ${settings.profileVisibility === 'private' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'}`}
+                      >
+                        Private
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between py-3 border-b border-gray-200">
+                    <div className="flex items-center gap-3">
+                      <Shield className="h-5 w-5 text-gray-500" />
+                      <div>
+                        <h4 className="text-sm font-medium text-gray-900">
+                          Two-Factor Authentication
+                        </h4>
+                        <p className="text-sm text-gray-600">
+                          Add extra security to your account
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() =>
+                        setSettings(s => ({
+                          ...s,
+                          twoFactorAuth: !s.twoFactorAuth,
+                        }))
+                      }
+                      className={`px-3 py-1 rounded-full text-sm font-medium ${settings.twoFactorAuth ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'}`}
+                    >
+                      {settings.twoFactorAuth ? 'Enabled' : 'Disabled'}
+                    </button>
+                  </div>
+
+                  <div className="flex items-center justify-between py-3">
                     <div>
                       <h4 className="text-sm font-medium text-gray-900">
                         Theme
@@ -400,6 +533,15 @@ export default function ProfilePage() {
                     </div>
                     <ThemeToggle />
                   </div>
+                </div>
+
+                <div className="mt-6">
+                  <button
+                    onClick={handleSaveSettings}
+                    className="w-full bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+                  >
+                    Save Settings
+                  </button>
                 </div>
               </section>
             </aside>
@@ -449,13 +591,24 @@ export default function ProfilePage() {
 
               {/* Recent Sequences Section */}
               <section
+                id="activity"
                 className="bg-white rounded-lg shadow-md"
                 aria-label="Recent Sequences"
               >
                 <div className="p-6 border-b border-gray-200">
-                  <h2 className="text-xl font-semibold text-gray-900">
-                    My Recent Sequences
-                  </h2>
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-xl font-semibold text-gray-900">
+                      Activity History
+                    </h2>
+                    <div className="hidden md:flex items-center gap-3">
+                      <button className="px-3 py-1 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm">
+                        Filter
+                      </button>
+                      <button className="px-3 py-1 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm">
+                        Export
+                      </button>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="divide-y divide-gray-200">
@@ -497,7 +650,7 @@ export default function ProfilePage() {
 
                 <div className="p-6 border-t border-gray-200 text-center">
                   <button className="text-blue-500 hover:text-blue-600 transition-colors font-medium">
-                    View All Sequences
+                    View All Activity
                   </button>
                 </div>
               </section>
