@@ -170,12 +170,12 @@ export default function SellerRegisterPage() {
                   </div>
                   <div className="ml-3">
                     <div
-                      className={`text-sm font-medium ${isActive ? 'text-blue-600' : isCompleted ? 'text-green-600' : 'text-gray-500'}`}
+                      className={`text-sm font-medium ${isActive ? 'text-blue-700' : isCompleted ? 'text-green-600' : 'text-gray-500'}`}
                     >
                       Step {step.number}
                     </div>
                     <div
-                      className={`text-xs ${isActive ? 'text-blue-600' : isCompleted ? 'text-green-600' : 'text-gray-500'}`}
+                      className={`text-xs ${isActive ? 'text-blue-700' : isCompleted ? 'text-green-600' : 'text-gray-500'}`}
                     >
                       {step.title}
                     </div>

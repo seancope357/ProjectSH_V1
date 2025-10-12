@@ -56,7 +56,7 @@ export default function ForgotPasswordPage() {
               Remember your password?{' '}
               <Link
                 href="/auth/signin"
-                className="font-medium text-blue-600 hover:text-blue-500"
+                className="font-medium text-blue-700 hover:text-blue-800"
               >
                 Sign in here
               </Link>
@@ -145,7 +145,7 @@ export default function ForgotPasswordPage() {
                       setError('')
                       setEmail('')
                     }}
-                    className="text-sm text-blue-600 hover:text-blue-500"
+                    className="text-sm text-blue-700 hover:text-blue-800"
                   >
                     Send to a different email
                   </button>

@@ -334,7 +334,7 @@ export default function HomePage() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/seller" className="hover:text-white">
+                  <Link href="/seller/dashboard" className="hover:text-white">
                     Seller Dashboard
                   </Link>
                 </li>

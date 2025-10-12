@@ -159,7 +159,7 @@ export function Navigation() {
 
                 {user.user_metadata?.role === 'SELLER' && (
                   <Link
-                    href="/seller"
+                    href="/seller/dashboard"
                     className="text-gray-900 dark:text-gray-100 hover:text-blue-700 dark:hover:text-blue-300 px-3 py-2 text-sm font-medium transition-colors"
                   >
                     Seller Dashboard
@@ -281,7 +281,7 @@ export function Navigation() {
 
                 {user.user_metadata?.role === 'SELLER' && (
                   <Link
-                    href="/seller"
+                    href="/seller/dashboard"
                     className="text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 block px-3 py-2 text-base font-medium transition-colors"
                     onClick={() => setIsMenuOpen(false)}
                   >

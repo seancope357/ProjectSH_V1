@@ -298,7 +298,7 @@ function SignUpPageContent() {
               Already have an account?{' '}
               <Link
                 href="/auth/signin"
-                className="font-medium text-blue-600 hover:text-blue-500"
+                className="font-medium text-blue-700 hover:text-blue-800"
               >
                 Sign in
               </Link>

@@ -17,7 +17,7 @@ export function SellerKpiStrip({ items }: { items: KpiItem[] }) {
       case 'yellow':
         return 'text-yellow-600'
       default:
-        return 'text-blue-600'
+        return 'text-blue-700'
     }
   }
 

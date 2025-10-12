@@ -138,7 +138,7 @@ function SignInPageContent() {
       <div className="flex flex-col justify-center py-12 sm:px-6 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
           <div className="text-center">
-            <h1 className="text-3xl font-bold text-blue-600">SequenceHUB</h1>
+            <h1 className="text-3xl font-bold text-blue-700">SequenceHUB</h1>
             <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
               Sign in to your account
             </h2>
@@ -146,7 +146,7 @@ function SignInPageContent() {
               Or{' '}
               <Link
                 href="/auth/register"
-                className="font-medium text-blue-600 hover:text-blue-500"
+                className="font-medium text-blue-700 hover:text-blue-800"
               >
                 create a new account
               </Link>
@@ -253,7 +253,7 @@ function SignInPageContent() {
                     id="remember-me"
                     name="remember-me"
                     type="checkbox"
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    className="h-4 w-4 text-blue-700 focus:ring-blue-300 border-gray-300 rounded"
                   />
                   <label
                     htmlFor="remember-me"
@@ -266,7 +266,7 @@ function SignInPageContent() {
                 <div className="text-sm">
                   <Link
                     href="/auth/forgot-password"
-                    className="font-medium text-blue-600 hover:text-blue-500"
+                    className="font-medium text-blue-700 hover:text-blue-800"
                   >
                     Forgot your password?
                   </Link>
@@ -295,7 +295,7 @@ function SignInPageContent() {
                   Don&apos;t have an account?{' '}
                   <Link
                     href="/auth/register"
-                    className="font-medium text-blue-600 hover:text-blue-500"
+                    className="font-medium text-blue-700 hover:text-blue-800"
                   >
                     Sign up here
                   </Link>

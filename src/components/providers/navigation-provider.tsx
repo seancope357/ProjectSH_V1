@@ -44,7 +44,7 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
     user: null,
     loading: true,
     lastBuyerPath: '/',
-    lastSellerPath: '/seller',
+    lastSellerPath: '/seller/dashboard',
   })
 
   const router = useRouter()

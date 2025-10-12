@@ -25,7 +25,7 @@ export function PrimaryNav() {
   ]
 
   const getSellerNavItems = () => [
-    { href: '/seller', label: 'Dashboard' },
+    { href: '/seller/dashboard', label: 'Dashboard' },
     { href: '/seller/upload', label: 'Upload' },
     { href: '/seller/sequences', label: 'My Sequences' },
     { href: '/seller/orders', label: 'Orders' },
@@ -59,7 +59,9 @@ export function PrimaryNav() {
           {/* Logo and Brand */}
           <div className="flex items-center">
             <Link
-              href={currentRole === 'SELLER' ? '/seller' : '/dashboard'}
+              href={
+                currentRole === 'SELLER' ? '/seller/dashboard' : '/dashboard'
+              }
               className="flex-shrink-0"
             >
               <div className="flex flex-col items-center">

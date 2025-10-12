@@ -158,7 +158,7 @@ export default function HelpPage() {
             <p className="text-gray-600 mb-4">
               Comprehensive guides and tutorials
             </p>
-            <button className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
+            <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
               View Docs
             </button>
           </div>

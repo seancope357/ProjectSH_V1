@@ -13,7 +13,7 @@ export function ActivityFeed({ items }: { items: ActivityItem[] }) {
       case 'sale':
         return 'text-green-600'
       case 'message':
-        return 'text-blue-600'
+        return 'text-blue-700'
       case 'payout':
         return 'text-purple-600'
       case 'listing':
