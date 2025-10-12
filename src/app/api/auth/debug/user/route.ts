@@ -4,7 +4,10 @@ import { supabaseAdmin } from '@/lib/supabase-db'
 export async function GET(request: NextRequest) {
   try {
     // Restrict debug route in production unless explicitly enabled
-    if (process.env.NODE_ENV === 'production' && process.env.ENABLE_DEBUG_ROUTES !== 'true') {
+    if (
+      process.env.NODE_ENV === 'production' &&
+      process.env.ENABLE_DEBUG_ROUTES !== 'true'
+    ) {
       return NextResponse.json({ error: 'Not found' }, { status: 404 })
     }
 
@@ -40,6 +43,9 @@ export async function GET(request: NextRequest) {
     })
   } catch (e: any) {
     console.error('Debug user fetch failed:', e)
-    return NextResponse.json({ error: e?.message || 'Failed to fetch user' }, { status: 500 })
+    return NextResponse.json(
+      { error: e?.message || 'Failed to fetch user' },
+      { status: 500 }
+    )
   }
 }

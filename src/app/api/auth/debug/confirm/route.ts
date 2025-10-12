@@ -4,23 +4,31 @@ import { supabaseAdmin } from '@/lib/supabase-db'
 export async function GET(request: NextRequest) {
   try {
     // Restrict in production unless explicitly enabled
-    if (process.env.NODE_ENV === 'production' && process.env.ENABLE_DEBUG_ROUTES !== 'true') {
+    if (
+      process.env.NODE_ENV === 'production' &&
+      process.env.ENABLE_DEBUG_ROUTES !== 'true'
+    ) {
       return NextResponse.json({ error: 'Not found' }, { status: 404 })
     }
 
     const url = new URL(request.url)
     const id = url.searchParams.get('id')
     const emailParam = url.searchParams.get('email')
-    const redirectBase = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+    const redirectBase =
+      process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
 
     if (!id && !emailParam) {
-      return NextResponse.json({ error: 'id or email required' }, { status: 400 })
+      return NextResponse.json(
+        { error: 'id or email required' },
+        { status: 400 }
+      )
     }
 
     // Try to fetch email from user if not provided
     let email = emailParam || null
     if (id && !email) {
-      const { data: userResp, error: userErr } = await supabaseAdmin.auth.admin.getUserById(id)
+      const { data: userResp, error: userErr } =
+        await supabaseAdmin.auth.admin.getUserById(id)
       if (userErr) {
         console.error('getUserById error:', userErr)
       }
@@ -37,10 +45,18 @@ export async function GET(request: NextRequest) {
         user_id: id,
         options: { redirectTo },
       } as any)
-      attempts.push({ type: 'email_confirmation', ok: !error, error: error?.message })
+      attempts.push({
+        type: 'email_confirmation',
+        ok: !error,
+        error: error?.message,
+      })
       if (!error) {
         const link = (data as any)?.properties?.action_link || null
-        return NextResponse.json({ action_link: link, redirect_to: redirectTo, attempts })
+        return NextResponse.json({
+          action_link: link,
+          redirect_to: redirectTo,
+          attempts,
+        })
       } else {
         console.warn('email_confirmation failed:', error?.message)
       }
@@ -56,7 +72,11 @@ export async function GET(request: NextRequest) {
       attempts.push({ type: 'recovery', ok: !error, error: error?.message })
       if (!error) {
         const link = (data as any)?.properties?.action_link || null
-        return NextResponse.json({ action_link: link, redirect_to: redirectTo, attempts })
+        return NextResponse.json({
+          action_link: link,
+          redirect_to: redirectTo,
+          attempts,
+        })
       } else {
         console.warn('recovery failed:', error?.message)
       }
@@ -72,19 +92,31 @@ export async function GET(request: NextRequest) {
       attempts.push({ type: 'invite', ok: !error, error: error?.message })
       if (!error) {
         const link = (data as any)?.properties?.action_link || null
-        return NextResponse.json({ action_link: link, redirect_to: redirectTo, attempts })
+        return NextResponse.json({
+          action_link: link,
+          redirect_to: redirectTo,
+          attempts,
+        })
       } else {
         console.warn('invite failed:', error?.message)
       }
     }
 
-    return NextResponse.json({
-      error: 'Failed to generate any link',
-      attempts,
-      hint: email ? 'Check Supabase Auth settings: email confirmation enabled, site URL, SMTP.' : 'User email not available; provide ?email=... to try recovery/invite.',
-    }, { status: 400 })
+    return NextResponse.json(
+      {
+        error: 'Failed to generate any link',
+        attempts,
+        hint: email
+          ? 'Check Supabase Auth settings: email confirmation enabled, site URL, SMTP.'
+          : 'User email not available; provide ?email=... to try recovery/invite.',
+      },
+      { status: 400 }
+    )
   } catch (e: any) {
     console.error('Generate confirm link failed:', e)
-    return NextResponse.json({ error: e?.message || 'Failed to generate link' }, { status: 500 })
+    return NextResponse.json(
+      { error: e?.message || 'Failed to generate link' },
+      { status: 500 }
+    )
   }
 }

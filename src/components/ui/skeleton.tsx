@@ -1,23 +1,33 @@
-"use client"
+'use client'
 
-import React from "react"
-import { useFeatureFlags } from "@/components/providers/feature-flags"
+import React from 'react'
+import { useFeatureFlags } from '@/components/providers/feature-flags'
 
 type SkeletonProps = React.HTMLAttributes<HTMLDivElement> & {
   rounded?: string
 }
 
-export function Skeleton({ className = "", rounded = "rounded-lg", ...props }: SkeletonProps) {
+export function Skeleton({
+  className = '',
+  rounded = 'rounded-lg',
+  ...props
+}: SkeletonProps) {
   const { enableShimmer } = useFeatureFlags()
   return (
     <div
       {...props}
-      className={`skeleton bg-gray-200 dark:bg-gray-800 ${rounded} ${enableShimmer ? "" : "no-shimmer"} ${className}`}
+      className={`skeleton bg-gray-200 dark:bg-gray-800 ${rounded} ${enableShimmer ? '' : 'no-shimmer'} ${className}`}
     />
   )
 }
 
-export function SkeletonText({ lines = 2, className = "" }: { lines?: number, className?: string }) {
+export function SkeletonText({
+  lines = 2,
+  className = '',
+}: {
+  lines?: number
+  className?: string
+}) {
   return (
     <div className={`space-y-2 ${className}`}>
       {Array.from({ length: lines }).map((_, i) => (
@@ -27,7 +37,7 @@ export function SkeletonText({ lines = 2, className = "" }: { lines?: number, cl
   )
 }
 
-export function SkeletonImage({ className = "" }: { className?: string }) {
+export function SkeletonImage({ className = '' }: { className?: string }) {
   return <Skeleton className={`w-full h-full ${className}`} />
 }
 

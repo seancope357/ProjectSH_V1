@@ -1,7 +1,8 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { Navigation } from '@/components/ui/navigation'
+import Image from 'next/image'
+// Removed page-level Navigation; global header renders in layout
 import { Download, Search, Calendar, FileDown } from 'lucide-react'
 import { ListRowSkeleton } from '@/components/ui/skeleton'
 
@@ -34,7 +35,9 @@ export default function DownloadsPage() {
         const res = await fetch('/api/downloads')
         if (!res.ok) {
           const body = await res.json().catch(() => ({}))
-          throw new Error(body?.error || `Failed to load downloads (${res.status})`)
+          throw new Error(
+            body?.error || `Failed to load downloads (${res.status})`
+          )
         }
         const data = await res.json()
         setDownloads(data.downloads || [])
@@ -48,9 +51,12 @@ export default function DownloadsPage() {
   }, [])
 
   const filtered = useMemo(() => {
-    return downloads.filter(d =>
-      (d.sequences?.title || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-      d.sequence_id.toLowerCase().includes(searchTerm.toLowerCase())
+    return downloads.filter(
+      d =>
+        (d.sequences?.title || '')
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase()) ||
+        d.sequence_id.toLowerCase().includes(searchTerm.toLowerCase())
     )
   }, [downloads, searchTerm])
 
@@ -58,25 +64,35 @@ export default function DownloadsPage() {
     const result = [...filtered]
     switch (sortBy) {
       case 'oldest':
-        result.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+        result.sort(
+          (a, b) =>
+            new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+        )
         break
       case 'title':
-        result.sort((a, b) => (a.sequences?.title || '').localeCompare(b.sequences?.title || ''))
+        result.sort((a, b) =>
+          (a.sequences?.title || '').localeCompare(b.sequences?.title || '')
+        )
         break
       default:
-        result.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+        result.sort(
+          (a, b) =>
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        )
     }
     return result
   }, [filtered, sortBy])
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navigation />
+      {/* Global header handled by RootLayout */}
 
       <div className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <h1 className="text-3xl font-bold text-gray-900">My Downloads</h1>
-          <p className="mt-2 text-gray-600">Access purchased sequences and download files</p>
+          <p className="mt-2 text-gray-600">
+            Access purchased sequences and download files
+          </p>
         </div>
       </div>
 
@@ -89,7 +105,7 @@ export default function DownloadsPage() {
                 type="text"
                 placeholder="Search downloads..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={e => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
@@ -97,7 +113,7 @@ export default function DownloadsPage() {
               <label className="text-sm text-gray-600 mr-2">Sort by:</label>
               <select
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as any)}
+                onChange={e => setSortBy(e.target.value as any)}
                 className="border border-gray-300 rounded-lg px-3 py-2"
               >
                 <option value="newest">Newest</option>
@@ -110,7 +126,9 @@ export default function DownloadsPage() {
 
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">Available Downloads</h2>
+            <h2 className="text-lg font-semibold text-gray-900">
+              Available Downloads
+            </h2>
           </div>
 
           {loading && (
@@ -127,22 +145,31 @@ export default function DownloadsPage() {
           {!loading && !error && sorted.length === 0 && (
             <div className="p-12 text-center">
               <FileDown className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No downloads found</h3>
-              <p className="text-gray-600">Your purchased items will appear here</p>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">
+                No downloads found
+              </h3>
+              <p className="text-gray-600">
+                Your purchased items will appear here
+              </p>
             </div>
           )}
 
           {!loading && !error && sorted.length > 0 && (
             <div className="divide-y divide-gray-200">
-              {sorted.map((d) => (
-                <div key={d.id} className="p-6 hover:bg-gray-50 transition-colors">
+              {sorted.map(d => (
+                <div
+                  key={d.id}
+                  className="p-6 hover:bg-gray-50 transition-colors"
+                >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                       {d.sequences?.thumbnail_url && (
-                        <img
+                        <Image
                           src={d.sequences.thumbnail_url}
-                          alt={d.sequences.title}
-                          className="w-16 h-16 rounded object-cover"
+                          alt={d.sequences.title || 'Sequence thumbnail'}
+                          width={64}
+                          height={64}
+                          className="rounded object-cover"
                         />
                       )}
                       <div>
@@ -169,7 +196,9 @@ export default function DownloadsPage() {
                       <button
                         type="button"
                         onClick={async () => {
-                          const url = d.sequences?.file_url || `/api/download/${d.sequence_id}`
+                          const url =
+                            d.sequences?.file_url ||
+                            `/api/download/${d.sequence_id}`
                           try {
                             await navigator.clipboard.writeText(url || '')
                             setCopiedId(d.id)

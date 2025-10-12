@@ -47,7 +47,10 @@ export async function GET(
 
       return NextResponse.json(formatted)
     } catch (dbError) {
-      console.warn('Supabase sequence unavailable, serving mock sequence:', dbError)
+      console.warn(
+        'Supabase sequence unavailable, serving mock sequence:',
+        dbError
+      )
       // Mock sequence fallback to keep UI functional
       const mock = {
         id: '00000000-0000-4000-8000-000000000001',
@@ -67,9 +70,13 @@ export async function GET(
           username: 'lightmaster',
           isVerified: true,
           totalSales: 2500,
-          memberSince: new Date(Date.now() - 1000 * 60 * 60 * 24 * 365 * 3).toISOString(),
+          memberSince: new Date(
+            Date.now() - 1000 * 60 * 60 * 24 * 365 * 3
+          ).toISOString(),
         },
-        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 90).toISOString(),
+        createdAt: new Date(
+          Date.now() - 1000 * 60 * 60 * 24 * 90
+        ).toISOString(),
         updatedAt: new Date().toISOString(),
         specifications: {
           duration: 180,
@@ -97,8 +104,11 @@ export async function DELETE(
 ) {
   try {
     const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser()
+
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }

@@ -50,7 +50,8 @@ export function ThemeProvider({
     let effectiveTheme: 'dark' | 'light'
 
     if (theme === 'system') {
-      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
+      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)')
+        .matches
         ? 'dark'
         : 'light'
       effectiveTheme = systemTheme
@@ -63,7 +64,7 @@ export function ThemeProvider({
 
     // Listen for system theme changes when theme is set to 'system'
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-    
+
     const handleChange = () => {
       if (theme === 'system') {
         const newSystemTheme = mediaQuery.matches ? 'dark' : 'light'

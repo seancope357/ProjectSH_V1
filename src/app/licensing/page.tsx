@@ -1,20 +1,30 @@
 'use client'
 
-import { Navigation } from '@/components/ui/navigation'
-import { Music, ShieldCheck, ExternalLink, CheckCircle, AlertTriangle } from 'lucide-react'
+// Removed page-level Navigation; global header renders in layout
+import {
+  Music,
+  ShieldCheck,
+  ExternalLink,
+  CheckCircle,
+  AlertTriangle,
+} from 'lucide-react'
 import Link from 'next/link'
 
 export default function LicensingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      <Navigation />
+      {/* Global header handled by RootLayout */}
 
       {/* Header */}
       <div className="bg-gradient-to-r from-indigo-600 to-violet-600">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-white">Song Licensing for Xlights</h1>
-            <p className="mt-2 text-indigo-100">Buy rights to use music in your sequences</p>
+            <h1 className="text-3xl font-bold text-white">
+              Song Licensing for Xlights
+            </h1>
+            <p className="mt-2 text-indigo-100">
+              Buy rights to use music in your sequences
+            </p>
           </div>
           <Music aria-hidden="true" className="h-8 w-8 text-white" />
         </div>
@@ -24,25 +34,55 @@ export default function LicensingPage() {
         {/* Why Licensing Matters */}
         <section className="bg-white/90 backdrop-blur-sm rounded-xl ring-1 ring-gray-200 shadow-sm p-6">
           <div className="flex items-center gap-2 mb-4">
-            <ShieldCheck aria-hidden="true" className="h-5 w-5 text-green-600" />
-            <h2 className="text-xl font-semibold text-gray-900">Stay Compliant</h2>
+            <ShieldCheck
+              aria-hidden="true"
+              className="h-5 w-5 text-green-600"
+            />
+            <h2 className="text-xl font-semibold text-gray-900">
+              Stay Compliant
+            </h2>
           </div>
           <p className="text-gray-700">
-            Using commercial songs without proper licensing can result in takedowns or legal issues. Choose a licensing partner and obtain the appropriate rights for your public displays, recordings, and shared sequences.
+            Using commercial songs without proper licensing can result in
+            takedowns or legal issues. Choose a licensing partner and obtain the
+            appropriate rights for your public displays, recordings, and shared
+            sequences.
           </p>
         </section>
 
         {/* Recommended Providers */}
         <section className="bg-white/90 backdrop-blur-sm rounded-xl ring-1 ring-gray-200 shadow-sm p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Recommended Licensing Providers</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">
+            Recommended Licensing Providers
+          </h2>
           <div className="grid md:grid-cols-2 gap-4">
             {[
-              { name: 'Lickd', url: 'https://lickd.co/', notes: 'Mainstream commercial tracks with YouTube clearance options.' },
-              { name: 'Soundstripe', url: 'https://soundstripe.com/', notes: 'Subscription library with broad usage licensing.' },
-              { name: 'Epidemic Sound', url: 'https://www.epidemicsound.com/', notes: 'Large catalog, simple licensing for creators.' },
-              { name: 'Artlist', url: 'https://artlist.io/', notes: 'Royalty-free tracks with creator-friendly plans.' },
-            ].map((p) => (
-              <div key={p.name} className="p-4 rounded-xl ring-1 ring-gray-200 bg-white hover:ring-indigo-300 hover:shadow-md transition">
+              {
+                name: 'Lickd',
+                url: 'https://lickd.co/',
+                notes:
+                  'Mainstream commercial tracks with YouTube clearance options.',
+              },
+              {
+                name: 'Soundstripe',
+                url: 'https://soundstripe.com/',
+                notes: 'Subscription library with broad usage licensing.',
+              },
+              {
+                name: 'Epidemic Sound',
+                url: 'https://www.epidemicsound.com/',
+                notes: 'Large catalog, simple licensing for creators.',
+              },
+              {
+                name: 'Artlist',
+                url: 'https://artlist.io/',
+                notes: 'Royalty-free tracks with creator-friendly plans.',
+              },
+            ].map(p => (
+              <div
+                key={p.name}
+                className="p-4 rounded-xl ring-1 ring-gray-200 bg-white hover:ring-indigo-300 hover:shadow-md transition"
+              >
                 <div className="flex items-center justify-between">
                   <div>
                     <div className="font-medium text-gray-900">{p.name}</div>
@@ -65,29 +105,55 @@ export default function LicensingPage() {
 
         {/* How It Works */}
         <section className="bg-white/90 backdrop-blur-sm rounded-xl ring-1 ring-gray-200 shadow-sm p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">How to License a Song</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">
+            How to License a Song
+          </h2>
           <ol className="list-decimal list-inside space-y-2 text-gray-700">
             <li>Pick a provider and search for your desired track.</li>
-            <li>Choose a plan that covers your intended use (public display, online video, resale in sequences if applicable).</li>
+            <li>
+              Choose a plan that covers your intended use (public display,
+              online video, resale in sequences if applicable).
+            </li>
             <li>Complete checkout and keep your license confirmation.</li>
-            <li>Document the license in your sequence metadata (song title, provider, license ID).</li>
+            <li>
+              Document the license in your sequence metadata (song title,
+              provider, license ID).
+            </li>
           </ol>
           <div className="mt-4 flex items-center gap-2 text-green-700 bg-green-50 border border-green-200 rounded-xl p-3">
             <CheckCircle aria-hidden="true" className="h-4 w-4" />
-            <span className="text-sm">Add proof of license to your sequence description to streamline reviews.</span>
+            <span className="text-sm">
+              Add proof of license to your sequence description to streamline
+              reviews.
+            </span>
           </div>
           <div className="mt-2 flex items-center gap-2 text-amber-700 bg-amber-50 border border-amber-200 rounded-xl p-3">
             <AlertTriangle aria-hidden="true" className="h-4 w-4" />
-            <span className="text-sm">Not all licenses permit redistribution; ensure your usage includes performance/display rights for Xlights shows.</span>
+            <span className="text-sm">
+              Not all licenses permit redistribution; ensure your usage includes
+              performance/display rights for Xlights shows.
+            </span>
           </div>
         </section>
 
         {/* Next Steps */}
         <section className="bg-white/90 backdrop-blur-sm rounded-xl ring-1 ring-gray-200 shadow-sm p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Next Steps</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">
+            Next Steps
+          </h2>
           <div className="flex flex-wrap items-center gap-3">
-            <Link href="/creator" className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">Back to Creator Hub</Link>
-            <Link href="/sequences" className="px-4 py-2 bg-gray-900 text-white rounded hover:bg-gray-800">Browse Sequences</Link>
+            <Link
+              href="/creator"
+              className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
+            >
+              Back to Creator Hub
+            </Link>
+            <Link
+              href="/sequences"
+              className="px-4 py-2 bg-gray-900 text-white rounded hover:bg-gray-800"
+            >
+              Browse Sequences
+            </Link>
           </div>
         </section>
       </div>

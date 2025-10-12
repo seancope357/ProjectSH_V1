@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Navigation } from '@/components/ui/navigation'
+// Removed page-level Navigation; global header renders in layout
 import { useAuth } from '@/components/providers/session-provider'
 import { Upload, CheckCircle, AlertCircle, X } from 'lucide-react'
 
@@ -214,7 +214,7 @@ export default function SellerUploadPage() {
             setError(resp?.error || 'Upload failed')
             setStatus('error')
           }
-        } catch (e) {
+        } catch {
           setError('Unexpected response from server')
           setStatus('error')
         }
@@ -229,7 +229,7 @@ export default function SellerUploadPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navigation />
+      {/* Global header handled by RootLayout */}
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <h1 className="text-2xl font-bold text-gray-900 mb-2">
           Upload New Sequence

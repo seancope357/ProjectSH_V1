@@ -17,6 +17,9 @@ export async function GET() {
     const downloads = await db.downloads.findMany(user.id)
     return NextResponse.json({ downloads }, { status: 200 })
   } catch (e: any) {
-    return NextResponse.json({ error: e?.message || 'Failed to fetch downloads' }, { status: 500 })
+    return NextResponse.json(
+      { error: e?.message || 'Failed to fetch downloads' },
+      { status: 500 }
+    )
   }
 }

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Navigation } from '@/components/ui/navigation'
+// Removed page-level Navigation; global header renders in layout
 import { useAuth } from '@/components/providers/session-provider'
 import {
   Upload,
@@ -14,7 +14,6 @@ import {
   Shield,
   User,
   Globe,
-  FileText,
   Info,
   ListChecks,
 } from 'lucide-react'
@@ -64,7 +63,7 @@ export default function SellerOnboardingPage() {
         if (res.ok && data?.profile) {
           setProfile(prev => ({ ...prev, ...data.profile }))
         }
-      } catch (e) {
+      } catch {
         // ignore load errors, start with blank
       }
     }
@@ -97,7 +96,7 @@ export default function SellerOnboardingPage() {
       }
       const url = json?.avatarUrl || ''
       setProfile(prev => ({ ...prev, avatar_url: url }))
-    } catch (err) {
+    } catch {
       alert('Failed to upload avatar')
     } finally {
       setAvatarUploading(false)
@@ -126,7 +125,7 @@ export default function SellerOnboardingPage() {
         return
       }
       router.replace('/seller/dashboard')
-    } catch (e) {
+    } catch {
       setError('Unexpected error saving profile')
     } finally {
       setSaving(false)
@@ -145,7 +144,7 @@ export default function SellerOnboardingPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navigation />
+      {/* Global header handled by RootLayout */}
 
       <section className="bg-white border-b border-gray-200">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">

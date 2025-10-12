@@ -1,9 +1,10 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 import { useParams, useRouter } from 'next/navigation'
-import { Navigation } from '@/components/ui/navigation'
-import { Package, Calendar, CheckCircle2, AlertCircle, ArrowLeft } from 'lucide-react'
+// Removed page-level Navigation; global header renders in layout
+import { Calendar, CheckCircle2, AlertCircle, ArrowLeft } from 'lucide-react'
 
 type OrderItem = {
   sequence_id: string
@@ -58,7 +59,7 @@ export default function OrderReceiptPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navigation />
+      {/* Global header handled by RootLayout */}
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <button
@@ -72,7 +73,9 @@ export default function OrderReceiptPage() {
         <div className="bg-white rounded-lg shadow-md p-6">
           <div className="flex items-start justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Order Receipt</h1>
+              <h1 className="text-2xl font-bold text-gray-900">
+                Order Receipt
+              </h1>
               {order && (
                 <div className="mt-2 flex items-center gap-4 text-sm text-gray-600">
                   <span>Order #{order.id}</span>
@@ -84,13 +87,15 @@ export default function OrderReceiptPage() {
               )}
             </div>
             {order && (
-              <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium ${
-                order.status === 'completed'
-                  ? 'bg-green-100 text-green-800'
-                  : order.status === 'pending'
-                  ? 'bg-yellow-100 text-yellow-800'
-                  : 'bg-gray-100 text-gray-800'
-              }`}>
+              <span
+                className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium ${
+                  order.status === 'completed'
+                    ? 'bg-green-100 text-green-800'
+                    : order.status === 'pending'
+                      ? 'bg-yellow-100 text-yellow-800'
+                      : 'bg-gray-100 text-gray-800'
+                }`}
+              >
                 {order.status === 'completed' ? (
                   <CheckCircle2 className="h-4 w-4" />
                 ) : (
@@ -101,19 +106,26 @@ export default function OrderReceiptPage() {
             )}
           </div>
 
-          {loading && <div className="mt-6 text-gray-600">Loading order...</div>}
+          {loading && (
+            <div className="mt-6 text-gray-600">Loading order...</div>
+          )}
           {error && <div className="mt-6 text-red-600">{error}</div>}
 
           {order && (
             <div className="mt-6 grid md:grid-cols-3 gap-6">
               <div className="md:col-span-2 space-y-4">
-                {order.items.map((item) => (
-                  <div key={item.sequence_id} className="flex gap-4 p-4 border rounded-lg">
+                {order.items.map(item => (
+                  <div
+                    key={item.sequence_id}
+                    className="flex gap-4 p-4 border rounded-lg"
+                  >
                     {item.sequence?.thumbnail_url && (
-                      <img
+                      <Image
                         src={item.sequence.thumbnail_url}
-                        alt={item.sequence.title}
-                        className="w-20 h-20 rounded object-cover"
+                        alt={item.sequence.title || 'Sequence thumbnail'}
+                        width={80}
+                        height={80}
+                        className="rounded object-cover"
                       />
                     )}
                     <div className="flex-1">
@@ -140,7 +152,9 @@ export default function OrderReceiptPage() {
               </div>
               <div className="space-y-3">
                 <div className="border rounded-lg p-4">
-                  <h4 className="text-sm font-semibold text-gray-900 mb-3">Summary</h4>
+                  <h4 className="text-sm font-semibold text-gray-900 mb-3">
+                    Summary
+                  </h4>
                   <div className="flex items-center justify-between text-sm text-gray-700">
                     <span>Subtotal</span>
                     <span>${Number(order.subtotal || 0).toFixed(2)}</span>

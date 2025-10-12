@@ -1,23 +1,24 @@
 'use client'
 
 import Link from 'next/link'
-import { useAuth } from '@/components/providers/session-provider'
-import { Navigation } from '@/components/ui/navigation'
+// Removed page-level Navigation; global header renders in layout
 import { AuthButton } from '@/components/ui/auth-button'
 import { Search, Zap, Shield, Users, ArrowRight } from 'lucide-react'
 import { useFeatureFlags } from '@/components/providers/feature-flags'
 
 export default function HomePage() {
-  const { user } = useAuth()
   const { enableAnimations, reducedMotion } = useFeatureFlags()
-  const pulseClass = (!enableAnimations || reducedMotion) ? '' : 'animate-pulse'
+  // Removed unused pulse animation class; motion is controlled via feature flags
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <Navigation />
-      
+      {/* Global header handled by RootLayout */}
+
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 dark:from-blue-800 dark:via-purple-800 dark:to-indigo-900" aria-label="Hero Banner">
+      <section
+        className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 dark:from-blue-800 dark:via-purple-800 dark:to-indigo-900"
+        aria-label="Hero Banner"
+      >
         {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 via-transparent to-purple-500/20"></div>
 
@@ -43,8 +44,10 @@ export default function HomePage() {
               Your One-Stop Marketplace For Premium xLights Sequences
             </h1>
             <p className="text-xl text-blue-100 mb-8 max-w-3xl mx-auto drop-shadow-md">
-              A premier marketplace where talented xLights sequence creators showcase and sell their premium sequences. 
-              Connect with skilled vendors and discover the perfect sequences for your holiday light displays.
+              A premier marketplace where talented xLights sequence creators
+              showcase and sell their premium sequences. Connect with skilled
+              vendors and discover the perfect sequences for your holiday light
+              displays.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
@@ -68,12 +71,13 @@ export default function HomePage() {
               Featured Sequences
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Discover our most popular and highest-rated LED sequences from talented creators.
+              Discover our most popular and highest-rated LED sequences from
+              talented creators.
             </p>
           </header>
-          
-            <div className="grid md:grid-cols-3 gap-8">
-              {/* Featured Sequence 1 */}
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Featured Sequence 1 */}
             <div className="mi-card bg-white/90 backdrop-blur-sm rounded-xl ring-1 ring-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
               <div className="aspect-video bg-gradient-to-br from-purple-500 to-pink-500 relative">
                 <div className="absolute inset-0 flex items-center justify-center">
@@ -86,20 +90,29 @@ export default function HomePage() {
                 </div>
               </div>
               <div className="p-6">
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Neon Dreams</h3>
-                <p className="text-gray-600 mb-4">A vibrant cyberpunk-inspired sequence with flowing neon effects perfect for modern displays.</p>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  Neon Dreams
+                </h3>
+                <p className="text-gray-600 mb-4">
+                  A vibrant cyberpunk-inspired sequence with flowing neon
+                  effects perfect for modern displays.
+                </p>
                 <div className="flex items-center justify-between mb-4">
-                  <span className="text-2xl font-bold text-blue-600">$12.99</span>
+                  <span className="text-2xl font-bold text-blue-600">
+                    $12.99
+                  </span>
                   <div className="flex items-center">
-                    <div className="flex text-yellow-400">
-                      ★★★★★
-                    </div>
+                    <div className="flex text-yellow-400">★★★★★</div>
                     <span className="text-gray-500 text-sm ml-1">(127)</span>
                   </div>
                 </div>
                 <div className="flex gap-2 mb-4">
-                  <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">1920x1080</span>
-                  <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">60fps</span>
+                  <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                    1920x1080
+                  </span>
+                  <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                    60fps
+                  </span>
                 </div>
                 <Link
                   href="/sequence/1"
@@ -123,20 +136,29 @@ export default function HomePage() {
                 </div>
               </div>
               <div className="p-6">
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Ocean Waves</h3>
-                <p className="text-gray-600 mb-4">Calming blue waves that flow across your display with realistic water movement patterns.</p>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  Ocean Waves
+                </h3>
+                <p className="text-gray-600 mb-4">
+                  Calming blue waves that flow across your display with
+                  realistic water movement patterns.
+                </p>
                 <div className="flex items-center justify-between mb-4">
-                  <span className="text-2xl font-bold text-blue-600">$9.99</span>
+                  <span className="text-2xl font-bold text-blue-600">
+                    $9.99
+                  </span>
                   <div className="flex items-center">
-                    <div className="flex text-yellow-400">
-                      ★★★★★
-                    </div>
+                    <div className="flex text-yellow-400">★★★★★</div>
                     <span className="text-gray-500 text-sm ml-1">(89)</span>
                   </div>
                 </div>
                 <div className="flex gap-2 mb-4">
-                  <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">2560x1440</span>
-                  <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">30fps</span>
+                  <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                    2560x1440
+                  </span>
+                  <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                    30fps
+                  </span>
                 </div>
                 <Link
                   href="/sequence/2"
@@ -160,20 +182,29 @@ export default function HomePage() {
                 </div>
               </div>
               <div className="p-6">
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Fire Storm</h3>
-                <p className="text-gray-600 mb-4">Intense fire effects with realistic flames and ember particles for dramatic displays.</p>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  Fire Storm
+                </h3>
+                <p className="text-gray-600 mb-4">
+                  Intense fire effects with realistic flames and ember particles
+                  for dramatic displays.
+                </p>
                 <div className="flex items-center justify-between mb-4">
-                  <span className="text-2xl font-bold text-blue-600">$15.99</span>
+                  <span className="text-2xl font-bold text-blue-600">
+                    $15.99
+                  </span>
                   <div className="flex items-center">
-                    <div className="flex text-yellow-400">
-                      ★★★★☆
-                    </div>
+                    <div className="flex text-yellow-400">★★★★☆</div>
                     <span className="text-gray-500 text-sm ml-1">(203)</span>
                   </div>
                 </div>
                 <div className="flex gap-2 mb-4">
-                  <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">3840x2160</span>
-                  <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">60fps</span>
+                  <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                    3840x2160
+                  </span>
+                  <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                    60fps
+                  </span>
                 </div>
                 <Link
                   href="/sequence/3"
@@ -205,46 +236,62 @@ export default function HomePage() {
               Why Choose SequenceHUB?
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              We make it easy to find, purchase, and use LED sequences that work perfectly with your setup.
+              We make it easy to find, purchase, and use LED sequences that work
+              perfectly with your setup.
             </p>
           </header>
-          
+
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div className="text-center">
               <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Search aria-hidden="true" className="h-8 w-8 text-blue-600" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Smart Search</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                Smart Search
+              </h3>
               <p className="text-gray-600">
-                Find sequences by resolution, style, theme, and compatibility with your hardware.
+                Find sequences by resolution, style, theme, and compatibility
+                with your hardware.
               </p>
             </div>
-            
+
             <div className="text-center">
               <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Zap aria-hidden="true" className="h-8 w-8 text-green-600" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Instant Download</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                Instant Download
+              </h3>
               <p className="text-gray-600">
-                Purchase and download sequences immediately. No waiting, no hassle.
+                Purchase and download sequences immediately. No waiting, no
+                hassle.
               </p>
             </div>
-            
+
             <div className="text-center">
               <div className="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Shield aria-hidden="true" className="h-8 w-8 text-purple-600" />
+                <Shield
+                  aria-hidden="true"
+                  className="h-8 w-8 text-purple-600"
+                />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">High Quality Content</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                High Quality Content
+              </h3>
               <p className="text-gray-600">
-                All sequences in our marketplace are carefully curated and tested to ensure the highest quality lighting effects for your LED displays.
+                All sequences in our marketplace are carefully curated and
+                tested to ensure the highest quality lighting effects for your
+                LED displays.
               </p>
             </div>
-            
+
             <div className="text-center">
               <div className="bg-orange-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Users aria-hidden="true" className="h-8 w-8 text-orange-600" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Creator Community</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                Creator Community
+              </h3>
               <p className="text-gray-600">
                 Join a thriving community of LED artists and sequence creators.
               </p>
@@ -266,25 +313,61 @@ export default function HomePage() {
             <div>
               <h4 className="font-semibold mb-4">Marketplace</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><Link href="/sequences" className="hover:text-white">Browse Sequences</Link></li>
-                <li><Link href="/categories" className="hover:text-white">Categories</Link></li>
+                <li>
+                  <Link href="/sequences" className="hover:text-white">
+                    Browse Sequences
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/categories" className="hover:text-white">
+                    Categories
+                  </Link>
+                </li>
               </ul>
             </div>
             <div>
               <h4 className="font-semibold mb-4">Creators</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><Link href="/seller/register" className="hover:text-white">Become a Seller</Link></li>
-                <li><Link href="/seller" className="hover:text-white">Seller Dashboard</Link></li>
-                <li><Link href="/guidelines" className="hover:text-white">Guidelines</Link></li>
+                <li>
+                  <Link href="/seller/register" className="hover:text-white">
+                    Become a Seller
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/seller" className="hover:text-white">
+                    Seller Dashboard
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/guidelines" className="hover:text-white">
+                    Guidelines
+                  </Link>
+                </li>
               </ul>
             </div>
             <div>
               <h4 className="font-semibold mb-4">Support</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><Link href="/help" className="hover:text-white">Help Center</Link></li>
-                <li><Link href="/contact" className="hover:text-white">Contact Us</Link></li>
-                <li><Link href="/terms" className="hover:text-white">Terms of Service</Link></li>
-                <li><Link href="/privacy" className="hover:text-white">Privacy Policy</Link></li>
+                <li>
+                  <Link href="/help" className="hover:text-white">
+                    Help Center
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/contact" className="hover:text-white">
+                    Contact Us
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/terms" className="hover:text-white">
+                    Terms of Service
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/privacy" className="hover:text-white">
+                    Privacy Policy
+                  </Link>
+                </li>
               </ul>
             </div>
           </div>

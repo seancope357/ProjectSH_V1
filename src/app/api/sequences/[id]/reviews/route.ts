@@ -31,13 +31,17 @@ export async function GET(
 
       return NextResponse.json({ reviews: formatted })
     } catch (dbError) {
-      console.warn('Supabase reviews unavailable, serving mock reviews:', dbError)
+      console.warn(
+        'Supabase reviews unavailable, serving mock reviews:',
+        dbError
+      )
       // Fall back to mock reviews to prevent UI errors
       const mock = [
         {
           id: 'rev-001',
           rating: 5,
-          comment: 'Absolutely stunning sequence! The transitions are buttery smooth.',
+          comment:
+            'Absolutely stunning sequence! The transitions are buttery smooth.',
           user: { username: 'holidayfan' },
           createdAt: new Date().toISOString(),
         },

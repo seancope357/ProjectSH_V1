@@ -48,39 +48,59 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // Seller onboarding gating
+  // Role-based route protection and navigation
   if (user) {
-    const isSellerRole = user.user_metadata?.role === 'SELLER'
-    const isAdminRole = user.user_metadata?.role === 'ADMIN'
+    const userRole = user.user_metadata?.role
+    const isSellerRole = userRole === 'SELLER'
+    const isAdminRole = userRole === 'ADMIN'
     const isSellerArea = request.nextUrl.pathname.startsWith('/seller')
+    const isAdminArea = request.nextUrl.pathname.startsWith('/admin')
     const isOnboardingPage =
       request.nextUrl.pathname.startsWith('/seller/onboarding')
 
-    if (isSellerArea && (isSellerRole || isAdminRole)) {
-      // Load seller profile minimal fields to determine onboarding completeness
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('full_name, username, bio, stripe_onboarding_complete')
-        .eq('id', user.id)
-        .single()
+    // Admin area protection
+    if (isAdminArea && !isAdminRole) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/'
+      return NextResponse.redirect(url)
+    }
 
-      // Consider onboarding complete only if key fields exist and Stripe step marked complete
-      const hasRequiredProfile =
-        !!profile?.full_name && !!profile?.username && !!profile?.bio
-      const stripeComplete = !!profile?.stripe_onboarding_complete
-      const onboardingComplete =
-        !profileError && hasRequiredProfile && stripeComplete
-
-      if (!onboardingComplete && !isOnboardingPage) {
+    // Seller area protection and onboarding flow
+    if (isSellerArea) {
+      // Non-sellers trying to access seller area
+      if (!isSellerRole && !isAdminRole) {
         const url = request.nextUrl.clone()
         url.pathname = '/seller/onboarding'
         return NextResponse.redirect(url)
       }
 
-      if (onboardingComplete && isOnboardingPage) {
-        const url = request.nextUrl.clone()
-        url.pathname = '/seller/dashboard'
-        return NextResponse.redirect(url)
+      // Sellers/Admins - check onboarding completion
+      if (isSellerRole || isAdminRole) {
+        // Load seller profile minimal fields to determine onboarding completeness
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('full_name, username, bio, stripe_onboarding_complete')
+          .eq('id', user.id)
+          .single()
+
+        // Consider onboarding complete only if key fields exist and Stripe step marked complete
+        const hasRequiredProfile =
+          !!profile?.full_name && !!profile?.username && !!profile?.bio
+        const stripeComplete = !!profile?.stripe_onboarding_complete
+        const onboardingComplete =
+          !profileError && hasRequiredProfile && stripeComplete
+
+        if (!onboardingComplete && !isOnboardingPage) {
+          const url = request.nextUrl.clone()
+          url.pathname = '/seller/onboarding'
+          return NextResponse.redirect(url)
+        }
+
+        if (onboardingComplete && isOnboardingPage) {
+          const url = request.nextUrl.clone()
+          url.pathname = '/seller'
+          return NextResponse.redirect(url)
+        }
       }
     }
   }

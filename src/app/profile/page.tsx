@@ -3,7 +3,7 @@
 import { useState, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Navigation } from '@/components/ui/navigation'
+// Removed page-level Navigation; global header renders in layout
 import {
   User,
   Mail,
@@ -17,19 +17,15 @@ import {
   Star,
   Eye,
   Settings,
-  ArrowLeft,
   Home,
   ShoppingBag,
-  Zap,
   Bell,
   Shield,
   Lock,
 } from 'lucide-react'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
-import { useAuth } from '@/components/providers/session-provider'
 
 export default function ProfilePage() {
-  const { user } = useAuth()
   const [isEditing, setIsEditing] = useState(false)
   const [profileData, setProfileData] = useState({
     name: 'John Doe',
@@ -140,7 +136,7 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navigation />
+      {/* Global header handled by RootLayout */}
 
       {/* Navigation Section */}
       <section

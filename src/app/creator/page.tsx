@@ -3,8 +3,15 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@/components/providers/session-provider'
-import { Navigation } from '@/components/ui/navigation'
-import { Zap, TrendingUp, Info, Lightbulb, Music, ShieldCheck } from 'lucide-react'
+// Removed page-level Navigation; global header renders in layout
+import {
+  Zap,
+  TrendingUp,
+  Info,
+  Lightbulb,
+  Music,
+  ShieldCheck,
+} from 'lucide-react'
 import RevenueChart from '@/components/ui/revenue-chart'
 
 type MarketInsights = {
@@ -35,11 +42,30 @@ type MarketInsights = {
 type CreatorInsights = {
   range: string
   period: { start: string; end: string }
-  totals: { sequences: number; revenue: number; sales: number; estimated: boolean }
+  totals: {
+    sequences: number
+    revenue: number
+    sales: number
+    estimated: boolean
+  }
   recent: { revenue: number; sales: number; estimated: boolean }
-  topSequences: Array<{ id: string; title: string; revenue: number; downloads: number; price: number; category: string; tags: string[] }>
-  breakdown: { categories: Array<{ name: string; count: number }>; tags: Array<{ name: string; count: number }> }
-  timeseries?: { granularity: 'daily' | 'weekly' | 'monthly' | 'quarterly'; points: Array<{ date: string; revenue: number; sales: number }> }
+  topSequences: Array<{
+    id: string
+    title: string
+    revenue: number
+    downloads: number
+    price: number
+    category: string
+    tags: string[]
+  }>
+  breakdown: {
+    categories: Array<{ name: string; count: number }>
+    tags: Array<{ name: string; count: number }>
+  }
+  timeseries?: {
+    granularity: 'daily' | 'weekly' | 'monthly' | 'quarterly'
+    points: Array<{ date: string; revenue: number; sales: number }>
+  }
 }
 
 export default function CreatorHubPage() {
@@ -47,7 +73,9 @@ export default function CreatorHubPage() {
   const [insights, setInsights] = useState<MarketInsights | null>(null)
   const [creator, setCreator] = useState<CreatorInsights | null>(null)
   const [loading, setLoading] = useState(true)
-  const [granularity, setGranularity] = useState<'daily' | 'weekly' | 'monthly' | 'quarterly'>('weekly')
+  const [granularity, setGranularity] = useState<
+    'daily' | 'weekly' | 'monthly' | 'quarterly'
+  >('weekly')
 
   useEffect(() => {
     const fetchInsights = async () => {
@@ -78,14 +106,16 @@ export default function CreatorHubPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      <Navigation />
+      {/* Global header handled by RootLayout */}
 
       {/* Header */}
       <div className="bg-gradient-to-r from-indigo-600 to-violet-600">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-white">Creator Hub</h1>
-            <p className="mt-2 text-indigo-100">Personalized tips, trends, and tools for Xlights creators</p>
+            <p className="mt-2 text-indigo-100">
+              Personalized tips, trends, and tools for Xlights creators
+            </p>
           </div>
           <div className="flex items-center gap-2 text-white/90">
             <Zap aria-hidden="true" className="h-6 w-6 text-white/95" />
@@ -98,13 +128,18 @@ export default function CreatorHubPage() {
         {/* Your Performance */}
         <section className="bg-white/90 backdrop-blur-sm rounded-xl ring-1 ring-gray-200 shadow-sm p-6">
           <div className="flex items-center gap-2 mb-4">
-            <TrendingUp aria-hidden="true" className="h-5 w-5 text-indigo-600" />
-            <h2 className="text-xl font-semibold text-gray-900">Your Performance (30 days)</h2>
+            <TrendingUp
+              aria-hidden="true"
+              className="h-5 w-5 text-indigo-600"
+            />
+            <h2 className="text-xl font-semibold text-gray-900">
+              Your Performance (30 days)
+            </h2>
           </div>
           {/* Granularity switch */}
           <div className="mb-3">
             <div className="inline-flex rounded-full bg-gray-100 p-0.5">
-              {(['daily','weekly','monthly','quarterly'] as const).map(g => (
+              {(['daily', 'weekly', 'monthly', 'quarterly'] as const).map(g => (
                 <button
                   key={g}
                   onClick={() => setGranularity(g)}
@@ -122,31 +157,46 @@ export default function CreatorHubPage() {
               <div className="grid sm:grid-cols-3 gap-4">
                 <div className="p-4 rounded-xl ring-1 ring-gray-200 bg-white hover:shadow-md transition">
                   <div className="text-sm text-gray-600">Revenue</div>
-                  <div className="text-2xl font-semibold text-gray-900">${creator.totals.revenue.toFixed(2)}</div>
+                  <div className="text-2xl font-semibold text-gray-900">
+                    ${creator.totals.revenue.toFixed(2)}
+                  </div>
                   {creator.totals.estimated && (
-                    <div className="text-xs text-gray-500">Estimated based on downloads</div>
+                    <div className="text-xs text-gray-500">
+                      Estimated based on downloads
+                    </div>
                   )}
                 </div>
                 <div className="p-4 rounded-xl ring-1 ring-gray-200 bg-white hover:shadow-md transition">
                   <div className="text-sm text-gray-600">Sales</div>
-                  <div className="text-2xl font-semibold text-gray-900">{creator.totals.sales}</div>
+                  <div className="text-2xl font-semibold text-gray-900">
+                    {creator.totals.sales}
+                  </div>
                   {creator.totals.estimated && (
-                    <div className="text-xs text-gray-500">Estimated based on downloads</div>
+                    <div className="text-xs text-gray-500">
+                      Estimated based on downloads
+                    </div>
                   )}
                 </div>
                 <div className="p-4 rounded-xl ring-1 ring-gray-200 bg-white hover:shadow-md transition">
                   <div className="text-sm text-gray-600">Active Sequences</div>
-                  <div className="text-2xl font-semibold text-gray-900">{creator.totals.sequences}</div>
+                  <div className="text-2xl font-semibold text-gray-900">
+                    {creator.totals.sequences}
+                  </div>
                 </div>
               </div>
 
               {/* Revenue Trend Chart */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Revenue Trend</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  Revenue Trend
+                </h3>
                 <RevenueChart
                   primary={{
                     label: 'Revenue',
-                    points: (creator.timeseries?.points || []).map(p => ({ date: p.date, value: p.revenue })),
+                    points: (creator.timeseries?.points || []).map(p => ({
+                      date: p.date,
+                      value: p.revenue,
+                    })),
                     color: '#4F46E5',
                   }}
                   granularity={creator.timeseries?.granularity || granularity}
@@ -159,28 +209,46 @@ export default function CreatorHubPage() {
 
               {/* Top performing sequences */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">Top Sequences</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                  Top Sequences
+                </h3>
                 {creator.topSequences.length === 0 ? (
                   <div className="text-gray-600">No sales data yet.</div>
                 ) : (
                   <div className="grid md:grid-cols-2 gap-4">
-                    {creator.topSequences.map((s) => (
-                      <Link key={s.id} href={`/sequence/${s.id}`} className="block">
+                    {creator.topSequences.map(s => (
+                      <Link
+                        key={s.id}
+                        href={`/sequence/${s.id}`}
+                        className="block"
+                      >
                         <div className="p-4 rounded-xl ring-1 ring-gray-200 hover:ring-indigo-300 hover:shadow-md transition">
                           <div className="flex items-center justify-between">
                             <div>
-                              <div className="font-medium text-gray-900">{s.title}</div>
-                              <div className="text-sm text-gray-600">{s.category}</div>
+                              <div className="font-medium text-gray-900">
+                                {s.title}
+                              </div>
+                              <div className="text-sm text-gray-600">
+                                {s.category}
+                              </div>
                               {s.tags && s.tags.length > 0 && (
-                                <div className="mt-1 text-xs text-gray-500">#{s.tags.slice(0, 3).join(' #')}</div>
+                                <div className="mt-1 text-xs text-gray-500">
+                                  #{s.tags.slice(0, 3).join(' #')}
+                                </div>
                               )}
                             </div>
                             <div className="text-sm text-gray-700 text-right">
                               <div>
-                                <span className="font-semibold">${s.revenue.toFixed(2)}</span> revenue
+                                <span className="font-semibold">
+                                  ${s.revenue.toFixed(2)}
+                                </span>{' '}
+                                revenue
                               </div>
                               <div>
-                                <span className="font-semibold">{s.downloads}</span> downloads
+                                <span className="font-semibold">
+                                  {s.downloads}
+                                </span>{' '}
+                                downloads
                               </div>
                             </div>
                           </div>
@@ -204,16 +272,20 @@ export default function CreatorHubPage() {
           </div>
           <ul className="grid md:grid-cols-2 gap-4 text-gray-700">
             <li className="p-4 rounded-xl bg-gradient-to-br from-amber-50 to-amber-100 ring-1 ring-amber-200">
-              <span className="font-medium">Lean into seasonal demand:</span> Christmas, Halloween, and New Year themes dominate downloads.
+              <span className="font-medium">Lean into seasonal demand:</span>{' '}
+              Christmas, Halloween, and New Year themes dominate downloads.
             </li>
             <li className="p-4 rounded-xl bg-gradient-to-br from-amber-50 to-amber-100 ring-1 ring-amber-200">
-              <span className="font-medium">Optimize previews:</span> High-quality audio/visual previews significantly boost conversion.
+              <span className="font-medium">Optimize previews:</span>{' '}
+              High-quality audio/visual previews significantly boost conversion.
             </li>
             <li className="p-4 rounded-xl bg-gradient-to-br from-amber-50 to-amber-100 ring-1 ring-amber-200">
-              <span className="font-medium">Tag smartly:</span> Use descriptive tags like "fast", "epic", "synth", "chorus" to improve discovery.
+              <span className="font-medium">Tag smartly:</span> Use descriptive
+              tags like "fast", "epic", "synth", "chorus" to improve discovery.
             </li>
             <li className="p-4 rounded-xl bg-gradient-to-br from-amber-50 to-amber-100 ring-1 ring-amber-200">
-              <span className="font-medium">Price with intent:</span> Balance price vs. downloads; consider $9.99–$14.99 for mainstream tracks.
+              <span className="font-medium">Price with intent:</span> Balance
+              price vs. downloads; consider $9.99–$14.99 for mainstream tracks.
             </li>
           </ul>
         </section>
@@ -231,12 +303,19 @@ export default function CreatorHubPage() {
             <div className="space-y-6">
               {/* Top Categories */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">Top Categories</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                  Top Categories
+                </h3>
                 <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                  {insights.topCategories.map((c) => (
-                    <div key={c.name} className="p-4 rounded-xl ring-1 ring-gray-200 bg-white hover:ring-indigo-300 hover:shadow-md transition">
+                  {insights.topCategories.map(c => (
+                    <div
+                      key={c.name}
+                      className="p-4 rounded-xl ring-1 ring-gray-200 bg-white hover:ring-indigo-300 hover:shadow-md transition"
+                    >
                       <div className="text-gray-900 font-medium">{c.name}</div>
-                      <div className="text-gray-600 text-sm">{c.count} sequences</div>
+                      <div className="text-gray-600 text-sm">
+                        {c.count} sequences
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -244,18 +323,29 @@ export default function CreatorHubPage() {
 
               {/* Top Sequences by Downloads */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">Bestsellers</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                  Bestsellers
+                </h3>
                 <div className="grid md:grid-cols-2 gap-4">
-                  {insights.topByDownloads.slice(0, 6).map((s) => (
-                    <Link key={s.id} href={`/sequence/${s.id}`} className="block">
+                  {insights.topByDownloads.slice(0, 6).map(s => (
+                    <Link
+                      key={s.id}
+                      href={`/sequence/${s.id}`}
+                      className="block"
+                    >
                       <div className="p-4 rounded-xl ring-1 ring-gray-200 hover:ring-indigo-300 hover:shadow-md transition">
                         <div className="flex items-center justify-between">
                           <div>
-                            <div className="font-medium text-gray-900">{s.title}</div>
-                            <div className="text-sm text-gray-600">{s.category}</div>
+                            <div className="font-medium text-gray-900">
+                              {s.title}
+                            </div>
+                            <div className="text-sm text-gray-600">
+                              {s.category}
+                            </div>
                           </div>
                           <div className="text-sm text-gray-700">
-                            <span className="font-semibold">{s.downloads}</span> downloads
+                            <span className="font-semibold">{s.downloads}</span>{' '}
+                            downloads
                           </div>
                         </div>
                       </div>
@@ -266,10 +356,15 @@ export default function CreatorHubPage() {
 
               {/* Hot Tags */}
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">Hot Tags</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                  Hot Tags
+                </h3>
                 <div className="flex flex-wrap gap-2">
-                  {insights.hotTags.map((t) => (
-                    <span key={t.name} className="px-3 py-1 bg-indigo-50 text-indigo-700 ring-1 ring-indigo-100 rounded-full text-sm hover:bg-indigo-100 transition">
+                  {insights.hotTags.map(t => (
+                    <span
+                      key={t.name}
+                      className="px-3 py-1 bg-indigo-50 text-indigo-700 ring-1 ring-indigo-100 rounded-full text-sm hover:bg-indigo-100 transition"
+                    >
                       #{t.name}
                     </span>
                   ))}
@@ -288,11 +383,17 @@ export default function CreatorHubPage() {
             <h2 className="text-xl font-semibold text-white">Song Licensing</h2>
           </div>
           <p className="text-indigo-100 mb-4">
-            Want to use commercial tracks in your Xlights sequences? Ensure you have proper rights.
-            Explore licensing partners and pick a plan that fits your use.
+            Want to use commercial tracks in your Xlights sequences? Ensure you
+            have proper rights. Explore licensing partners and pick a plan that
+            fits your use.
           </p>
           <div className="flex items-center gap-3">
-            <Link href="/licensing" className="px-4 py-2 bg-white text-indigo-700 rounded hover:bg-indigo-50">Explore Licensing Options</Link>
+            <Link
+              href="/licensing"
+              className="px-4 py-2 bg-white text-indigo-700 rounded hover:bg-indigo-50"
+            >
+              Explore Licensing Options
+            </Link>
             <div className="flex items-center text-white/85 text-sm gap-1">
               <ShieldCheck aria-hidden="true" className="h-4 w-4 text-white" />
               <span>Stay compliant with usage rights</span>
@@ -305,8 +406,9 @@ export default function CreatorHubPage() {
           <div className="flex items-center gap-2">
             <Info aria-hidden="true" className="h-4 w-4 text-indigo-600" />
             <p className="text-sm text-indigo-800">
-              Insights are based on marketplace activity and may update periodically.
-              For more detailed analytics, use the Seller Dashboard.
+              Insights are based on marketplace activity and may update
+              periodically. For more detailed analytics, use the Seller
+              Dashboard.
             </p>
           </div>
         </section>

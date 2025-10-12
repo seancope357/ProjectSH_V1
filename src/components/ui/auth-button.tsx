@@ -33,11 +33,11 @@ export function AuthButton() {
         {isOpen && (
           <>
             {/* Backdrop */}
-            <div 
-              className="fixed inset-0 z-10" 
+            <div
+              className="fixed inset-0 z-10"
               onClick={() => setIsOpen(false)}
             />
-            
+
             {/* Dropdown Menu */}
             <div className="absolute top-full mt-2 w-full min-w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-20 overflow-hidden">
               <Link
@@ -80,11 +80,11 @@ export function AuthButton() {
       {isOpen && (
         <>
           {/* Backdrop */}
-          <div 
-            className="fixed inset-0 z-10" 
+          <div
+            className="fixed inset-0 z-10"
             onClick={() => setIsOpen(false)}
           />
-          
+
           {/* Dropdown Menu */}
           <div className="absolute top-full mt-2 w-full bg-white rounded-lg shadow-xl border border-gray-200 z-20 overflow-hidden">
             <Link

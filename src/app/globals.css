@@ -1,5 +1,5 @@
-@import "tailwindcss";
-@import "../styles/sections.css";
+@import 'tailwindcss';
+@import '../styles/sections.css';
 
 :root {
   /* Light theme colors */
@@ -80,7 +80,9 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
 
 /* Global smooth scrolling with sticky header compensation */
@@ -107,15 +109,18 @@ body {
 /* SVG Hover Animations */
 svg.lucide,
 svg.mi-svg-hover,
-img[src$=".svg"] {
-  transition: transform 200ms ease, filter 200ms ease, color 200ms ease;
+img[src$='.svg'] {
+  transition:
+    transform 200ms ease,
+    filter 200ms ease,
+    color 200ms ease;
   will-change: transform, filter, color;
   transform-origin: center center;
 }
 
 svg.lucide:hover,
 svg.mi-svg-hover:hover,
-img[src$=".svg"]:hover {
+img[src$='.svg']:hover {
   transform: translateZ(0) scale(1.045);
   filter: saturate(1.05) brightness(1.05);
 }
@@ -124,12 +129,12 @@ img[src$=".svg"]:hover {
 @media (prefers-reduced-motion: reduce) {
   svg.lucide,
   svg.mi-svg-hover,
-  img[src$=".svg"] {
+  img[src$='.svg'] {
     transition: none !important;
   }
   svg.lucide:hover,
   svg.mi-svg-hover:hover,
-  img[src$=".svg"]:hover {
+  img[src$='.svg']:hover {
     transform: none !important;
     filter: none !important;
   }
@@ -151,16 +156,26 @@ img[src$=".svg"]:hover {
 }
 
 .skeleton::after {
-  content: "";
+  content: '';
   position: absolute;
   inset: 0;
-  background-image: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0) 100%);
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.6) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
   background-size: 200% 100%;
   animation: shimmer 1.6s linear infinite;
 }
 
 .dark .skeleton::after {
-  background-image: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0) 100%);
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.15) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
 }
 
 .no-shimmer.skeleton::after {

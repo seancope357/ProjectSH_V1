@@ -1,17 +1,22 @@
-"use client"
+'use client'
 
-import { Navigation } from '@/components/ui/navigation'
+// Removed page-level Navigation; global header renders in layout
 import { AlertTriangle, ShoppingCart, Search } from 'lucide-react'
 
 export default function CheckoutCancelPage() {
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navigation />
+      {/* Global header handled by RootLayout */}
 
       <div className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <h1 className="text-3xl font-bold text-gray-900">Checkout Canceled</h1>
-          <p className="mt-2 text-gray-600">Your payment was not completed. You can resume checkout or keep browsing.</p>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Checkout Canceled
+          </h1>
+          <p className="mt-2 text-gray-600">
+            Your payment was not completed. You can resume checkout or keep
+            browsing.
+          </p>
         </div>
       </div>
 
@@ -20,8 +25,13 @@ export default function CheckoutCancelPage() {
           <div className="flex items-start gap-3">
             <AlertTriangle className="h-6 w-6 text-yellow-600 mt-1" />
             <div>
-              <h2 className="text-lg font-semibold text-gray-900">Payment not completed</h2>
-              <p className="text-gray-600">If this was accidental, you can return to your cart to try again. Your cart items are preserved.</p>
+              <h2 className="text-lg font-semibold text-gray-900">
+                Payment not completed
+              </h2>
+              <p className="text-gray-600">
+                If this was accidental, you can return to your cart to try
+                again. Your cart items are preserved.
+              </p>
             </div>
           </div>
 

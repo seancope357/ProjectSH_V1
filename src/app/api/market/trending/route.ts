@@ -8,12 +8,16 @@ export async function GET() {
     try {
       sequences = await db.sequences.findMany({})
     } catch (dbError) {
-      console.warn('Supabase unavailable for market insights, using mock dataset:', dbError)
+      console.warn(
+        'Supabase unavailable for market insights, using mock dataset:',
+        dbError
+      )
       sequences = [
         {
           id: '00000000-0000-4000-8000-000000000001',
           title: 'Christmas Wonderland',
-          description: 'A magical Christmas light sequence with twinkling effects and smooth transitions.',
+          description:
+            'A magical Christmas light sequence with twinkling effects and smooth transitions.',
           price: 12.99,
           category: { name: 'Holiday & Seasonal' },
           tags: ['christmas', 'twinkling', 'festive'],
@@ -29,7 +33,8 @@ export async function GET() {
         {
           id: '00000000-0000-4000-8000-000000000002',
           title: 'Haunted Night',
-          description: 'Spooky Halloween sequence with flickering lights and eerie effects.',
+          description:
+            'Spooky Halloween sequence with flickering lights and eerie effects.',
           price: 9.99,
           category: { name: 'Halloween' },
           tags: ['halloween', 'spooky', 'flicker'],
@@ -45,7 +50,8 @@ export async function GET() {
         {
           id: '00000000-0000-4000-8000-000000000003',
           title: 'New Year Blast',
-          description: 'High-energy sequence for New Year celebrations with fast rhythms.',
+          description:
+            'High-energy sequence for New Year celebrations with fast rhythms.',
           price: 14.99,
           category: { name: 'New Year' },
           tags: ['newyear', 'fast', 'epic'],
@@ -76,7 +82,7 @@ export async function GET() {
       categoryCounts[categoryName] = (categoryCounts[categoryName] || 0) + 1
 
       const tags: string[] = Array.isArray(s.tags) ? s.tags : []
-      tags.forEach((t) => {
+      tags.forEach(t => {
         const key = (t || '').toLowerCase()
         if (!key) return
         tagCounts[key] = (tagCounts[key] || 0) + 1

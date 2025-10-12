@@ -21,31 +21,34 @@ export async function GET(request: NextRequest) {
           total: 0,
           totalPages: 0,
           hasNext: false,
-          hasPrev: false
-        }
+          hasPrev: false,
+        },
       })
     }
 
     // Get all sequences and filter in memory for now
     // TODO: Implement full-text search in Supabase
     const allSequences = await db.sequences.findMany({})
-    
+
     // Filter sequences based on search criteria
     const filteredSequences = allSequences.filter((sequence: any) => {
-      const matchesQuery = 
+      const matchesQuery =
         sequence.title?.toLowerCase().includes(query.toLowerCase()) ||
         sequence.description?.toLowerCase().includes(query.toLowerCase()) ||
-        sequence.tags?.some((tag: string) => tag.toLowerCase().includes(query.toLowerCase()))
-      
+        sequence.tags?.some((tag: string) =>
+          tag.toLowerCase().includes(query.toLowerCase())
+        )
+
       const matchesCategory = !category || sequence.category?.name === category
-      const matchesPrice = sequence.price >= minPrice && sequence.price <= maxPrice
-      
+      const matchesPrice =
+        sequence.price >= minPrice && sequence.price <= maxPrice
+
       return matchesQuery && matchesCategory && matchesPrice
     })
 
     // Apply sorting
-    let sortedSequences = [...filteredSequences]
-    
+    const sortedSequences = [...filteredSequences]
+
     switch (sort) {
       case 'price-low':
         sortedSequences.sort((a, b) => a.price - b.price)
@@ -54,17 +57,25 @@ export async function GET(request: NextRequest) {
         sortedSequences.sort((a, b) => b.price - a.price)
         break
       case 'popular':
-        sortedSequences.sort((a, b) => (b.download_count || 0) - (a.download_count || 0))
+        sortedSequences.sort(
+          (a, b) => (b.download_count || 0) - (a.download_count || 0)
+        )
         break
       case 'rating':
         sortedSequences.sort((a, b) => (b.rating || 0) - (a.rating || 0))
         break
       case 'newest':
-        sortedSequences.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+        sortedSequences.sort(
+          (a, b) =>
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        )
         break
       default: // relevance
         // For now, just sort by newest as a fallback
-        sortedSequences.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+        sortedSequences.sort(
+          (a, b) =>
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        )
     }
 
     // Apply pagination
@@ -87,10 +98,11 @@ export async function GET(request: NextRequest) {
       thumbnailUrl: sequence.thumbnail_url,
       seller: {
         username: sequence.seller?.username || 'Unknown',
-        displayName: sequence.seller?.full_name || sequence.seller?.username || 'Unknown'
+        displayName:
+          sequence.seller?.full_name || sequence.seller?.username || 'Unknown',
       },
       createdAt: sequence.created_at,
-      updatedAt: sequence.updated_at
+      updatedAt: sequence.updated_at,
     }))
 
     return NextResponse.json({
@@ -101,9 +113,9 @@ export async function GET(request: NextRequest) {
         total,
         totalPages: Math.ceil(total / limit),
         hasNext: page * limit < total,
-        hasPrev: page > 1
+        hasPrev: page > 1,
       },
-      searchQuery: query
+      searchQuery: query,
     })
   } catch (error) {
     console.error('Error searching sequences:', error)

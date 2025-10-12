@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Navigation } from '@/components/ui/navigation'
+// Removed page-level Navigation; global header renders in layout
 import { supabase } from '@/lib/supabase'
 
 export default function AuthCallbackPage() {
@@ -13,7 +13,10 @@ export default function AuthCallbackPage() {
   useEffect(() => {
     const completeAuth = async () => {
       try {
-        const { data: { user }, error } = await supabase.auth.getUser()
+        const {
+          data: { user },
+          error,
+        } = await supabase.auth.getUser()
         if (error) {
           setError(error.message)
           return
@@ -21,11 +24,16 @@ export default function AuthCallbackPage() {
         if (user) {
           const callbackUrl = searchParams.get('callbackUrl') || '/'
           const role = user.user_metadata?.role
-          const target = (role === 'SELLER' || role === 'ADMIN') ? '/seller/dashboard' : callbackUrl
+          const target =
+            role === 'SELLER' || role === 'ADMIN'
+              ? '/seller/dashboard'
+              : callbackUrl
           router.replace(target)
         } else {
           // If user is not present after redirect, guide to sign in
-          setError('Authentication did not complete. Please try signing in again.')
+          setError(
+            'Authentication did not complete. Please try signing in again.'
+          )
         }
       } catch (e) {
         setError('Unexpected error completing authentication.')
@@ -36,11 +44,13 @@ export default function AuthCallbackPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navigation />
+      {/* Global header handled by RootLayout */}
       <div className="flex min-h-screen items-center justify-center px-4">
         <div className="mi-card w-full max-w-md">
           <h1 className="text-xl font-semibold">Completing sign in…</h1>
-          <p className="mt-2 text-sm text-gray-600">If you are not redirected automatically, this page will guide you.</p>
+          <p className="mt-2 text-sm text-gray-600">
+            If you are not redirected automatically, this page will guide you.
+          </p>
           {error && (
             <div className="mt-4 rounded-md bg-red-50 p-4">
               <div className="text-sm text-red-700">{error}</div>

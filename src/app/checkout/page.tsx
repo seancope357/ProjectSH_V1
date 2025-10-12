@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Navigation } from '@/components/ui/navigation'
+// Removed page-level Navigation; global header renders in layout
 import { CreditCard } from 'lucide-react'
 
 interface CartItem {
@@ -42,11 +42,6 @@ export default function CheckoutPage() {
     }
   }
 
-  // Payments are currently disabled; no-op handler retained for future enablement
-  function payWithStripe() {
-    console.warn('Payments are currently disabled')
-  }
-
   const subtotal = cartItems.reduce(
     (sum, item) => sum + item.sequence.price * item.quantity,
     0
@@ -54,7 +49,7 @@ export default function CheckoutPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navigation />
+      {/* Global header handled by RootLayout */}
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <h1 className="text-2xl font-bold text-gray-900 mb-4">Checkout</h1>
         {loading ? (

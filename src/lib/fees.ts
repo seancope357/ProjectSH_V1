@@ -32,8 +32,14 @@ export function calcOrderFees(items: { price: number }[]): {
 } {
   const itemFees = items.map(item => calcFees(item.price))
   const subtotal = items.reduce((sum, item) => sum + item.price, 0)
-  const totalPlatformFee = itemFees.reduce((sum, fee) => sum + fee.platformFeeTotal, 0)
-  const totalSellerAmount = itemFees.reduce((sum, fee) => sum + fee.sellerAmount, 0)
+  const totalPlatformFee = itemFees.reduce(
+    (sum, fee) => sum + fee.platformFeeTotal,
+    0
+  )
+  const totalSellerAmount = itemFees.reduce(
+    (sum, fee) => sum + fee.sellerAmount,
+    0
+  )
 
   return {
     subtotal,

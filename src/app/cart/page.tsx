@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '@/components/providers/session-provider'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-import { Navigation } from '@/components/ui/navigation'
+// Removed page-level Navigation; global header renders in layout
 import {
   Trash2,
   Plus,
@@ -134,7 +134,7 @@ export default function CartPage() {
   if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Navigation />
+        {/* Global header handled by RootLayout */}
         <div className="flex justify-center items-center py-20">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
         </div>
@@ -144,7 +144,7 @@ export default function CartPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navigation />
+      {/* Global header handled by RootLayout */}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">

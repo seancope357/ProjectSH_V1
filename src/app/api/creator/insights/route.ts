@@ -28,7 +28,10 @@ function getRangeDates(range: RangeKey) {
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser()
 
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -36,7 +39,8 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url)
     const rangeParam = (searchParams.get('range') as RangeKey) || '30d'
-    const granularity: Granularity = (searchParams.get('granularity') as Granularity) || 'daily'
+    const granularity: Granularity =
+      (searchParams.get('granularity') as Granularity) || 'daily'
     const { start, end } = getRangeDates(rangeParam)
 
     // Fetch seller's sequences
@@ -44,14 +48,16 @@ export async function GET(request: NextRequest) {
     try {
       const { data: seqData, error: seqError } = await supabaseAdmin
         .from('sequences')
-        .select(`
+        .select(
+          `
           id,
           title,
           price,
           download_count,
           tags,
           category:categories(name)
-        `)
+        `
+        )
         .eq('seller_id', user.id)
 
       if (seqError) throw seqError
@@ -65,19 +71,23 @@ export async function GET(request: NextRequest) {
     try {
       let query = supabaseAdmin
         .from('order_items')
-        .select(`
+        .select(
+          `
           order_id,
           sequence_id,
           price,
           seller_payout,
           created_at,
           orders!inner(status, created_at)
-        `)
+        `
+        )
         .eq('seller_id', user.id)
         .eq('orders.status', 'completed')
 
       // Apply date range filter on order_items.created_at
-      query = query.gte('created_at', start.toISOString()).lte('created_at', end.toISOString())
+      query = query
+        .gte('created_at', start.toISOString())
+        .lte('created_at', end.toISOString())
 
       const { data: oiData, error: oiError } = await query
       if (oiError) throw oiError
@@ -90,27 +100,43 @@ export async function GET(request: NextRequest) {
     const totalSequences = sequences.length
 
     // Revenue and sales from orders (authoritative if available)
-    const revenueFromOrders = orderItems.reduce((sum, i) => sum + Number(i.seller_payout || 0), 0)
+    const revenueFromOrders = orderItems.reduce(
+      (sum, i) => sum + Number(i.seller_payout || 0),
+      0
+    )
     const salesFromOrders = orderItems.length
 
     // Fallback estimates from sequence downloads if orders are empty
-    const estimatedRevenueFromDownloads = sequences.reduce((sum, s) => sum + Number((s.price || 0) * (s.download_count || 0) * 0.85), 0)
-    const estimatedSalesFromDownloads = sequences.reduce((sum, s) => sum + Number(s.download_count || 0), 0)
+    const estimatedRevenueFromDownloads = sequences.reduce(
+      (sum, s) => sum + Number((s.price || 0) * (s.download_count || 0) * 0.85),
+      0
+    )
+    const estimatedSalesFromDownloads = sequences.reduce(
+      (sum, s) => sum + Number(s.download_count || 0),
+      0
+    )
 
     const useEstimates = revenueFromOrders === 0 && salesFromOrders === 0
-    const totalRevenue = useEstimates ? estimatedRevenueFromDownloads : revenueFromOrders
-    const totalSales = useEstimates ? estimatedSalesFromDownloads : salesFromOrders
+    const totalRevenue = useEstimates
+      ? estimatedRevenueFromDownloads
+      : revenueFromOrders
+    const totalSales = useEstimates
+      ? estimatedSalesFromDownloads
+      : salesFromOrders
 
     // Top sequences by revenue or downloads
     const revenueBySequence: Record<string, number> = {}
     if (!useEstimates) {
       for (const item of orderItems) {
         const key = item.sequence_id
-        revenueBySequence[key] = (revenueBySequence[key] || 0) + Number(item.seller_payout || 0)
+        revenueBySequence[key] =
+          (revenueBySequence[key] || 0) + Number(item.seller_payout || 0)
       }
     } else {
       for (const s of sequences) {
-        revenueBySequence[s.id] = Number((s.price || 0) * (s.download_count || 0) * 0.85)
+        revenueBySequence[s.id] = Number(
+          (s.price || 0) * (s.download_count || 0) * 0.85
+        )
       }
     }
 
@@ -119,7 +145,12 @@ export async function GET(request: NextRequest) {
 
     const topSequences = Object.entries(revenueBySequence)
       .map(([sequenceId, revenue]) => {
-        const s = sequencesById[sequenceId] || { id: sequenceId, title: 'Unknown', price: 0, download_count: 0 }
+        const s = sequencesById[sequenceId] || {
+          id: sequenceId,
+          title: 'Unknown',
+          price: 0,
+          download_count: 0,
+        }
         return {
           id: sequenceId,
           title: s.title,
@@ -179,10 +210,15 @@ export async function GET(request: NextRequest) {
       return d
     }
 
-    const timeseriesBuckets: Record<string, { revenue: number; sales: number }> = {}
+    const timeseriesBuckets: Record<
+      string,
+      { revenue: number; sales: number }
+    > = {}
     if (!useEstimates) {
       for (const item of orderItems) {
-        const dt = new Date(item.created_at || item.orders?.created_at || Date.now())
+        const dt = new Date(
+          item.created_at || item.orders?.created_at || Date.now()
+        )
         const b = bucketStart(dt, granularity).toISOString()
         const entry = timeseriesBuckets[b] || { revenue: 0, sales: 0 }
         entry.revenue += Number(item.seller_payout || 0)
@@ -193,7 +229,11 @@ export async function GET(request: NextRequest) {
 
     const timeseriesPoints = Object.keys(timeseriesBuckets)
       .sort()
-      .map((iso) => ({ date: iso, revenue: Number(timeseriesBuckets[iso].revenue.toFixed(2)), sales: timeseriesBuckets[iso].sales }))
+      .map(iso => ({
+        date: iso,
+        revenue: Number(timeseriesBuckets[iso].revenue.toFixed(2)),
+        sales: timeseriesBuckets[iso].sales,
+      }))
 
     return NextResponse.json({
       range: rangeParam,

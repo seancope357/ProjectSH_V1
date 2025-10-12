@@ -4,18 +4,18 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '@/components/providers/session-provider'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-import { Navigation } from '@/components/ui/navigation'
-import { 
-  Plus, 
-  Eye, 
-  Edit, 
-  Trash2, 
-  Download, 
-  DollarSign, 
-  TrendingUp, 
+// Removed page-level Navigation; global header renders in layout
+import {
+  Plus,
+  Eye,
+  Edit,
+  Trash2,
+  Download,
+  DollarSign,
+  TrendingUp,
   Star,
   Upload,
-  BarChart3
+  BarChart3,
 } from 'lucide-react'
 
 interface SellerStats {
@@ -54,8 +54,12 @@ export default function SellerDashboard() {
   const [stats, setStats] = useState<SellerStats | null>(null)
   const [sequences, setSequences] = useState<Sequence[]>([])
   const [loading, setLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState<'overview' | 'sequences' | 'analytics'>('overview')
-  const [filterStatus, setFilterStatus] = useState<'all' | 'draft' | 'published' | 'suspended'>('all')
+  const [activeTab, setActiveTab] = useState<
+    'overview' | 'sequences' | 'analytics'
+  >('overview')
+  const [filterStatus, setFilterStatus] = useState<
+    'all' | 'draft' | 'published' | 'suspended'
+  >('all')
 
   useEffect(() => {
     if (!user && !authLoading) {
@@ -64,7 +68,11 @@ export default function SellerDashboard() {
     }
 
     // Check if user has seller or admin role
-    if (user && user.user_metadata?.role !== 'SELLER' && user.user_metadata?.role !== 'ADMIN') {
+    if (
+      user &&
+      user.user_metadata?.role !== 'SELLER' &&
+      user.user_metadata?.role !== 'ADMIN'
+    ) {
       router.push('/')
       return
     }
@@ -78,7 +86,7 @@ export default function SellerDashboard() {
     try {
       const [statsResponse, sequencesResponse] = await Promise.all([
         fetch('/api/seller/stats'),
-        fetch('/api/seller/sequences')
+        fetch('/api/seller/sequences'),
       ])
 
       if (statsResponse.ok) {
@@ -102,7 +110,7 @@ export default function SellerDashboard() {
 
     try {
       const response = await fetch(`/api/sequences/${sequenceId}`, {
-        method: 'DELETE'
+        method: 'DELETE',
       })
 
       if (response.ok) {
@@ -118,27 +126,34 @@ export default function SellerDashboard() {
       const response = await fetch(`/api/sequences/${sequenceId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: newStatus })
+        body: JSON.stringify({ status: newStatus }),
       })
 
       if (response.ok) {
-        setSequences(sequences.map(seq => 
-          seq.id === sequenceId ? { ...seq, status: newStatus as 'draft' | 'published' | 'suspended' } : seq
-        ))
+        setSequences(
+          sequences.map(seq =>
+            seq.id === sequenceId
+              ? {
+                  ...seq,
+                  status: newStatus as 'draft' | 'published' | 'suspended',
+                }
+              : seq
+          )
+        )
       }
     } catch (error) {
       console.error('Failed to update sequence status:', error)
     }
   }
 
-  const filteredSequences = sequences.filter(seq => 
-    filterStatus === 'all' || seq.status === filterStatus
+  const filteredSequences = sequences.filter(
+    seq => filterStatus === 'all' || seq.status === filterStatus
   )
 
   if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Navigation />
+        {/* Global header handled by RootLayout */}
         <div className="flex justify-center items-center py-20">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
         </div>
@@ -148,8 +163,8 @@ export default function SellerDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navigation />
-      
+      {/* Global header handled by RootLayout */}
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
@@ -166,11 +181,15 @@ export default function SellerDashboard() {
               {[
                 { id: 'overview', label: 'Overview', icon: BarChart3 },
                 { id: 'sequences', label: 'My Sequences', icon: Upload },
-                { id: 'analytics', label: 'Analytics', icon: TrendingUp }
-              ].map((tab) => (
+                { id: 'analytics', label: 'Analytics', icon: TrendingUp },
+              ].map(tab => (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id as 'overview' | 'sequences' | 'analytics')}
+                  onClick={() =>
+                    setActiveTab(
+                      tab.id as 'overview' | 'sequences' | 'analytics'
+                    )
+                  }
                   className={`flex items-center gap-2 py-2 px-1 border-b-2 font-medium text-sm ${
                     activeTab === tab.id
                       ? 'border-blue-500 text-blue-600'
@@ -244,7 +263,7 @@ export default function SellerDashboard() {
               <h2 className="text-lg font-semibold text-gray-900 mb-4">
                 Recent Sales
               </h2>
-              
+
               {stats.recentSales.length > 0 ? (
                 <div className="overflow-x-auto">
                   <table className="w-full">
@@ -265,7 +284,7 @@ export default function SellerDashboard() {
                       </tr>
                     </thead>
                     <tbody>
-                      {stats.recentSales.map((sale) => (
+                      {stats.recentSales.map(sale => (
                         <tr key={sale.id} className="border-b border-gray-100">
                           <td className="py-3 text-sm text-gray-900">
                             {sale.sequenceTitle}
@@ -301,7 +320,15 @@ export default function SellerDashboard() {
               <div className="flex items-center gap-4">
                 <select
                   value={filterStatus}
-                  onChange={(e) => setFilterStatus(e.target.value as 'all' | 'draft' | 'published' | 'suspended')}
+                  onChange={e =>
+                    setFilterStatus(
+                      e.target.value as
+                        | 'all'
+                        | 'draft'
+                        | 'published'
+                        | 'suspended'
+                    )
+                  }
                   className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="all">All Status</option>
@@ -322,8 +349,11 @@ export default function SellerDashboard() {
 
             {/* Sequences Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredSequences.map((sequence) => (
-                <div key={sequence.id} className="mi-card bg-white rounded-lg shadow-md overflow-hidden">
+              {filteredSequences.map(sequence => (
+                <div
+                  key={sequence.id}
+                  className="mi-card bg-white rounded-lg shadow-md overflow-hidden"
+                >
                   {/* Preview */}
                   <div className="aspect-video bg-gray-200">
                     {sequence.previewUrl ? (
@@ -347,13 +377,15 @@ export default function SellerDashboard() {
                       <h3 className="font-semibold text-lg line-clamp-1">
                         {sequence.title}
                       </h3>
-                      <span className={`px-2 py-1 text-xs rounded-full ${
-                        sequence.status === 'published' 
-                          ? 'bg-green-100 text-green-800'
-                          : sequence.status === 'draft'
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : 'bg-red-100 text-red-800'
-                      }`}>
+                      <span
+                        className={`px-2 py-1 text-xs rounded-full ${
+                          sequence.status === 'published'
+                            ? 'bg-green-100 text-green-800'
+                            : sequence.status === 'draft'
+                              ? 'bg-yellow-100 text-yellow-800'
+                              : 'bg-red-100 text-red-800'
+                        }`}
+                      >
                         {sequence.status}
                       </span>
                     </div>
@@ -394,7 +426,9 @@ export default function SellerDashboard() {
                         View
                       </button>
                       <button
-                        onClick={() => router.push(`/seller/edit/${sequence.id}`)}
+                        onClick={() =>
+                          router.push(`/seller/edit/${sequence.id}`)
+                        }
                         className="flex-1 mi-cta bg-blue-600 text-white hover:bg-blue-700"
                       >
                         <Edit className="w-4 h-4" />
@@ -411,7 +445,9 @@ export default function SellerDashboard() {
                     {/* Status Actions */}
                     {sequence.status === 'draft' && (
                       <button
-                        onClick={() => handleStatusChange(sequence.id, 'published')}
+                        onClick={() =>
+                          handleStatusChange(sequence.id, 'published')
+                        }
                         className="w-full mt-2 mi-cta bg-green-600 text-white hover:bg-green-700"
                       >
                         Publish
@@ -429,10 +465,9 @@ export default function SellerDashboard() {
                   No sequences found
                 </h2>
                 <p className="text-gray-600 mb-6">
-                  {filterStatus === 'all' 
+                  {filterStatus === 'all'
                     ? "You haven't uploaded any sequences yet."
-                    : `No sequences with status "${filterStatus}".`
-                  }
+                    : `No sequences with status "${filterStatus}".`}
                 </p>
                 <button
                   onClick={() => router.push('/seller/upload')}
@@ -452,7 +487,7 @@ export default function SellerDashboard() {
               <h2 className="text-lg font-semibold text-gray-900 mb-4">
                 Monthly Revenue Trend
               </h2>
-              
+
               {/* Simple bar chart representation */}
               <div className="space-y-2">
                 {stats.monthlyRevenue.map((revenue, index) => (
@@ -464,7 +499,7 @@ export default function SellerDashboard() {
                       <div
                         className="bg-blue-500 h-full rounded-full"
                         style={{
-                          width: `${Math.max(5, (revenue / Math.max(...stats.monthlyRevenue)) * 100)}%`
+                          width: `${Math.max(5, (revenue / Math.max(...stats.monthlyRevenue)) * 100)}%`,
                         }}
                       ></div>
                       <span className="absolute inset-0 flex items-center justify-center text-xs font-medium">
@@ -489,7 +524,10 @@ export default function SellerDashboard() {
                   <div className="flex justify-between">
                     <span className="text-gray-600">Avg. Order Value</span>
                     <span className="font-medium">
-                      ${stats.totalSales > 0 ? (stats.totalRevenue / stats.totalSales).toFixed(2) : '0.00'}
+                      $
+                      {stats.totalSales > 0
+                        ? (stats.totalRevenue / stats.totalSales).toFixed(2)
+                        : '0.00'}
                     </span>
                   </div>
                   <div className="flex justify-between">

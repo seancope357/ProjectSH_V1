@@ -7,15 +7,20 @@ export async function PATCH(
 ) {
   try {
     const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser()
+
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     // TODO: Implement admin sequence approval with Supabase
     return NextResponse.json(
-      { error: 'Admin sequence approval functionality temporarily unavailable' },
+      {
+        error: 'Admin sequence approval functionality temporarily unavailable',
+      },
       { status: 503 }
     )
   } catch (error) {

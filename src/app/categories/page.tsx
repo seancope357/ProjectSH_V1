@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import { Navigation } from '@/components/ui/navigation'
-import { Search, Filter, Grid, List } from 'lucide-react'
+// Removed page-level Navigation; global header renders in layout
+import { Search, Grid, List } from 'lucide-react'
 
 const categories = [
   {
@@ -11,43 +11,43 @@ const categories = [
     name: 'Gaming',
     description: 'Gaming sequences and macros',
     count: 245,
-    image: '/images/category-gaming.jpg'
+    image: '/images/category-gaming.jpg',
   },
   {
     id: 2,
     name: 'Productivity',
     description: 'Work and productivity automation',
     count: 189,
-    image: '/images/category-productivity.jpg'
+    image: '/images/category-productivity.jpg',
   },
   {
     id: 3,
     name: 'Creative',
     description: 'Design and creative workflows',
     count: 156,
-    image: '/images/category-creative.jpg'
+    image: '/images/category-creative.jpg',
   },
   {
     id: 4,
     name: 'Development',
     description: 'Programming and development tools',
     count: 203,
-    image: '/images/category-development.jpg'
+    image: '/images/category-development.jpg',
   },
   {
     id: 5,
     name: 'Entertainment',
     description: 'Media and entertainment sequences',
     count: 98,
-    image: '/images/category-entertainment.jpg'
+    image: '/images/category-entertainment.jpg',
   },
   {
     id: 6,
     name: 'Education',
     description: 'Learning and educational content',
     count: 134,
-    image: '/images/category-education.jpg'
-  }
+    image: '/images/category-education.jpg',
+  },
 ]
 
 export default function CategoriesPage() {
@@ -55,9 +55,10 @@ export default function CategoriesPage() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [sortBy, setSortBy] = useState('name')
 
-  const filteredCategories = categories.filter(category =>
-    category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    category.description.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredCategories = categories.filter(
+    category =>
+      category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      category.description.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
   const sortedCategories = [...filteredCategories].sort((a, b) => {
@@ -73,8 +74,8 @@ export default function CategoriesPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navigation />
-      
+      {/* Global header handled by RootLayout */}
+
       {/* Header */}
       <div className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -92,21 +93,21 @@ export default function CategoriesPage() {
               type="text"
               placeholder="Search categories..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={e => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
-          
+
           <div className="flex items-center gap-4">
             <select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
+              onChange={e => setSortBy(e.target.value)}
               className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="name">Sort by Name</option>
               <option value="count">Sort by Count</option>
             </select>
-            
+
             <div className="flex border border-gray-300 rounded-lg">
               <button
                 onClick={() => setViewMode('grid')}
@@ -129,8 +130,11 @@ export default function CategoriesPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
         {viewMode === 'grid' ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {sortedCategories.map((category) => (
-              <div key={category.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+            {sortedCategories.map(category => (
+              <div
+                key={category.id}
+                className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
+              >
                 <Image
                   src={category.image}
                   alt={category.name}
@@ -139,10 +143,14 @@ export default function CategoriesPage() {
                   className="w-full h-48 object-cover"
                 />
                 <div className="p-6">
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">{category.name}</h3>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                    {category.name}
+                  </h3>
                   <p className="text-gray-600 mb-4">{category.description}</p>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-500">{category.count} sequences</span>
+                    <span className="text-sm text-gray-500">
+                      {category.count} sequences
+                    </span>
                     <button className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
                       Browse
                     </button>
@@ -153,8 +161,11 @@ export default function CategoriesPage() {
           </div>
         ) : (
           <div className="space-y-4">
-            {sortedCategories.map((category) => (
-              <div key={category.id} className="bg-white rounded-lg shadow-md p-6 flex items-center gap-6">
+            {sortedCategories.map(category => (
+              <div
+                key={category.id}
+                className="bg-white rounded-lg shadow-md p-6 flex items-center gap-6"
+              >
                 <Image
                   src={category.image}
                   alt={category.name}
@@ -163,9 +174,13 @@ export default function CategoriesPage() {
                   className="w-24 h-24 object-cover rounded-lg"
                 />
                 <div className="flex-1">
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">{category.name}</h3>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                    {category.name}
+                  </h3>
                   <p className="text-gray-600 mb-2">{category.description}</p>
-                  <span className="text-sm text-gray-500">{category.count} sequences</span>
+                  <span className="text-sm text-gray-500">
+                    {category.count} sequences
+                  </span>
                 </div>
                 <button className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors">
                   Browse

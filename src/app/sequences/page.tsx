@@ -1,10 +1,21 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useState, useEffect, useCallback, Suspense } from 'react'
+import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-import { Navigation } from '@/components/ui/navigation'
-import { Grid, List, Eye, Heart, Star, Download, Filter, Settings } from 'lucide-react'
+// Removed page-level Navigation; global header renders in layout
+import {
+  Grid,
+  List,
+  Eye,
+  Heart,
+  Star,
+  Download,
+  Filter,
+  Cpu,
+  Gauge,
+  Clock,
+} from 'lucide-react'
 import { SequenceCardSkeleton, ListRowSkeleton } from '@/components/ui/skeleton'
 import { useAuth } from '@/components/providers/session-provider'
 
@@ -20,18 +31,26 @@ interface Sequence {
   downloads: number
   createdAt: string
   seller: {
-    name: string
+    name?: string
+    displayName?: string
+    username?: string
   }
+  // Tech attributes for badges (optional)
+  format?: string | null
+  frameRate?: number | null
+  duration?: number | null
+  fileSize?: string | number | null
 }
 
 function SequencesContent() {
   const router = useRouter()
-  const searchParams = useSearchParams()
   const { user } = useAuth()
-  
+
   const [sequences, setSequences] = useState<Sequence[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedCategory, setSelectedCategory] = useState('all')
+  const [formatFilter, setFormatFilter] = useState('all')
+  const [controllerFilter, setControllerFilter] = useState('all')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [favorites, setFavorites] = useState<Set<string>>(new Set())
   const [currentPage, setCurrentPage] = useState(1)
@@ -89,7 +108,7 @@ function SequencesContent() {
     }
   }, [])
 
-  const fetchSequences = async () => {
+  const fetchSequences = useCallback(async () => {
     setLoading(true)
     try {
       // Regular API call
@@ -99,9 +118,11 @@ function SequencesContent() {
         page: currentPage.toString(),
         limit: '12',
       })
-      
+      if (formatFilter !== 'all') params.set('format', formatFilter)
+      if (controllerFilter !== 'all') params.set('controller', controllerFilter)
+
       const response = await fetch(`/api/sequences?${params}`)
-      
+
       if (response.ok) {
         const data = await response.json()
         setSequences(data.sequences || [])
@@ -116,7 +137,8 @@ function SequencesContent() {
         {
           id: '1',
           title: 'Christmas Wonderland',
-          description: 'A magical Christmas light sequence with twinkling effects and smooth transitions.',
+          description:
+            'A magical Christmas light sequence with twinkling effects and smooth transitions.',
           price: 12.99,
           previewUrl: '/images/sequence-preview-default.jpg',
           category: 'christmas',
@@ -132,27 +154,27 @@ function SequencesContent() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [selectedCategory, sortBy, currentPage, formatFilter, controllerFilter])
 
   useEffect(() => {
     fetchSequences()
-  }, [selectedCategory, sortBy, currentPage])
+  }, [fetchSequences])
 
   // Toggle favorite function
   const toggleFavorite = async (sequenceId: string) => {
     const newFavorites = new Set(favorites)
-    
+
     if (favorites.has(sequenceId)) {
       newFavorites.delete(sequenceId)
     } else {
       newFavorites.add(sequenceId)
     }
-    
+
     setFavorites(newFavorites)
-    
+
     // Save to localStorage for non-authenticated users or as backup
     saveToLocalStorage('favorites', Array.from(newFavorites))
-    
+
     // If user is authenticated, also sync with server
     if (user) {
       try {
@@ -170,8 +192,8 @@ function SequencesContent() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navigation />
-      
+      {/* Global header handled by RootLayout */}
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header Section */}
         <header className="mb-8">
@@ -179,7 +201,8 @@ function SequencesContent() {
             Browse LED Sequences
           </h1>
           <p className="text-gray-600">
-            Discover thousands of high-quality LED sequences from talented creators
+            Discover thousands of high-quality LED sequences from talented
+            creators
           </p>
         </header>
 
@@ -195,12 +218,59 @@ function SequencesContent() {
                 </label>
                 <select
                   value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  onChange={e => setSelectedCategory(e.target.value)}
                   className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent mi-cta-secondary"
                 >
-                  {categories.map((cat) => (
+                  {categories.map(cat => (
                     <option key={cat.value} value={cat.value}>
                       {cat.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Format Filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Format
+                </label>
+                <select
+                  value={formatFilter}
+                  onChange={e => setFormatFilter(e.target.value)}
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent mi-cta-secondary"
+                >
+                  {[
+                    { value: 'all', label: 'All' },
+                    { value: 'FSEQ', label: 'FSEQ' },
+                    { value: 'MP4', label: 'MP4' },
+                    { value: 'ZIP', label: 'ZIP' },
+                  ].map(opt => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Controller Filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Controller
+                </label>
+                <select
+                  value={controllerFilter}
+                  onChange={e => setControllerFilter(e.target.value)}
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent mi-cta-secondary"
+                >
+                  {[
+                    { value: 'all', label: 'All' },
+                    { value: 'falcon', label: 'Falcon' },
+                    { value: 'kulp', label: 'Kulp' },
+                    { value: 'pixlite', label: 'PixLite' },
+                    { value: 'wled', label: 'WLED' },
+                  ].map(opt => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
                     </option>
                   ))}
                 </select>
@@ -213,10 +283,10 @@ function SequencesContent() {
                 </label>
                 <select
                   value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
+                  onChange={e => setSortBy(e.target.value)}
                   className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent mi-cta-secondary"
                 >
-                  {sortOptions.map((option) => (
+                  {sortOptions.map(option => (
                     <option key={option.value} value={option.value}>
                       {option.label}
                     </option>
@@ -258,7 +328,10 @@ function SequencesContent() {
             ) : (
               <div className="space-y-4 mb-8">
                 {Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="bg-white rounded-lg shadow-sm overflow-hidden">
+                  <div
+                    key={i}
+                    className="bg-white rounded-lg shadow-sm overflow-hidden"
+                  >
                     <ListRowSkeleton />
                   </div>
                 ))}
@@ -272,7 +345,7 @@ function SequencesContent() {
           <>
             {viewMode === 'grid' ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
-                {sequences.map((sequence) => (
+                {sequences.map(sequence => (
                   <div
                     key={sequence.id}
                     className="mi-card bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer overflow-hidden"
@@ -293,10 +366,10 @@ function SequencesContent() {
                           <Eye className="w-8 h-8 text-white" />
                         </div>
                       )}
-                      
+
                       {/* Favorite Button */}
                       <button
-                        onClick={(e) => {
+                        onClick={e => {
                           e.stopPropagation()
                           toggleFavorite(sequence.id)
                         }}
@@ -344,7 +417,7 @@ function SequencesContent() {
                         <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
                           {sequence.category}
                         </span>
-                        {sequence.tags.slice(0, 2).map((tag) => (
+                        {sequence.tags.slice(0, 2).map(tag => (
                           <span
                             key={tag}
                             className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full"
@@ -352,11 +425,32 @@ function SequencesContent() {
                             {tag}
                           </span>
                         ))}
+                        {/* Tech badges */}
+                        {sequence.format && (
+                          <span className="inline-flex items-center gap-1 px-2 py-1 bg-indigo-100 text-indigo-700 text-xs rounded-full">
+                            <Cpu className="w-3 h-3" /> {sequence.format}
+                          </span>
+                        )}
+                        {sequence.frameRate && (
+                          <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
+                            <Gauge className="w-3 h-3" /> {sequence.frameRate}{' '}
+                            fps
+                          </span>
+                        )}
+                        {sequence.duration && (
+                          <span className="inline-flex items-center gap-1 px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded-full">
+                            <Clock className="w-3 h-3" /> {sequence.duration}s
+                          </span>
+                        )}
                       </div>
 
                       {/* Seller */}
                       <div className="text-xs text-gray-500">
-                        by {sequence.seller.name}
+                        by{' '}
+                        {sequence.seller.name ||
+                          sequence.seller.displayName ||
+                          sequence.seller.username ||
+                          'Unknown'}
                       </div>
                     </div>
                   </div>
@@ -364,7 +458,7 @@ function SequencesContent() {
               </div>
             ) : (
               <div className="space-y-4 mb-8">
-                {sequences.map((sequence) => (
+                {sequences.map(sequence => (
                   <div
                     key={sequence.id}
                     className="mi-card bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer p-6 flex gap-6"
@@ -398,7 +492,7 @@ function SequencesContent() {
                             ${sequence.price}
                           </span>
                           <button
-                            onClick={(e) => {
+                            onClick={e => {
                               e.stopPropagation()
                               toggleFavorite(sequence.id)
                             }}
@@ -430,7 +524,11 @@ function SequencesContent() {
                           <span>{sequence.downloads}</span>
                         </div>
                         <div className="text-xs text-gray-500">
-                          by {sequence.seller.name}
+                          by{' '}
+                          {sequence.seller.name ||
+                            sequence.seller.displayName ||
+                            sequence.seller.username ||
+                            'Unknown'}
                         </div>
                       </div>
 
@@ -439,7 +537,7 @@ function SequencesContent() {
                         <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
                           {sequence.category}
                         </span>
-                        {sequence.tags.map((tag) => (
+                        {sequence.tags.map(tag => (
                           <span
                             key={tag}
                             className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full"
@@ -447,6 +545,23 @@ function SequencesContent() {
                             {tag}
                           </span>
                         ))}
+                        {/* Tech badges */}
+                        {sequence.format && (
+                          <span className="inline-flex items-center gap-1 px-2 py-1 bg-indigo-100 text-indigo-700 text-xs rounded-full">
+                            <Cpu className="w-3 h-3" /> {sequence.format}
+                          </span>
+                        )}
+                        {sequence.frameRate && (
+                          <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
+                            <Gauge className="w-3 h-3" /> {sequence.frameRate}{' '}
+                            fps
+                          </span>
+                        )}
+                        {sequence.duration && (
+                          <span className="inline-flex items-center gap-1 px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded-full">
+                            <Clock className="w-3 h-3" /> {sequence.duration}s
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -464,7 +579,7 @@ function SequencesContent() {
                 >
                   Previous
                 </button>
-                
+
                 <div className="flex gap-1">
                   {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                     const page = i + 1
@@ -483,9 +598,11 @@ function SequencesContent() {
                     )
                   })}
                 </div>
-                
+
                 <button
-                  onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                  onClick={() =>
+                    setCurrentPage(Math.min(totalPages, currentPage + 1))
+                  }
                   disabled={currentPage === totalPages}
                   className="mi-cta-secondary px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
                 >
@@ -527,18 +644,20 @@ function SequencesContent() {
 
 export default function SequencesPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-gray-50">
-        <Navigation />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <SequenceCardSkeleton key={i} />
-            ))}
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-gray-50">
+          {/* Global header handled by RootLayout */}
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <SequenceCardSkeleton key={i} />
+              ))}
+            </div>
           </div>
         </div>
-      </div>
-    }>
+      }
+    >
       <SequencesContent />
     </Suspense>
   )

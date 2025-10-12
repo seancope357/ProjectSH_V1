@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
+import { useState, useEffect, useCallback, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Image from 'next/image'
-import { Navigation } from '@/components/ui/navigation'
+// Removed page-level Navigation; global header renders in layout
 import { Search, Grid, List, Star, Download, Eye, Zap } from 'lucide-react'
 
 interface Sequence {
@@ -33,48 +33,58 @@ function SearchPageContent() {
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
 
-  const categories = ['all', 'christmas', 'halloween', 'music', 'effects', 'patterns']
+  const categories = [
+    'all',
+    'christmas',
+    'halloween',
+    'music',
+    'effects',
+    'patterns',
+  ]
   const sortOptions = [
     { value: 'newest', label: 'Newest First' },
     { value: 'oldest', label: 'Oldest First' },
     { value: 'price-low', label: 'Price: Low to High' },
     { value: 'price-high', label: 'Price: High to Low' },
     { value: 'rating', label: 'Highest Rated' },
-    { value: 'downloads', label: 'Most Downloaded' }
+    { value: 'downloads', label: 'Most Downloaded' },
   ]
 
-  const handleSearch = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault()
-    setLoading(true)
-    
-    try {
-      const params = new URLSearchParams({
-        q: searchQuery,
-        category: category !== 'all' ? category : '',
-        sort: sortBy,
-        page: currentPage.toString()
-      })
+  const handleSearch = useCallback(
+    async (e?: React.FormEvent) => {
+      if (e) e.preventDefault()
+      setLoading(true)
 
-      const response = await fetch(`/api/sequences/search?${params}`)
-      const data = await response.json()
-      
-      setSequences(data.sequences || [])
-      setTotalPages(data.totalPages || 1)
-    } catch (error) {
-      console.error('Search failed:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+      try {
+        const params = new URLSearchParams({
+          q: searchQuery,
+          category: category !== 'all' ? category : '',
+          sort: sortBy,
+          page: currentPage.toString(),
+        })
+
+        const response = await fetch(`/api/sequences/search?${params}`)
+        const data = await response.json()
+
+        setSequences(data.sequences || [])
+        setTotalPages(data.totalPages || 1)
+      } catch (error) {
+        console.error('Search failed:', error)
+      } finally {
+        setLoading(false)
+      }
+    },
+    [searchQuery, category, sortBy, currentPage]
+  )
 
   useEffect(() => {
     handleSearch()
-  }, [category, sortBy, currentPage])
+  }, [handleSearch])
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navigation />
-      
+      {/* Global header handled by RootLayout */}
+
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <header className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
@@ -97,7 +107,7 @@ function SearchPageContent() {
             <input
               type="text"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={e => setSearchQuery(e.target.value)}
               placeholder="Search sequences..."
               className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
@@ -110,12 +120,15 @@ function SearchPageContent() {
             {/* Category Filter */}
             <select
               value={category}
-              onChange={(e) => setCategory(e.target.value)}
+              onChange={e => setCategory(e.target.value)}
               className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             >
-              {categories.map((cat) => (
+              {categories.map(cat => (
                 <option key={cat} value={cat}>
-                  {cat === 'all' ? 'All Categories' : cat.charAt(0).toUpperCase() + cat.slice(1).replace('-', ' ')}
+                  {cat === 'all'
+                    ? 'All Categories'
+                    : cat.charAt(0).toUpperCase() +
+                      cat.slice(1).replace('-', ' ')}
                 </option>
               ))}
             </select>
@@ -123,10 +136,10 @@ function SearchPageContent() {
             {/* Sort Filter */}
             <select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
+              onChange={e => setSortBy(e.target.value)}
               className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             >
-              {sortOptions.map((option) => (
+              {sortOptions.map(option => (
                 <option key={option.value} value={option.value}>
                   {option.label}
                 </option>
@@ -168,17 +181,20 @@ function SearchPageContent() {
             {/* Sequences Grid/List */}
             {viewMode === 'grid' ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
-                {sequences.map((sequence) => (
-                  <div key={sequence.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                {sequences.map(sequence => (
+                  <div
+                    key={sequence.id}
+                    className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
+                  >
                     <div className="relative h-48 bg-gray-200">
                       {sequence.previewUrl ? (
                         <Image
-                            src={sequence.previewUrl}
-                            alt={sequence.title}
-                            fill
-                            className="object-cover"
-                            unoptimized
-                          />
+                          src={sequence.previewUrl}
+                          alt={sequence.title}
+                          fill
+                          className="object-cover"
+                          unoptimized
+                        />
                       ) : (
                         <div className="flex items-center justify-center h-full">
                           <Zap className="w-12 h-12 text-gray-400" />
@@ -186,13 +202,21 @@ function SearchPageContent() {
                       )}
                     </div>
                     <div className="p-4">
-                      <h3 className="font-semibold text-lg mb-2 truncate">{sequence.title}</h3>
-                      <p className="text-gray-600 text-sm mb-3 line-clamp-2">{sequence.description}</p>
+                      <h3 className="font-semibold text-lg mb-2 truncate">
+                        {sequence.title}
+                      </h3>
+                      <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                        {sequence.description}
+                      </p>
                       <div className="flex items-center justify-between mb-3">
-                        <span className="text-2xl font-bold text-blue-600">${sequence.price}</span>
+                        <span className="text-2xl font-bold text-blue-600">
+                          ${sequence.price}
+                        </span>
                         <div className="flex items-center gap-1">
                           <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                          <span className="text-sm text-gray-600">{sequence.rating}</span>
+                          <span className="text-sm text-gray-600">
+                            {sequence.rating}
+                          </span>
                         </div>
                       </div>
                       <div className="flex items-center justify-between text-sm text-gray-500 mb-3">
@@ -216,8 +240,11 @@ function SearchPageContent() {
               </div>
             ) : (
               <div className="space-y-4 mb-8">
-                {sequences.map((sequence) => (
-                  <div key={sequence.id} className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
+                {sequences.map(sequence => (
+                  <div
+                    key={sequence.id}
+                    className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
+                  >
                     <div className="flex gap-4">
                       <div className="w-24 h-24 bg-gray-200 rounded-lg flex-shrink-0">
                         {sequence.previewUrl ? (
@@ -237,10 +264,16 @@ function SearchPageContent() {
                       </div>
                       <div className="flex-1">
                         <div className="flex justify-between items-start mb-2">
-                          <h3 className="font-semibold text-xl">{sequence.title}</h3>
-                          <span className="text-2xl font-bold text-blue-600">${sequence.price}</span>
+                          <h3 className="font-semibold text-xl">
+                            {sequence.title}
+                          </h3>
+                          <span className="text-2xl font-bold text-blue-600">
+                            ${sequence.price}
+                          </span>
                         </div>
-                        <p className="text-gray-600 mb-3">{sequence.description}</p>
+                        <p className="text-gray-600 mb-3">
+                          {sequence.description}
+                        </p>
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-4 text-sm text-gray-500">
                             <span className="flex items-center gap-1">
@@ -283,7 +316,9 @@ function SearchPageContent() {
                   Page {currentPage} of {totalPages}
                 </span>
                 <button
-                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                  onClick={() =>
+                    setCurrentPage(prev => Math.min(prev + 1, totalPages))
+                  }
                   disabled={currentPage === totalPages}
                   className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
                 >

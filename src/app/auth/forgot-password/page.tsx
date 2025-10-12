@@ -1,21 +1,21 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { Navigation } from '@/components/ui/navigation';
+import { useState } from 'react'
+import Link from 'next/link'
+// Removed page-level Navigation; global header renders in layout
 
 export default function ForgotPasswordPage() {
-  const [email, setEmail] = useState('');
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [emailSent, setEmailSent] = useState(false);
+  const [email, setEmail] = useState('')
+  const [message, setMessage] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [emailSent, setEmailSent] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setMessage('');
-    setLoading(true);
+    e.preventDefault()
+    setError('')
+    setMessage('')
+    setLoading(true)
 
     try {
       const response = await fetch('/api/auth/forgot-password', {
@@ -24,26 +24,28 @@ export default function ForgotPasswordPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ email }),
-      });
+      })
 
       if (response.ok) {
-        setEmailSent(true);
-        setMessage('Password reset instructions have been sent to your email address.');
+        setEmailSent(true)
+        setMessage(
+          'Password reset instructions have been sent to your email address.'
+        )
       } else {
-        const data = await response.json();
-        setError(data.message || 'Failed to send reset email');
+        const data = await response.json()
+        setError(data.message || 'Failed to send reset email')
       }
     } catch (error) {
-      setError('An error occurred while sending the reset email');
+      setError('An error occurred while sending the reset email')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navigation />
-      
+      {/* Global header handled by RootLayout */}
+
       <div className="flex min-h-screen items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="w-full max-w-md space-y-8">
           <div>
@@ -60,7 +62,7 @@ export default function ForgotPasswordPage() {
               </Link>
             </p>
           </div>
-          
+
           {!emailSent ? (
             <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
               {error && (
@@ -68,9 +70,12 @@ export default function ForgotPasswordPage() {
                   <div className="text-sm text-red-700">{error}</div>
                 </div>
               )}
-              
+
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-gray-700"
+                >
                   Email Address
                 </label>
                 <input
@@ -81,7 +86,7 @@ export default function ForgotPasswordPage() {
                   className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
                   placeholder="Enter your email address"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={e => setEmail(e.target.value)}
                 />
                 <p className="mt-2 text-sm text-gray-500">
                   We'll send password reset instructions to this email address.
@@ -117,31 +122,34 @@ export default function ForgotPasswordPage() {
                       </svg>
                     </div>
                     <div className="ml-3">
-                      <p className="text-sm font-medium text-green-800">Email sent!</p>
+                      <p className="text-sm font-medium text-green-800">
+                        Email sent!
+                      </p>
                       <p className="mt-1 text-sm text-green-700">{message}</p>
                     </div>
                   </div>
                 </div>
               )}
-              
+
               <div className="text-center">
                 <p className="text-sm text-gray-600 mb-4">
-                  Check your email for password reset instructions. The link will expire in 1 hour.
+                  Check your email for password reset instructions. The link
+                  will expire in 1 hour.
                 </p>
-                
+
                 <div className="space-y-2">
                   <button
                     onClick={() => {
-                      setEmailSent(false);
-                      setMessage('');
-                      setError('');
-                      setEmail('');
+                      setEmailSent(false)
+                      setMessage('')
+                      setError('')
+                      setEmail('')
                     }}
                     className="text-sm text-blue-600 hover:text-blue-500"
                   >
                     Send to a different email
                   </button>
-                  
+
                   <div>
                     <Link
                       href="/auth/signin"
@@ -157,5 +165,5 @@ export default function ForgotPasswordPage() {
         </div>
       </div>
     </div>
-  );
+  )
 }

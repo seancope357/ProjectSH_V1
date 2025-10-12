@@ -9,8 +9,11 @@ export async function GET(
   try {
     const { sequenceId } = await params
     const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser()
+
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
@@ -46,7 +49,10 @@ export async function GET(
         return NextResponse.redirect(maybeSigned)
       }
     } catch (e) {
-      console.warn('Signed URL generation failed, falling back to direct URL', e)
+      console.warn(
+        'Signed URL generation failed, falling back to direct URL',
+        e
+      )
     }
 
     // Fallback: redirect to the actual file URL
@@ -72,7 +78,9 @@ async function maybeCreateSignedUrl(fileUrl: string): Promise<string | null> {
     const raw = fileUrl.replace('supabase://', '')
     const [bucket, ...rest] = raw.split('/')
     const path = rest.join('/')
-    const { data, error } = await supabaseAdmin.storage.from(bucket).createSignedUrl(path, 60 * 60)
+    const { data, error } = await supabaseAdmin.storage
+      .from(bucket)
+      .createSignedUrl(path, 60 * 60)
     if (error) throw error
     return data?.signedUrl ?? null
   }
@@ -86,7 +94,9 @@ async function maybeCreateSignedUrl(fileUrl: string): Promise<string | null> {
       const after = u.pathname.slice(idx + publicPrefix.length)
       const [bucket, ...rest] = after.split('/')
       const path = rest.join('/')
-      const { data, error } = await supabaseAdmin.storage.from(bucket).createSignedUrl(path, 60 * 60)
+      const { data, error } = await supabaseAdmin.storage
+        .from(bucket)
+        .createSignedUrl(path, 60 * 60)
       if (error) throw error
       return data?.signedUrl ?? null
     }
@@ -99,7 +109,9 @@ async function maybeCreateSignedUrl(fileUrl: string): Promise<string | null> {
     const [bucket, ...rest] = fileUrl.split('/')
     const path = rest.join('/')
     if (bucket && path) {
-      const { data, error } = await supabaseAdmin.storage.from(bucket).createSignedUrl(path, 60 * 60)
+      const { data, error } = await supabaseAdmin.storage
+        .from(bucket)
+        .createSignedUrl(path, 60 * 60)
       if (error) throw error
       return data?.signedUrl ?? null
     }

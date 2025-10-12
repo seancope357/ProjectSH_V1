@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Navigation } from '@/components/ui/navigation'
+// Removed page-level Navigation; global header renders in layout
 import { Mail, Phone, MapPin, Clock, Send } from 'lucide-react'
 
 export default function ContactPage() {
@@ -10,7 +10,7 @@ export default function ContactPage() {
     email: '',
     subject: '',
     message: '',
-    category: 'general'
+    category: 'general',
   })
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -23,22 +23,26 @@ export default function ContactPage() {
       email: '',
       subject: '',
       message: '',
-      category: 'general'
+      category: 'general',
     })
-    alert('Thank you for your message! We\'ll get back to you soon.')
+    alert("Thank you for your message! We'll get back to you soon.")
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     })
   }
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navigation />
-      
+      {/* Global header handled by RootLayout */}
+
       {/* Header */}
       <div className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -52,8 +56,10 @@ export default function ContactPage() {
           {/* Contact Information */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-6">Get in Touch</h2>
-              
+              <h2 className="text-xl font-semibold text-gray-900 mb-6">
+                Get in Touch
+              </h2>
+
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
                   <Mail className="h-6 w-6 text-blue-500 mt-1" />
@@ -63,7 +69,7 @@ export default function ContactPage() {
                     <p className="text-gray-600">hello@sequencehub.com</p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-start gap-4">
                   <Phone className="h-6 w-6 text-blue-500 mt-1" />
                   <div>
@@ -72,26 +78,32 @@ export default function ContactPage() {
                     <p className="text-sm text-gray-500">Mon-Fri 9AM-6PM EST</p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-start gap-4">
                   <MapPin className="h-6 w-6 text-blue-500 mt-1" />
                   <div>
                     <h3 className="font-medium text-gray-900">Address</h3>
                     <p className="text-gray-600">
-                      123 Tech Street<br />
-                      San Francisco, CA 94105<br />
+                      123 Tech Street
+                      <br />
+                      San Francisco, CA 94105
+                      <br />
                       United States
                     </p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-start gap-4">
                   <Clock className="h-6 w-6 text-blue-500 mt-1" />
                   <div>
-                    <h3 className="font-medium text-gray-900">Business Hours</h3>
+                    <h3 className="font-medium text-gray-900">
+                      Business Hours
+                    </h3>
                     <p className="text-gray-600">
-                      Monday - Friday: 9:00 AM - 6:00 PM<br />
-                      Saturday: 10:00 AM - 4:00 PM<br />
+                      Monday - Friday: 9:00 AM - 6:00 PM
+                      <br />
+                      Saturday: 10:00 AM - 4:00 PM
+                      <br />
                       Sunday: Closed
                     </p>
                   </div>
@@ -103,8 +115,9 @@ export default function ContactPage() {
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mt-6">
               <h3 className="font-medium text-blue-900 mb-2">Response Time</h3>
               <p className="text-blue-700 text-sm">
-                We typically respond to all inquiries within 24 hours during business days. 
-                For urgent technical issues, please mark your message as "Technical Support".
+                We typically respond to all inquiries within 24 hours during
+                business days. For urgent technical issues, please mark your
+                message as "Technical Support".
               </p>
             </div>
           </div>
@@ -112,12 +125,17 @@ export default function ContactPage() {
           {/* Contact Form */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-6">Send us a Message</h2>
-              
+              <h2 className="text-xl font-semibold text-gray-900 mb-6">
+                Send us a Message
+              </h2>
+
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label
+                      htmlFor="name"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
                       Full Name *
                     </label>
                     <input
@@ -131,9 +149,12 @@ export default function ContactPage() {
                       placeholder="Your full name"
                     />
                   </div>
-                  
+
                   <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label
+                      htmlFor="email"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
                       Email Address *
                     </label>
                     <input
@@ -150,7 +171,10 @@ export default function ContactPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="category"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     Category
                   </label>
                   <select
@@ -170,7 +194,10 @@ export default function ContactPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="subject"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     Subject *
                   </label>
                   <input
@@ -186,7 +213,10 @@ export default function ContactPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="message"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     Message *
                   </label>
                   <textarea
@@ -202,9 +232,7 @@ export default function ContactPage() {
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <p className="text-sm text-gray-500">
-                    * Required fields
-                  </p>
+                  <p className="text-sm text-gray-500">* Required fields</p>
                   <button
                     type="submit"
                     className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2"
@@ -221,9 +249,12 @@ export default function ContactPage() {
         {/* FAQ Link */}
         <div className="mt-12 text-center">
           <div className="bg-white rounded-lg shadow-md p-6 inline-block">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Looking for quick answers?</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              Looking for quick answers?
+            </h3>
             <p className="text-gray-600 mb-4">
-              Check out our FAQ section for immediate answers to common questions.
+              Check out our FAQ section for immediate answers to common
+              questions.
             </p>
             <button className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors">
               Visit FAQ

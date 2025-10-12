@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react'
 import { useAuth } from '@/components/providers/session-provider'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Navigation } from '@/components/ui/navigation'
+// Removed page-level Navigation; global header renders in layout
 import { User, Store, ArrowRight } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 
@@ -79,7 +79,7 @@ function RoleSelectionContent() {
   if (!user) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Navigation />
+        {/* Global header handled by RootLayout */}
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
@@ -92,7 +92,7 @@ function RoleSelectionContent() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navigation />
+      {/* Global header handled by RootLayout */}
 
       <div className="flex min-h-screen items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="w-full max-w-2xl space-y-8">
