@@ -49,7 +49,7 @@ export function Navigation() {
                     <span className="text-purple-600 dark:text-purple-400">
                       Sequence
                     </span>
-                    <span className="text-blue-600 dark:text-blue-400">
+                    <span className="text-blue-700 dark:text-blue-300">
                       HUB
                     </span>
                   </h1>
@@ -124,21 +124,21 @@ export function Navigation() {
             <div className="hidden md:ml-6 md:flex md:space-x-8">
               <Link
                 href="/sequences"
-                className="text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 px-3 py-2 text-sm font-medium transition-colors"
+                className="text-gray-900 dark:text-gray-100 hover:text-blue-700 dark:hover:text-blue-300 px-3 py-2 text-sm font-medium transition-colors"
               >
                 Browse Sequences
               </Link>
 
               <Link
                 href="/creator"
-                className="text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 px-3 py-2 text-sm font-medium transition-colors"
+                className="text-gray-900 dark:text-gray-100 hover:text-blue-700 dark:hover:text-blue-300 px-3 py-2 text-sm font-medium transition-colors"
               >
                 Creator Hub
               </Link>
 
               <Link
                 href="/licensing"
-                className="text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 px-3 py-2 text-sm font-medium transition-colors"
+                className="text-gray-900 dark:text-gray-100 hover:text-blue-700 dark:hover:text-blue-300 px-3 py-2 text-sm font-medium transition-colors"
               >
                 Licensing
               </Link>
@@ -152,7 +152,7 @@ export function Navigation() {
               <>
                 <Link
                   href="/cart"
-                  className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 p-2 transition-colors"
+                  className="text-gray-700 dark:text-gray-300 hover:text-blue-700 dark:hover:text-blue-300 p-2 transition-colors"
                 >
                   <ShoppingCart className="h-6 w-6" />
                 </Link>
@@ -160,7 +160,7 @@ export function Navigation() {
                 {user.user_metadata?.role === 'SELLER' && (
                   <Link
                     href="/seller"
-                    className="text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 px-3 py-2 text-sm font-medium transition-colors"
+                    className="text-gray-900 dark:text-gray-100 hover:text-blue-700 dark:hover:text-blue-300 px-3 py-2 text-sm font-medium transition-colors"
                   >
                     Seller Dashboard
                   </Link>
@@ -169,14 +169,14 @@ export function Navigation() {
                 {user.user_metadata?.role === 'ADMIN' && (
                   <Link
                     href="/admin"
-                    className="text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 px-3 py-2 text-sm font-medium transition-colors"
+                    className="text-gray-900 dark:text-gray-100 hover:text-blue-700 dark:hover:text-blue-300 px-3 py-2 text-sm font-medium transition-colors"
                   >
                     Admin Panel
                   </Link>
                 )}
 
                 <div className="relative group">
-                  <button className="flex items-center text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 p-2 transition-colors">
+                  <button className="flex items-center text-gray-700 dark:text-gray-300 hover:text-blue-700 dark:hover:text-blue-300 p-2 transition-colors">
                     <User className="h-6 w-6" />
                   </button>
                   <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-[60] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
@@ -215,7 +215,7 @@ export function Navigation() {
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 p-2 transition-colors"
+              className="text-gray-700 dark:text-gray-300 hover:text-blue-700 dark:hover:text-blue-300 p-2 transition-colors"
             >
               {isMenuOpen ? (
                 <X className="h-6 w-6" />
@@ -233,7 +233,7 @@ export function Navigation() {
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 transition-colors">
             <Link
               href="/sequences"
-              className="text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 block px-3 py-2 text-base font-medium transition-colors"
+              className="text-gray-900 dark:text-gray-100 hover:text-blue-700 dark:hover:text-blue-300 block px-3 py-2 text-base font-medium transition-colors"
               onClick={() => setIsMenuOpen(false)}
             >
               Browse Sequences
@@ -241,7 +241,7 @@ export function Navigation() {
 
             <Link
               href="/creator"
-              className="text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 block px-3 py-2 text-base font-medium transition-colors"
+              className="text-gray-900 dark:text-gray-100 hover:text-blue-700 dark:hover:text-blue-300 block px-3 py-2 text-base font-medium transition-colors"
               onClick={() => setIsMenuOpen(false)}
             >
               Creator Hub
@@ -249,7 +249,7 @@ export function Navigation() {
 
             <Link
               href="/licensing"
-              className="text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 block px-3 py-2 text-base font-medium transition-colors"
+              className="text-gray-900 dark:text-gray-100 hover:text-blue-700 dark:hover:text-blue-300 block px-3 py-2 text-base font-medium transition-colors"
               onClick={() => setIsMenuOpen(false)}
             >
               Licensing
@@ -259,21 +259,21 @@ export function Navigation() {
               <>
                 <Link
                   href="/cart"
-                  className="text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 block px-3 py-2 text-base font-medium transition-colors"
+                  className="text-gray-900 dark:text-gray-100 hover:text-blue-700 dark:hover:text-blue-300 block px-3 py-2 text-base font-medium transition-colors"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Cart
                 </Link>
                 <Link
                   href="/profile"
-                  className="text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 block px-3 py-2 text-base font-medium transition-colors"
+                  className="text-gray-900 dark:text-gray-100 hover:text-blue-700 dark:hover:text-blue-300 block px-3 py-2 text-base font-medium transition-colors"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Profile
                 </Link>
                 <Link
                   href="/orders"
-                  className="text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 block px-3 py-2 text-base font-medium transition-colors"
+                  className="text-gray-900 dark:text-gray-100 hover:text-blue-700 dark:hover:text-blue-300 block px-3 py-2 text-base font-medium transition-colors"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   My Orders
@@ -304,7 +304,7 @@ export function Navigation() {
                     handleSignOut()
                     setIsMenuOpen(false)
                   }}
-                  className="text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 block px-3 py-2 text-base font-medium w-full text-left transition-colors"
+                  className="text-gray-900 dark:text-gray-100 hover:text-blue-700 dark:hover:text-blue-300 block px-3 py-2 text-base font-medium w-full text-left transition-colors"
                 >
                   Sign Out
                 </button>

@@ -43,7 +43,8 @@ export default function RegisterPage() {
         options: {
           data: {
             name: formData.name,
-            role: formData.role,
+            // Normalize role casing to align with app checks
+            role: formData.role === 'seller' ? 'SELLER' : 'USER',
           },
         },
       })
@@ -52,9 +53,13 @@ export default function RegisterPage() {
         setError(error.message)
       } else {
         // Registration successful
-        router.push(
-          '/auth/signin?message=Registration successful! Please check your email to verify your account.'
+        const base = '/auth/signin'
+        const message = encodeURIComponent(
+          'Registration successful! Please check your email to verify your account.'
         )
+        // Direct new users to profile creation after sign-in
+        const callback = encodeURIComponent('/profile/create')
+        router.push(`${base}?message=${message}&callbackUrl=${callback}`)
       }
     } catch (error) {
       setError('An error occurred during registration')

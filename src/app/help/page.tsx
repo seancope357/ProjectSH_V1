@@ -77,7 +77,7 @@ const faqData = [
       },
       {
         q: 'What are the seller fees?',
-        a: 'We charge a 15% platform fee on each sale. This covers payment processing, hosting, and platform maintenance costs.',
+        a: 'We collect a 10% platform commission on each sale. This covers payment processing, hosting, and platform maintenance costs.',
       },
       {
         q: 'When do I get paid?',

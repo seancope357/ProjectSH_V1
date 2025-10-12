@@ -17,6 +17,17 @@ import {
   Upload,
   BarChart3,
 } from 'lucide-react'
+import { SellerKpiStrip } from '@/components/ui/seller-kpi-strip'
+import { SellerTopTasks } from '@/components/ui/seller-top-tasks'
+import { OrdersQueue } from '@/components/ui/orders-queue'
+import { ListingsHealth } from '@/components/ui/listings-health'
+import { ShopAdvisor } from '@/components/ui/shop-advisor'
+import { ActivityFeed } from '@/components/ui/activity-feed'
+import { QuickActions } from '@/components/ui/quick-actions'
+import type { KpiItem } from '@/components/ui/seller-kpi-strip'
+import type { TopTask } from '@/components/ui/seller-top-tasks'
+import type { OrderItem } from '@/components/ui/orders-queue'
+import type { ActivityItem } from '@/components/ui/activity-feed'
 
 interface SellerStats {
   totalRevenue: number
@@ -150,6 +161,119 @@ export default function SellerDashboard() {
     seq => filterStatus === 'all' || seq.status === filterStatus
   )
 
+  // Dashboard mock data (to be wired to real endpoints)
+  const kpiItems: KpiItem[] = stats
+    ? [
+        {
+          label: 'Total Revenue',
+          value: `$${stats.totalRevenue.toFixed(2)}`,
+          accent: 'green',
+        },
+        { label: 'Total Sales', value: stats.totalSales, accent: 'blue' },
+        {
+          label: 'Sequences',
+          value: stats.totalSequences,
+          accent: 'purple',
+        },
+        {
+          label: 'Avg. Rating',
+          value: stats.averageRating.toFixed(1),
+          accent: 'yellow',
+        },
+      ]
+    : []
+
+  const topTasks: TopTask[] = [
+    {
+      id: 'messages',
+      label: 'Messages awaiting reply',
+      count: 2,
+      icon: 'messages',
+    },
+    {
+      id: 'renewal',
+      label: 'Drafts ready to publish',
+      count: 1,
+      icon: 'renewal',
+    },
+    { id: 'overdue', label: 'Overdue shipments', count: 0, icon: 'overdue' },
+  ]
+
+  const ordersQueue: OrderItem[] = [
+    { id: '1024', buyer: 'jamie', items: 3, ageLabel: '2h', status: 'open' },
+    { id: '1023', buyer: 'alex', items: 1, ageLabel: '1d', status: 'open' },
+    {
+      id: '1022',
+      buyer: 'mira',
+      items: 2,
+      ageLabel: '3d',
+      status: 'completed',
+    },
+  ]
+
+  const listingsHealth = sequences.slice(0, 5).map(seq => ({
+    id: seq.id,
+    title: seq.title,
+    status: seq.status,
+    views: undefined,
+    rating: seq.rating,
+  }))
+
+  const advisorTips = [
+    {
+      id: 'tip-1',
+      title: 'Add a short demo video',
+      description: 'Listings with demos convert 18% better on average.',
+      ctaLabel: 'Upload demo',
+    },
+    {
+      id: 'tip-2',
+      title: 'Enable bundle pricing',
+      description: 'Offer a multi-sequence bundle to increase AOV.',
+      ctaLabel: 'Create bundle',
+    },
+  ]
+
+  const activityItems: ActivityItem[] = [
+    {
+      id: 'act-1',
+      ts: 'Today 10:24',
+      kind: 'sale',
+      summary: 'Sold “Christmas Wonderland” for $12.99',
+    },
+    {
+      id: 'act-2',
+      ts: 'Today 09:10',
+      kind: 'message',
+      summary: 'Buyer asked about controller compatibility',
+    },
+    {
+      id: 'act-3',
+      ts: 'Yesterday',
+      kind: 'payout',
+      summary: 'Weekly payout sent: $86.50',
+    },
+  ]
+
+  const quickActions = [
+    {
+      id: 'qa-upload',
+      label: 'Upload Sequence',
+      onClick: () => router.push('/seller/upload'),
+    },
+    {
+      id: 'qa-new-listing',
+      label: 'Create Listing',
+      onClick: () => router.push('/seller/sequences'),
+    },
+    { id: 'qa-offer', label: 'Create Offer' },
+    {
+      id: 'qa-payouts',
+      label: 'View Payouts',
+      onClick: () => router.push('/seller/payouts'),
+    },
+  ]
+
   if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -207,107 +331,23 @@ export default function SellerDashboard() {
         {/* Overview Tab */}
         {activeTab === 'overview' && stats && (
           <div className="space-y-6">
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div className="mi-card bg-white rounded-lg shadow-md p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-500">Total Revenue</p>
-                    <p className="text-2xl font-bold text-gray-900">
-                      ${stats.totalRevenue.toFixed(2)}
-                    </p>
-                  </div>
-                  <DollarSign className="w-8 h-8 text-green-500" />
-                </div>
+            {/* Quick actions */}
+            <QuickActions actions={quickActions} />
+
+            {/* KPI strip */}
+            <SellerKpiStrip items={kpiItems} />
+
+            {/* Core panels */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2 space-y-6">
+                <SellerTopTasks tasks={topTasks} />
+                <OrdersQueue orders={ordersQueue} />
+                <ListingsHealth items={listingsHealth} />
               </div>
-
-              <div className="mi-card bg-white rounded-lg shadow-md p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-500">Total Sales</p>
-                    <p className="text-2xl font-bold text-gray-900">
-                      {stats.totalSales}
-                    </p>
-                  </div>
-                  <Download className="w-8 h-8 text-blue-500" />
-                </div>
+              <div className="space-y-6">
+                <ShopAdvisor tips={advisorTips} />
+                <ActivityFeed items={activityItems} />
               </div>
-
-              <div className="mi-card bg-white rounded-lg shadow-md p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-500">Sequences</p>
-                    <p className="text-2xl font-bold text-gray-900">
-                      {stats.totalSequences}
-                    </p>
-                  </div>
-                  <Upload className="w-8 h-8 text-purple-500" />
-                </div>
-              </div>
-
-              <div className="mi-card bg-white rounded-lg shadow-md p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-500">Avg. Rating</p>
-                    <p className="text-2xl font-bold text-gray-900">
-                      {stats.averageRating.toFixed(1)}
-                    </p>
-                  </div>
-                  <Star className="w-8 h-8 text-yellow-500" />
-                </div>
-              </div>
-            </div>
-
-            {/* Recent Sales */}
-            <div className="mi-card bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                Recent Sales
-              </h2>
-
-              {stats.recentSales.length > 0 ? (
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-gray-200">
-                        <th className="text-left py-2 text-sm font-medium text-gray-500">
-                          Sequence
-                        </th>
-                        <th className="text-left py-2 text-sm font-medium text-gray-500">
-                          Buyer
-                        </th>
-                        <th className="text-left py-2 text-sm font-medium text-gray-500">
-                          Amount
-                        </th>
-                        <th className="text-left py-2 text-sm font-medium text-gray-500">
-                          Date
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {stats.recentSales.map(sale => (
-                        <tr key={sale.id} className="border-b border-gray-100">
-                          <td className="py-3 text-sm text-gray-900">
-                            {sale.sequenceTitle}
-                          </td>
-                          <td className="py-3 text-sm text-gray-600">
-                            {sale.buyerUsername}
-                          </td>
-                          <td className="py-3 text-sm font-medium text-green-600">
-                            ${sale.amount.toFixed(2)}
-                          </td>
-                          <td className="py-3 text-sm text-gray-500">
-                            {new Date(sale.createdAt).toLocaleDateString()}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              ) : (
-                <p className="text-gray-500 text-center py-8">
-                  No sales yet. Upload your first sequence to get started!
-                </p>
-              )}
             </div>
           </div>
         )}

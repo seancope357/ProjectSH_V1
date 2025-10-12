@@ -114,7 +114,7 @@ export function SecondaryNav() {
               {crumb.href ? (
                 <Link
                   href={crumb.href}
-                  className="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                  className="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
                 >
                   {crumb.label}
                 </Link>

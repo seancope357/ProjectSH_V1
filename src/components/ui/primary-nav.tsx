@@ -17,9 +17,10 @@ export function PrimaryNav() {
 
   // Role-specific navigation items
   const getBuyerNavItems = () => [
+    { href: '/dashboard', label: 'Dashboard' },
     { href: '/sequences', label: 'Browse Sequences' },
     { href: '/categories', label: 'Categories' },
-    { href: '/creator-guide', label: 'Creator Guide' },
+    { href: '/licensing', label: 'Licensing' },
     { href: '/help', label: 'Help' },
   ]
 
@@ -58,7 +59,7 @@ export function PrimaryNav() {
           {/* Logo and Brand */}
           <div className="flex items-center">
             <Link
-              href={currentRole === 'SELLER' ? '/seller' : '/'}
+              href={currentRole === 'SELLER' ? '/seller' : '/dashboard'}
               className="flex-shrink-0"
             >
               <div className="flex flex-col items-center">
@@ -67,7 +68,7 @@ export function PrimaryNav() {
                     <span className="text-purple-600 dark:text-purple-400">
                       Sequence
                     </span>
-                    <span className="text-blue-600 dark:text-blue-400">
+                    <span className="text-blue-700 dark:text-blue-300">
                       HUB
                     </span>
                   </h1>
@@ -98,7 +99,7 @@ export function PrimaryNav() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 px-3 py-2 text-sm font-medium transition-colors duration-200 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md"
+                  className="text-gray-700 dark:text-gray-300 hover:text-blue-700 dark:hover:text-blue-300 px-3 py-2 text-sm font-medium transition-colors duration-200 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md"
                 >
                   {item.label}
                 </Link>
@@ -119,7 +120,7 @@ export function PrimaryNav() {
                 {currentRole === 'BUYER' && (
                   <Link
                     href="/cart"
-                    className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 p-2 transition-colors duration-200 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md"
+                    className="text-gray-700 dark:text-gray-300 hover:text-blue-700 dark:hover:text-blue-300 p-2 transition-colors duration-200 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md"
                     title="Shopping Cart"
                   >
                     <ShoppingCart className="h-5 w-5" />
@@ -128,7 +129,7 @@ export function PrimaryNav() {
 
                 {/* User Menu */}
                 <div className="relative group">
-                  <button className="flex items-center text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 p-2 transition-colors duration-200 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md">
+                  <button className="flex items-center text-gray-700 dark:text-gray-300 hover:text-blue-700 dark:hover:text-blue-300 p-2 transition-colors duration-200 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md">
                     <User className="h-5 w-5" />
                   </button>
                   <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-[60] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
@@ -178,7 +179,7 @@ export function PrimaryNav() {
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 p-2 transition-colors duration-200 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md"
+              className="text-gray-700 dark:text-gray-300 hover:text-blue-700 dark:hover:text-blue-300 p-2 transition-colors duration-200 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md"
             >
               {isMenuOpen ? (
                 <X className="h-6 w-6" />
@@ -198,7 +199,7 @@ export function PrimaryNav() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 block px-3 py-2 text-base font-medium transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md"
+                className="text-gray-900 dark:text-gray-100 hover:text-blue-700 dark:hover:text-blue-300 block px-3 py-2 text-base font-medium transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {item.label}
@@ -217,7 +218,7 @@ export function PrimaryNav() {
                 {currentRole === 'BUYER' && (
                   <Link
                     href="/cart"
-                    className="text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 block px-3 py-2 text-base font-medium transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md"
+                    className="text-gray-900 dark:text-gray-100 hover:text-blue-700 dark:hover:text-blue-300 block px-3 py-2 text-base font-medium transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Cart
@@ -226,7 +227,7 @@ export function PrimaryNav() {
 
                 <Link
                   href="/profile"
-                  className="text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 block px-3 py-2 text-base font-medium transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md"
+                  className="text-gray-900 dark:text-gray-100 hover:text-blue-700 dark:hover:text-blue-300 block px-3 py-2 text-base font-medium transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Profile
@@ -236,14 +237,14 @@ export function PrimaryNav() {
                   <>
                     <Link
                       href="/orders"
-                      className="text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 block px-3 py-2 text-base font-medium transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md"
+                      className="text-gray-900 dark:text-gray-100 hover:text-blue-700 dark:hover:text-blue-300 block px-3 py-2 text-base font-medium transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       My Orders
                     </Link>
                     <Link
                       href="/downloads"
-                      className="text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 block px-3 py-2 text-base font-medium transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md"
+                      className="text-gray-900 dark:text-gray-100 hover:text-blue-700 dark:hover:text-blue-300 block px-3 py-2 text-base font-medium transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       Downloads
@@ -256,7 +257,7 @@ export function PrimaryNav() {
                     handleSignOut()
                     setIsMenuOpen(false)
                   }}
-                  className="text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 block px-3 py-2 text-base font-medium w-full text-left transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md"
+                  className="text-gray-900 dark:text-gray-100 hover:text-blue-700 dark:hover:text-blue-300 block px-3 py-2 text-base font-medium w-full text-left transition-colors hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md"
                 >
                   Sign Out
                 </button>

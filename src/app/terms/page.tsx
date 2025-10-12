@@ -94,7 +94,7 @@ export default function TermsPage() {
             <li>
               You must complete seller verification before listing paid content
             </li>
-            <li>SequenceHUB charges a 15% platform fee on all sales</li>
+            <li>SequenceHUB charges a 10% platform commission on all sales</li>
             <li>
               Payments are processed weekly with a minimum threshold of $25
             </li>

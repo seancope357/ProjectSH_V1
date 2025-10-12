@@ -1,6 +1,6 @@
 /**
  * Calculate platform fees for orders
- * Fee structure: 15% + $0.50 per order item
+ * Fee structure: 10% commission on item price
  */
 
 export interface FeeCalculation {
@@ -11,8 +11,8 @@ export interface FeeCalculation {
 }
 
 export function calcFees(itemPrice: number): FeeCalculation {
-  const platformFeePercent = Math.round(itemPrice * 0.15) // 15% of item price
-  const platformFeeFixed = 50 // $0.50 in cents
+  const platformFeePercent = Math.round(itemPrice * 0.1) // 10% of item price
+  const platformFeeFixed = 0 // no fixed fee
   const platformFeeTotal = platformFeePercent + platformFeeFixed
   const sellerAmount = itemPrice - platformFeeTotal
 

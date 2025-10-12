@@ -147,7 +147,7 @@ export default function ProfilePage() {
           <div className="flex items-center space-x-2 text-sm">
             <Link
               href="/"
-              className="flex items-center text-gray-500 hover:text-blue-600 transition-colors"
+              className="flex items-center text-gray-500 hover:text-blue-700 transition-colors"
             >
               <Home className="h-4 w-4 mr-1" />
               Home
@@ -200,19 +200,19 @@ export default function ProfilePage() {
           <div className="flex items-center gap-6 overflow-x-auto py-3 text-sm">
             <a
               href="#overview"
-              className="text-gray-700 hover:text-blue-600 font-medium"
+              className="text-gray-700 hover:text-blue-700 font-medium"
             >
               Overview
             </a>
             <a
               href="#settings"
-              className="text-gray-700 hover:text-blue-600 font-medium"
+              className="text-gray-700 hover:text-blue-700 font-medium"
             >
               Account Settings
             </a>
             <a
               href="#activity"
-              className="text-gray-700 hover:text-blue-600 font-medium"
+              className="text-gray-700 hover:text-blue-700 font-medium"
             >
               Activity
             </a>
@@ -632,7 +632,7 @@ export default function ProfilePage() {
                         </div>
 
                         <div className="flex gap-2">
-                          <button className="text-blue-500 hover:text-blue-600 transition-colors">
+                          <button className="text-blue-700 hover:text-blue-800 transition-colors">
                             <Edit className="h-5 w-5" />
                           </button>
                           <button className="text-gray-500 hover:text-gray-600 transition-colors">
@@ -645,7 +645,7 @@ export default function ProfilePage() {
                 </div>
 
                 <div className="p-6 border-t border-gray-200 text-center">
-                  <button className="text-blue-500 hover:text-blue-600 transition-colors font-medium">
+                  <button className="text-blue-700 hover:text-blue-800 transition-colors font-medium">
                     View All Activity
                   </button>
                 </div>
