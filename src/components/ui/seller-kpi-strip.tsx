@@ -24,8 +24,11 @@ export function SellerKpiStrip({ items }: { items: KpiItem[] }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {items.map(item => (
-        <div key={item.label} className="bg-white rounded-lg shadow-md p-6">
-          <p className="text-sm text-gray-500">{item.label}</p>
+        <div key={item.label} className="mi-card mi-surface p-6 mi-fade-in">
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-gray-500">{item.label}</p>
+            <span className="mi-badge bg-orange-100 text-orange-700">KPI</span>
+          </div>
           <div className="mt-1 flex items-baseline gap-2">
             <span className={`text-2xl font-bold ${accentClass(item.accent)}`}>
               {item.value}

@@ -19,7 +19,7 @@ const faqData = [
     questions: [
       {
         q: 'What is SequenceHUB?',
-        a: 'SequenceHUB is a platform for sharing and discovering automation sequences, macros, and workflows that help streamline repetitive tasks across various applications and systems.',
+        a: 'SequenceHUB is a platform for sharing and discovering automation sequences and macros that help streamline repetitive tasks across various applications and systems.',
       },
       {
         q: 'How do I create an account?',

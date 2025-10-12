@@ -1,64 +1,49 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Image from 'next/image'
 // Removed page-level Navigation; global header renders in layout
 import { Search, Grid, List } from 'lucide-react'
 
-const categories = [
-  {
-    id: 1,
-    name: 'Gaming',
-    description: 'Gaming sequences and macros',
-    count: 245,
-    image: '/images/category-gaming.jpg',
-  },
-  {
-    id: 2,
-    name: 'Productivity',
-    description: 'Work and productivity automation',
-    count: 189,
-    image: '/images/category-productivity.jpg',
-  },
-  {
-    id: 3,
-    name: 'Creative',
-    description: 'Design and creative workflows',
-    count: 156,
-    image: '/images/category-creative.jpg',
-  },
-  {
-    id: 4,
-    name: 'Development',
-    description: 'Programming and development tools',
-    count: 203,
-    image: '/images/category-development.jpg',
-  },
-  {
-    id: 5,
-    name: 'Entertainment',
-    description: 'Media and entertainment sequences',
-    count: 98,
-    image: '/images/category-entertainment.jpg',
-  },
-  {
-    id: 6,
-    name: 'Education',
-    description: 'Learning and educational content',
-    count: 134,
-    image: '/images/category-education.jpg',
-  },
-]
+type Category = { id: string; name: string; description?: string | null }
 
 export default function CategoriesPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [sortBy, setSortBy] = useState('name')
+  const [categories, setCategories] = useState<Category[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      setLoading(true)
+      setError('')
+      try {
+        const res = await fetch('/api/categories')
+        const json = await res.json()
+        if (!res.ok) {
+          setError(json?.error || 'Failed to load categories')
+          setCategories([])
+        } else {
+          setCategories(Array.isArray(json.categories) ? json.categories : [])
+        }
+      } catch (e) {
+        setError('Failed to load categories')
+        setCategories([])
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadCategories()
+  }, [])
 
   const filteredCategories = categories.filter(
     category =>
       category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      category.description.toLowerCase().includes(searchTerm.toLowerCase())
+      (category.description || '')
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase())
   )
 
   const sortedCategories = [...filteredCategories].sort((a, b) => {
@@ -128,6 +113,16 @@ export default function CategoriesPage() {
 
       {/* Categories Grid/List */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-4 mb-6">
+            {error}
+          </div>
+        )}
+        {!loading && categories.length === 0 && !error && (
+          <div className="bg-white rounded-lg shadow-md p-6 text-gray-700">
+            No categories yet.
+          </div>
+        )}
         {viewMode === 'grid' ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {sortedCategories.map(category => (
@@ -135,22 +130,14 @@ export default function CategoriesPage() {
                 key={category.id}
                 className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
               >
-                <Image
-                  src={category.image}
-                  alt={category.name}
-                  width={300}
-                  height={192}
-                  className="w-full h-48 object-cover"
-                />
                 <div className="p-6">
                   <h3 className="text-xl font-semibold text-gray-900 mb-2">
                     {category.name}
                   </h3>
-                  <p className="text-gray-600 mb-4">{category.description}</p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-500">
-                      {category.count} sequences
-                    </span>
+                  {category.description ? (
+                    <p className="text-gray-600 mb-4">{category.description}</p>
+                  ) : null}
+                  <div className="flex items-center justify-end">
                     <button className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
                       Browse
                     </button>
@@ -166,21 +153,13 @@ export default function CategoriesPage() {
                 key={category.id}
                 className="bg-white rounded-lg shadow-md p-6 flex items-center gap-6"
               >
-                <Image
-                  src={category.image}
-                  alt={category.name}
-                  width={96}
-                  height={96}
-                  className="w-24 h-24 object-cover rounded-lg"
-                />
                 <div className="flex-1">
                   <h3 className="text-xl font-semibold text-gray-900 mb-2">
                     {category.name}
                   </h3>
-                  <p className="text-gray-600 mb-2">{category.description}</p>
-                  <span className="text-sm text-gray-500">
-                    {category.count} sequences
-                  </span>
+                  {category.description ? (
+                    <p className="text-gray-600 mb-2">{category.description}</p>
+                  ) : null}
                 </div>
                 <button className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors">
                   Browse

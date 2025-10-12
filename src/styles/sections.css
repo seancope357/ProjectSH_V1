@@ -292,7 +292,7 @@ section aside + section {
   text-decoration: none;
   min-height: 44px; /* touch target friendly */
   padding: 0.75rem 1rem; /* consistent spacing */
-  border-radius: 0.5rem; /* consistent shape */
+  border-radius: var(--radius-md); /* consistent shape */
   font-weight: 600;
   font-size: 0.95rem;
   line-height: 1; /* prevent vertical jitter */
@@ -301,19 +301,21 @@ section aside + section {
 /* Card hover/press subtle elevation and lift */
 .mi-card {
   transition:
-    transform 240ms cubic-bezier(0.2, 0.8, 0.2, 1),
-    box-shadow 240ms ease,
-    border-color 240ms ease;
+    transform var(--duration-medium) var(--easing-standard),
+    box-shadow var(--duration-medium) ease,
+    border-color var(--duration-medium) ease;
   transform: translateZ(0);
   will-change: transform, box-shadow;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
 }
 .mi-card:hover {
   transform: translateY(-2px) scale(1.01);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--shadow-md);
 }
 .mi-card:active {
   transform: translateY(0) scale(0.995);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--shadow-sm);
 }
 .mi-card:focus-visible {
   outline: 2px solid rgba(99, 102, 241, 0.75);
@@ -323,21 +325,22 @@ section aside + section {
 /* Primary CTA button interaction */
 .mi-cta {
   transition:
-    transform 200ms cubic-bezier(0.2, 0.8, 0.2, 1),
-    box-shadow 200ms ease,
-    background-color 200ms ease,
-    color 200ms ease;
+    transform var(--duration-fast) var(--easing-standard),
+    box-shadow var(--duration-fast) ease,
+    background-color var(--duration-fast) ease,
+    color var(--duration-fast) ease;
   transform: translateZ(0);
   will-change: transform, box-shadow, background-color, color;
+  border-radius: var(--radius-md);
 }
 .mi-cta:hover {
   transform: translateY(-1px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-md);
   filter: brightness(1.05);
 }
 .mi-cta:active {
   transform: translateY(0) scale(0.98);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-sm);
   filter: brightness(0.98);
 }
 .mi-cta:focus-visible {
@@ -348,21 +351,22 @@ section aside + section {
 /* Secondary CTA (ghost) interaction */
 .mi-cta-secondary {
   transition:
-    transform 200ms cubic-bezier(0.2, 0.8, 0.2, 1),
-    box-shadow 200ms ease,
-    border-color 200ms ease,
-    color 200ms ease;
+    transform var(--duration-fast) var(--easing-standard),
+    box-shadow var(--duration-fast) ease,
+    border-color var(--duration-fast) ease,
+    color var(--duration-fast) ease;
   transform: translateZ(0);
   will-change: transform, box-shadow, border-color, color;
+  border-radius: var(--radius-md);
 }
 .mi-cta-secondary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--shadow-sm);
   border-color: rgba(255, 255, 255, 0.6);
 }
 .mi-cta-secondary:active {
   transform: translateY(0) scale(0.99);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--shadow-sm);
 }
 .mi-cta-secondary:focus-visible {
   outline: 2px solid rgba(255, 255, 255, 0.75);
@@ -381,4 +385,37 @@ section aside + section {
       color 1ms ease;
     transform: none !important;
   }
+}
+
+/* Surfaces and badges */
+.mi-surface {
+  background: var(--card);
+  color: var(--card-foreground);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.mi-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Simple fade-in utility */
+@keyframes mi-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.mi-fade-in {
+  animation: mi-fade-in var(--duration-medium) var(--easing-standard);
 }

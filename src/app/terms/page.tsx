@@ -26,8 +26,8 @@ export default function TermsPage() {
           <h2>2. Description of Service</h2>
           <p>
             SequenceHUB is a platform that allows users to share, discover, and
-            purchase automation sequences, macros, and workflows. The service
-            includes but is not limited to:
+            purchase automation sequences and macros. The service includes but
+            is not limited to:
           </p>
           <ul>
             <li>Uploading and sharing automation sequences</li>

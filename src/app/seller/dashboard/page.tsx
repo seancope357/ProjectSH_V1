@@ -35,13 +35,12 @@ interface SellerStats {
   totalSequences: number
   averageRating: number
   monthlyRevenue: number[]
-  recentSales: Array<{
-    id: string
-    sequenceTitle: string
-    amount: number
-    buyerUsername: string
-    createdAt: string
-  }>
+}
+
+interface SellerProfileSummary {
+  full_name?: string
+  username?: string
+  avatar_url?: string | null
 }
 
 interface Sequence {
@@ -65,6 +64,8 @@ export default function SellerDashboard() {
   const [stats, setStats] = useState<SellerStats | null>(null)
   const [sequences, setSequences] = useState<Sequence[]>([])
   const [loading, setLoading] = useState(true)
+  const [sellerProfile, setSellerProfile] =
+    useState<SellerProfileSummary | null>(null)
   const [activeTab, setActiveTab] = useState<
     'overview' | 'sequences' | 'analytics'
   >('overview')
@@ -95,19 +96,47 @@ export default function SellerDashboard() {
 
   const fetchDashboardData = async () => {
     try {
-      const [statsResponse, sequencesResponse] = await Promise.all([
-        fetch('/api/seller/stats'),
-        fetch('/api/seller/sequences'),
+      const [profileRes, insightsRes] = await Promise.all([
+        fetch('/api/user/setup-profile'),
+        fetch('/api/creator/insights?range=30d&granularity=daily'),
       ])
 
-      if (statsResponse.ok) {
-        const statsData = await statsResponse.json()
-        setStats(statsData)
+      if (profileRes.ok) {
+        const { profile } = await profileRes.json()
+        setSellerProfile(profile)
       }
 
-      if (sequencesResponse.ok) {
-        const sequencesData = await sequencesResponse.json()
-        setSequences(sequencesData.sequences)
+      if (insightsRes.ok) {
+        const data = await insightsRes.json()
+        const totals = data?.totals || {}
+        const points = data?.timeseries?.points || []
+        setStats({
+          totalRevenue: Number(totals.revenue || 0),
+          totalSales: Number(totals.sales || 0),
+          totalSequences: Number(totals.sequences || 0),
+          averageRating: 0,
+          monthlyRevenue: points.map((p: any) => Number(p.revenue || 0)),
+        })
+
+        const topSequences = Array.isArray(data?.topSequences)
+          ? data.topSequences
+          : []
+        setSequences(
+          topSequences.map((s: any) => ({
+            id: s.id,
+            title: s.title || 'Untitled',
+            description: '',
+            price: Number(s.price || 0),
+            previewUrl: null,
+            category: s.category || 'Uncategorized',
+            status: 'published',
+            rating: 0,
+            downloadCount: Number(s.downloads || 0),
+            revenue: Number(s.revenue || 0),
+            createdAt: '',
+            updatedAt: '',
+          }))
+        )
       }
     } catch (error) {
       console.error('Failed to fetch dashboard data:', error)
@@ -292,10 +321,43 @@ export default function SellerDashboard() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Seller Dashboard</h1>
-          <p className="text-gray-600 mt-2">
-            Manage your sequences and track your performance
-          </p>
+          <div className="flex items-center gap-4">
+            {sellerProfile?.avatar_url ? (
+              <Image
+                src={sellerProfile.avatar_url}
+                alt={sellerProfile.full_name || 'Seller avatar'}
+                width={48}
+                height={48}
+                className="rounded-full object-cover"
+              />
+            ) : (
+              <div className="w-12 h-12 rounded-full bg-gray-200" />
+            )}
+            <div className="flex items-center gap-3">
+              <h1 className="text-3xl font-bold text-gray-900">
+                Seller Dashboard
+              </h1>
+              <span className="px-2 py-1 text-xs font-medium bg-orange-100 text-orange-700 rounded-full">
+                Seller-only
+              </span>
+            </div>
+          </div>
+          <div className="mt-2 text-gray-700">
+            {sellerProfile?.full_name && (
+              <p className="font-medium">
+                {sellerProfile.full_name}{' '}
+                {sellerProfile.username && (
+                  <span className="text-gray-500">
+                    @{sellerProfile.username}
+                  </span>
+                )}
+              </p>
+            )}
+            <p className="text-sm">
+              This dashboard is for sellers. Buyers browse the main Marketplace
+              with tagging for easy search — like Etsy.
+            </p>
+          </div>
         </div>
 
         {/* Tabs */}

@@ -23,6 +23,28 @@
   --input: #e5e5e5;
   --ring: #171717;
   --radius: 0.5rem;
+
+  /* Design tokens: elevation, motion, and accents */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+
+  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 6px 12px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 12px 24px rgba(0, 0, 0, 0.14);
+
+  --easing-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --easing-emphasized: cubic-bezier(0.3, 0.8, 0.2, 1);
+  --duration-fast: 160ms;
+  --duration-medium: 240ms;
+  --duration-slow: 360ms;
+
+  /* Accent palette */
+  --accent-blue: #2563eb;
+  --accent-green: #16a34a;
+  --accent-purple: #7c3aed;
+  --accent-yellow: #ca8a04;
 }
 
 .dark {
@@ -81,8 +103,8 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
   transition:
-    background-color 0.3s ease,
-    color 0.3s ease;
+    background-color var(--duration-medium) var(--easing-standard),
+    color var(--duration-medium) var(--easing-standard);
 }
 
 /* Global smooth scrolling with sticky header compensation */
@@ -111,9 +133,9 @@ svg.lucide,
 svg.mi-svg-hover,
 img[src$='.svg'] {
   transition:
-    transform 200ms ease,
-    filter 200ms ease,
-    color 200ms ease;
+    transform var(--duration-fast) var(--easing-standard),
+    filter var(--duration-fast) var(--easing-standard),
+    color var(--duration-fast) var(--easing-standard);
   will-change: transform, filter, color;
   transform-origin: center center;
 }

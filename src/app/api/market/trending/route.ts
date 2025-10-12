@@ -3,69 +3,8 @@ import { db } from '@/lib/supabase-db'
 
 export async function GET() {
   try {
-    // Fetch all published/active/approved sequences
-    let sequences: any[] = []
-    try {
-      sequences = await db.sequences.findMany({})
-    } catch (dbError) {
-      console.warn(
-        'Supabase unavailable for market insights, using mock dataset:',
-        dbError
-      )
-      sequences = [
-        {
-          id: '00000000-0000-4000-8000-000000000001',
-          title: 'Christmas Wonderland',
-          description:
-            'A magical Christmas light sequence with twinkling effects and smooth transitions.',
-          price: 12.99,
-          category: { name: 'Holiday & Seasonal' },
-          tags: ['christmas', 'twinkling', 'festive'],
-          rating: 4.8,
-          rating_count: 128,
-          download_count: 1250,
-          preview_url: '/images/sequence-preview-default.jpg',
-          thumbnail_url: '/images/sequence-preview-default.jpg',
-          seller: { username: 'lightmaster', full_name: 'LightMaster Pro' },
-          created_at: new Date(Date.now() - 86400000 * 20).toISOString(),
-          updated_at: new Date().toISOString(),
-        },
-        {
-          id: '00000000-0000-4000-8000-000000000002',
-          title: 'Haunted Night',
-          description:
-            'Spooky Halloween sequence with flickering lights and eerie effects.',
-          price: 9.99,
-          category: { name: 'Halloween' },
-          tags: ['halloween', 'spooky', 'flicker'],
-          rating: 4.6,
-          rating_count: 96,
-          download_count: 980,
-          preview_url: '/images/sequence-preview-default.jpg',
-          thumbnail_url: '/images/sequence-preview-default.jpg',
-          seller: { username: 'spookylights', full_name: 'Spooky Lights' },
-          created_at: new Date(Date.now() - 86400000 * 35).toISOString(),
-          updated_at: new Date().toISOString(),
-        },
-        {
-          id: '00000000-0000-4000-8000-000000000003',
-          title: 'New Year Blast',
-          description:
-            'High-energy sequence for New Year celebrations with fast rhythms.',
-          price: 14.99,
-          category: { name: 'New Year' },
-          tags: ['newyear', 'fast', 'epic'],
-          rating: 4.7,
-          rating_count: 102,
-          download_count: 760,
-          preview_url: '/images/sequence-preview-default.jpg',
-          thumbnail_url: '/images/sequence-preview-default.jpg',
-          seller: { username: 'festivalfx', full_name: 'Festival FX' },
-          created_at: new Date(Date.now() - 86400000 * 10).toISOString(),
-          updated_at: new Date().toISOString(),
-        },
-      ]
-    }
+    // Fetch all published/active/approved sequences (no mock fallback)
+    const sequences: any[] = await db.sequences.findMany({})
 
     // Aggregate categories
     const categoryCounts: Record<string, number> = {}

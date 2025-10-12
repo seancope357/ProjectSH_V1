@@ -26,58 +26,8 @@ export async function GET(request: NextRequest) {
       filters.category = categoryParam
     }
 
-    // Try fetching from DB, fall back to mock if env/config issues
-    let sequences: any[] = []
-    try {
-      sequences = await db.sequences.findMany(filters)
-    } catch (dbError) {
-      console.warn('Supabase unavailable, serving mock sequences:', dbError)
-      sequences = [
-        {
-          id: '00000000-0000-4000-8000-000000000001',
-          title: 'Christmas Wonderland',
-          description:
-            'A magical Christmas light sequence with twinkling effects and smooth transitions.',
-          price: 12.99,
-          category: { name: 'Holiday & Seasonal' },
-          tags: ['christmas', 'twinkling', 'festive'],
-          rating: 4.8,
-          rating_count: 128,
-          download_count: 1250,
-          preview_url: '/images/sequence-preview-default.jpg',
-          thumbnail_url: '/images/sequence-preview-default.jpg',
-          seller: { username: 'lightmaster', full_name: 'LightMaster Pro' },
-          created_at: '2024-01-15T00:00:00.000Z',
-          updated_at: '2024-01-15T00:00:00.000Z',
-          format: 'MP4',
-          frame_rate: 30,
-          duration: 180,
-          file_size: '200MB',
-          controllers: ['Falcon'],
-        },
-        {
-          id: '00000000-0000-4000-8000-000000000002',
-          title: 'Halloween Spooktacular',
-          description: 'Spooky sequence with eerie fades and strobe bursts.',
-          price: 9.99,
-          category: { name: 'Holiday & Seasonal' },
-          tags: ['halloween', 'strobe', 'spooky'],
-          rating: 4.6,
-          rating_count: 84,
-          download_count: 870,
-          preview_url: '/images/sequence-preview-default.jpg',
-          thumbnail_url: '/images/sequence-preview-default.jpg',
-          seller: { username: 'spookylights', full_name: 'Spooky Lights Co.' },
-          created_at: '2024-02-10T00:00:00.000Z',
-          updated_at: '2024-02-10T00:00:00.000Z',
-          format: 'FSEQ',
-          frame_rate: 40,
-          duration: 150,
-          file_size: '120MB',
-          controllers: ['Kulp'],
-        },
-      ]
-    }
+    // Fetch from DB (no mock fallback)
+    const sequences: any[] = await db.sequences.findMany(filters)
 
     // Apply filtering, sorting and pagination in memory for now
     // TODO: Move sorting to database level for better performance

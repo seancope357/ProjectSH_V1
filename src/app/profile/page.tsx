@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 // Removed page-level Navigation; global header renders in layout
@@ -24,17 +24,19 @@ import {
   Lock,
 } from 'lucide-react'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
+import { useAuth } from '@/components/providers/session-provider'
 
 export default function ProfilePage() {
+  const { user } = useAuth()
   const [isEditing, setIsEditing] = useState(false)
   const [profileData, setProfileData] = useState({
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    username: 'johndoe',
-    bio: 'Automation enthusiast and productivity expert. Love creating sequences that make life easier.',
-    location: 'San Francisco, CA',
-    website: 'https://johndoe.dev',
-    joinDate: 'January 2023',
+    name: '',
+    email: '',
+    username: '',
+    bio: '',
+    location: '',
+    website: '',
+    joinDate: '',
     avatarUrl: '',
   })
 
@@ -88,12 +90,12 @@ export default function ProfilePage() {
     }
   }
 
-  const stats = {
-    sequences: 24,
-    downloads: 1250,
-    rating: 4.8,
-    views: 5420,
-  }
+  const [stats, setStats] = useState({
+    sequences: 0,
+    downloads: 0,
+    rating: 0,
+    views: 0,
+  })
 
   // Account settings state (stubbed client-side for now)
   const [settings, setSettings] = useState({
@@ -107,32 +109,93 @@ export default function ProfilePage() {
     alert('Settings saved')
   }
 
-  const recentSequences = [
-    {
-      id: 1,
-      title: 'Email Automation Workflow',
-      category: 'Productivity',
-      downloads: 156,
-      rating: 4.9,
-      date: '2024-01-15',
-    },
-    {
-      id: 2,
-      title: 'Gaming Macro Set',
-      category: 'Gaming',
-      downloads: 89,
-      rating: 4.7,
-      date: '2024-01-10',
-    },
-    {
-      id: 3,
-      title: 'Design Tool Shortcuts',
-      category: 'Creative',
-      downloads: 203,
-      rating: 4.8,
-      date: '2024-01-05',
-    },
-  ]
+  const [recentSequences, setRecentSequences] = useState<
+    Array<{
+      id: string
+      title: string
+      downloads: number
+      rating: number
+      category: string
+      date: string
+    }>
+  >([])
+
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        const res = await fetch('/api/user/setup-profile', { method: 'GET' })
+        const data = await res.json()
+        if (res.ok && data?.profile) {
+          const p = data.profile || {}
+          setProfileData(prev => ({
+            ...prev,
+            name: p.full_name || '',
+            email: user?.email || '',
+            username: p.username || '',
+            bio: p.bio || '',
+            website: p.website_url || '',
+            joinDate: '',
+            avatarUrl: p.avatar_url || '',
+          }))
+          setEditData(ed => ({
+            ...ed,
+            name: p.full_name || '',
+            email: user?.email || '',
+            username: p.username || '',
+            bio: p.bio || '',
+            website: p.website_url || '',
+            avatarUrl: p.avatar_url || '',
+          }))
+        }
+      } catch {
+        // ignore profile load errors
+      }
+    }
+
+    const loadDownloads = async () => {
+      try {
+        const res = await fetch('/api/downloads')
+        const json = await res.json()
+        if (!res.ok) return
+        const downloads = Array.isArray(json.downloads) ? json.downloads : []
+        const uniqueSeqIds = new Set<string>()
+        const activities: Array<{
+          id: string
+          title: string
+          downloads: number
+          rating: number
+          category: string
+          date: string
+        }> = []
+        downloads.forEach((d: any) => {
+          const seq = d.sequences || {}
+          const id = seq.id || d.sequence_id
+          if (id) uniqueSeqIds.add(id)
+          activities.push({
+            id: id || String(Math.random()),
+            title: seq.title || 'Sequence',
+            downloads: 1,
+            rating: 0,
+            category: (seq.category?.name as string) || '—',
+            date: d.created_at || '',
+          })
+        })
+        // Sort by date desc
+        activities.sort((a, b) => (b.date || '').localeCompare(a.date || ''))
+        setRecentSequences(activities.slice(0, 10))
+        setStats(s => ({
+          ...s,
+          downloads: downloads.length,
+          sequences: uniqueSeqIds.size,
+        }))
+      } catch {
+        // ignore downloads load errors
+      }
+    }
+
+    loadProfile()
+    if (user) loadDownloads()
+  }, [user])
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -246,7 +309,7 @@ export default function ProfilePage() {
                 className="flex items-center justify-center px-4 py-3 bg-orange-50 text-orange-700 rounded-lg hover:bg-orange-100 transition-colors"
               >
                 <Upload className="h-4 w-4 mr-2" />
-                Sell
+                Dashboard
               </Link>
             </div>
           </div>
@@ -362,7 +425,9 @@ export default function ProfilePage() {
                   <div className="flex items-center gap-3">
                     <Calendar className="h-5 w-5 text-gray-400" />
                     <span className="text-gray-600">
-                      Joined {profileData.joinDate}
+                      {profileData.joinDate
+                        ? `Joined ${profileData.joinDate}`
+                        : ''}
                     </span>
                   </div>
                 </div>
@@ -608,40 +673,44 @@ export default function ProfilePage() {
                 </div>
 
                 <div className="divide-y divide-gray-200">
-                  {recentSequences.map(sequence => (
-                    <div
-                      key={sequence.id}
-                      className="p-6 hover:bg-gray-50 transition-colors"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <h3 className="text-lg font-medium text-gray-900 mb-1">
-                            {sequence.title}
-                          </h3>
-                          <div className="flex items-center gap-4 text-sm text-gray-600">
-                            <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-                              {sequence.category}
-                            </span>
-                            <span>{sequence.downloads} downloads</span>
-                            <div className="flex items-center gap-1">
-                              <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                              <span>{sequence.rating}</span>
+                  {recentSequences.length === 0 ? (
+                    <div className="p-6 text-gray-600">No activity yet.</div>
+                  ) : (
+                    recentSequences.map(sequence => (
+                      <div
+                        key={sequence.id}
+                        className="p-6 hover:bg-gray-50 transition-colors"
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <h3 className="text-lg font-medium text-gray-900 mb-1">
+                              {sequence.title}
+                            </h3>
+                            <div className="flex items-center gap-4 text-sm text-gray-600">
+                              <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                                {sequence.category}
+                              </span>
+                              <span>{sequence.downloads} downloads</span>
+                              <div className="flex items-center gap-1">
+                                <Star className="h-4 w-4 text-yellow-500 fill-current" />
+                                <span>{sequence.rating}</span>
+                              </div>
+                              <span>{sequence.date}</span>
                             </div>
-                            <span>{sequence.date}</span>
+                          </div>
+
+                          <div className="flex gap-2">
+                            <button className="text-blue-700 hover:text-blue-800 transition-colors">
+                              <Edit className="h-5 w-5" />
+                            </button>
+                            <button className="text-gray-500 hover:text-gray-600 transition-colors">
+                              <Eye className="h-5 w-5" />
+                            </button>
                           </div>
                         </div>
-
-                        <div className="flex gap-2">
-                          <button className="text-blue-700 hover:text-blue-800 transition-colors">
-                            <Edit className="h-5 w-5" />
-                          </button>
-                          <button className="text-gray-500 hover:text-gray-600 transition-colors">
-                            <Eye className="h-5 w-5" />
-                          </button>
-                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))
+                  )}
                 </div>
 
                 <div className="p-6 border-t border-gray-200 text-center">
