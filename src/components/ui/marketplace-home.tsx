@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { Search, ArrowRight, TrendingUp, Star } from 'lucide-react'
+import { HeroAnimation } from './hero-animation'
 
 type TrendingSequence = {
   id: string
@@ -71,36 +72,9 @@ export function MarketplaceHome() {
         className="relative isolate overflow-hidden"
         aria-label="Marketplace Hero"
       >
-        {/* Media background */}
-        {(() => {
-          const src = (insights?.topByDownloads?.[0]?.previewUrl ||
-            insights?.topByDownloads?.[0]?.thumbnailUrl ||
-            '/images/sequence-preview-default.jpg') as string
-          const isVideo = /\.(mp4|webm|ogg)$/i.test(src || '')
-          return (
-            <div className="absolute inset-0 -z-10">
-              {isVideo ? (
-                <video
-                  className="w-full h-full object-cover"
-                  src={src}
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  aria-hidden="true"
-                />
-              ) : (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  className="w-full h-full object-cover"
-                  src={src}
-                  alt="Hero background"
-                />
-              )}
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-700/70 via-purple-700/60 to-indigo-900/70" />
-            </div>
-          )
-        })()}
+        {/* Animated xLights-style preview */}
+        <HeroAnimation className="absolute inset-0 -z-10 w-full h-full" />
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-700/70 via-purple-700/60 to-indigo-900/70" />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-24">
           <header className="text-center">
