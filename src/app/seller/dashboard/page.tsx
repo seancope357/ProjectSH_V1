@@ -295,7 +295,16 @@ export default function SellerDashboard() {
       label: 'Create Listing',
       onClick: () => router.push('/seller/sequences'),
     },
-    { id: 'qa-offer', label: 'Create Offer' },
+    {
+      id: 'qa-promotions',
+      label: 'Manage Promotions',
+      onClick: () => router.push('/seller/promotions'),
+    },
+    {
+      id: 'qa-messages',
+      label: 'Messages',
+      onClick: () => router.push('/contact'),
+    },
     {
       id: 'qa-payouts',
       label: 'View Payouts',

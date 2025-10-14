@@ -26,8 +26,19 @@ export async function GET(request: NextRequest) {
       filters.category = categoryParam
     }
 
-    // Fetch from DB (no mock fallback)
-    const sequences: any[] = await db.sequences.findMany(filters)
+    // Fetch from DB using relationship-free query to avoid FK dependency issues
+    const sequences: any[] = await db.sequences.findManySimple(filters)
+
+    // Attempt to build a category id->name map; gracefully handle absence
+    const categoryMap = new Map<string, string>()
+    try {
+      const categories = await db.categories.findMany()
+      categories.forEach((c: any) => {
+        if (c?.id) categoryMap.set(String(c.id), c.name || 'Uncategorized')
+      })
+    } catch {
+      // If categories table/relationship is unavailable, fall back later
+    }
 
     // Apply filtering, sorting and pagination in memory for now
     // TODO: Move sorting to database level for better performance
@@ -95,30 +106,40 @@ export async function GET(request: NextRequest) {
     const total = filteredSequences.length
 
     // Format sequences for response
-    const formattedSequences = paginatedSequences.map((sequence: any) => ({
-      id: sequence.id,
-      title: sequence.title,
-      description: sequence.description,
-      price: sequence.price,
-      category: sequence.category?.name || 'Uncategorized',
-      tags: sequence.tags || [],
-      rating: sequence.rating || 0,
-      downloads: sequence.download_count || 0,
-      reviewCount: sequence.rating_count || 0,
-      previewUrl: sequence.preview_url,
-      thumbnailUrl: sequence.thumbnail_url,
-      format: sequence.format || null,
-      frameRate: sequence.frame_rate || null,
-      duration: sequence.duration || null,
-      fileSize: sequence.file_size || null,
-      seller: {
-        username: sequence.seller?.username || 'Unknown',
-        displayName:
-          sequence.seller?.full_name || sequence.seller?.username || 'Unknown',
-      },
-      createdAt: sequence.created_at,
-      updatedAt: sequence.updated_at,
-    }))
+    const formattedSequences = paginatedSequences.map((sequence: any) => {
+      const categoryId = sequence?.category_id
+        ? String(sequence.category_id)
+        : ''
+      const categoryName =
+        (categoryId && categoryMap.get(categoryId)) || 'Uncategorized'
+
+      return {
+        id: sequence.id,
+        title: sequence.title,
+        description: sequence.description,
+        price: sequence.price,
+        category: categoryName,
+        tags: Array.isArray(sequence.tags) ? sequence.tags : [],
+        rating: sequence.rating || 0,
+        downloads: sequence.download_count || 0,
+        reviewCount: sequence.rating_count || 0,
+        previewUrl: sequence.preview_url,
+        thumbnailUrl: sequence.thumbnail_url,
+        format: sequence.format || null,
+        frameRate: sequence.frame_rate || null,
+        duration: sequence.duration || null,
+        fileSize: sequence.file_size || null,
+        seller: {
+          username: (sequence.seller && sequence.seller.username) || 'Unknown',
+          displayName:
+            (sequence.seller &&
+              (sequence.seller.full_name || sequence.seller.username)) ||
+            'Unknown',
+        },
+        createdAt: sequence.created_at,
+        updatedAt: sequence.updated_at,
+      }
+    })
 
     return NextResponse.json({
       sequences: formattedSequences,

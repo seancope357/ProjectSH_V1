@@ -405,6 +405,34 @@ section aside + section {
   font-weight: 600;
 }
 
+/* Inputs (selects, text fields) */
+.mi-input {
+  display: inline-flex;
+  align-items: center;
+  min-height: 42px;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--background);
+  color: var(--foreground);
+  transition:
+    border-color var(--duration-fast) var(--easing-standard),
+    box-shadow var(--duration-fast) ease,
+    background-color var(--duration-fast) ease,
+    color var(--duration-fast) ease;
+}
+.mi-input:hover {
+  box-shadow: var(--shadow-sm);
+}
+.mi-input:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+.mi-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 /* Simple fade-in utility */
 @keyframes mi-fade-in {
   from {

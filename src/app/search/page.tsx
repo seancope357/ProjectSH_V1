@@ -28,7 +28,7 @@ function SearchPageContent() {
   const [loading, setLoading] = useState(false)
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '')
   const [category, setCategory] = useState('all')
-  const [sortBy, setSortBy] = useState('newest')
+  const [sortBy, setSortBy] = useState('relevance')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
@@ -42,12 +42,12 @@ function SearchPageContent() {
     'patterns',
   ]
   const sortOptions = [
+    { value: 'relevance', label: 'Best Match' },
     { value: 'newest', label: 'Newest First' },
-    { value: 'oldest', label: 'Oldest First' },
     { value: 'price-low', label: 'Price: Low to High' },
     { value: 'price-high', label: 'Price: High to Low' },
+    { value: 'popular', label: 'Most Downloaded' },
     { value: 'rating', label: 'Highest Rated' },
-    { value: 'downloads', label: 'Most Downloaded' },
   ]
 
   const handleSearch = useCallback(
@@ -67,7 +67,7 @@ function SearchPageContent() {
         const data = await response.json()
 
         setSequences(data.sequences || [])
-        setTotalPages(data.totalPages || 1)
+        setTotalPages((data.pagination && data.pagination.totalPages) || 1)
       } catch (error) {
         console.error('Search failed:', error)
       } finally {
@@ -224,7 +224,13 @@ function SearchPageContent() {
                           <Download className="w-4 h-4" />
                           {sequence.downloads}
                         </span>
-                        <span>by {sequence.seller.name}</span>
+                        <span>
+                          by{' '}
+                          {(sequence as any)?.seller?.name ||
+                            (sequence as any)?.seller?.displayName ||
+                            (sequence as any)?.seller?.username ||
+                            'Unknown'}
+                        </span>
                       </div>
                       <div className="flex gap-2">
                         <button className="flex-1 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors">
@@ -284,7 +290,13 @@ function SearchPageContent() {
                               <Download className="w-4 h-4" />
                               {sequence.downloads}
                             </span>
-                            <span>by {sequence.seller.name}</span>
+                            <span>
+                              by{' '}
+                              {(sequence as any)?.seller?.name ||
+                                (sequence as any)?.seller?.displayName ||
+                                (sequence as any)?.seller?.username ||
+                                'Unknown'}
+                            </span>
                           </div>
                           <div className="flex gap-2">
                             <button className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors">

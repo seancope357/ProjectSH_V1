@@ -191,7 +191,7 @@ function SequencesContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen">
       {/* Global header handled by RootLayout */}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -207,7 +207,10 @@ function SequencesContent() {
         </header>
 
         {/* Filters and Controls */}
-        <div className="mi-card bg-white rounded-lg shadow-sm p-6 mb-8">
+        <section
+          aria-label="Search Filters and Controls"
+          className="mi-surface mi-card p-6 mb-8 mi-fade-in"
+        >
           <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
             {/* Left side filters */}
             <div className="flex flex-wrap gap-4 items-center">
@@ -219,7 +222,7 @@ function SequencesContent() {
                 <select
                   value={selectedCategory}
                   onChange={e => setSelectedCategory(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent mi-cta-secondary"
+                  className="mi-input"
                 >
                   {categories.map(cat => (
                     <option key={cat.value} value={cat.value}>
@@ -237,7 +240,7 @@ function SequencesContent() {
                 <select
                   value={formatFilter}
                   onChange={e => setFormatFilter(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent mi-cta-secondary"
+                  className="mi-input"
                 >
                   {[
                     { value: 'all', label: 'All' },
@@ -260,7 +263,7 @@ function SequencesContent() {
                 <select
                   value={controllerFilter}
                   onChange={e => setControllerFilter(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent mi-cta-secondary"
+                  className="mi-input"
                 >
                   {[
                     { value: 'all', label: 'All' },
@@ -284,7 +287,7 @@ function SequencesContent() {
                 <select
                   value={sortBy}
                   onChange={e => setSortBy(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent mi-cta-secondary"
+                  className="mi-input"
                 >
                   {sortOptions.map(option => (
                     <option key={option.value} value={option.value}>
@@ -296,25 +299,27 @@ function SequencesContent() {
             </div>
 
             {/* Right side controls */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
               {/* View Mode Toggle */}
-              <div className="flex items-center border border-gray-300 rounded-lg">
+              <div className="flex items-center rounded-lg overflow-hidden border border-gray-300">
                 <button
                   onClick={() => setViewMode('grid')}
-                  className={`p-2 ${viewMode === 'grid' ? 'bg-blue-500 text-white' : 'text-gray-600'}`}
+                  className={`mi-cta-secondary px-3 py-2 ${viewMode === 'grid' ? 'bg-blue-500 text-white' : 'text-gray-700'}`}
+                  aria-label="Grid view"
                 >
                   <Grid className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => setViewMode('list')}
-                  className={`p-2 ${viewMode === 'list' ? 'bg-blue-500 text-white' : 'text-gray-600'}`}
+                  className={`mi-cta-secondary px-3 py-2 ${viewMode === 'list' ? 'bg-blue-500 text-white' : 'text-gray-700'}`}
+                  aria-label="List view"
                 >
                   <List className="w-4 h-4" />
                 </button>
               </div>
             </div>
           </div>
-        </div>
+        </section>
 
         {/* Loading State */}
         {loading && (
@@ -344,11 +349,14 @@ function SequencesContent() {
         {!loading && (
           <>
             {viewMode === 'grid' ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+              <section
+                aria-label="Sequences Results"
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8"
+              >
                 {sequences.map(sequence => (
                   <div
                     key={sequence.id}
-                    className="mi-card bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer overflow-hidden"
+                    className="mi-card mi-surface hover:shadow-md transition-shadow cursor-pointer overflow-hidden mi-fade-in"
                     onClick={() => handleSequenceClick(sequence.id)}
                   >
                     {/* Image */}
@@ -414,31 +422,31 @@ function SequencesContent() {
 
                       {/* Tags */}
                       <div className="flex flex-wrap gap-1 mb-3">
-                        <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                        <span className="mi-badge bg-blue-100 text-blue-800">
                           {sequence.category}
                         </span>
                         {sequence.tags.slice(0, 2).map(tag => (
                           <span
                             key={tag}
-                            className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full"
+                            className="mi-badge bg-gray-100 text-gray-700"
                           >
                             {tag}
                           </span>
                         ))}
                         {/* Tech badges */}
                         {sequence.format && (
-                          <span className="inline-flex items-center gap-1 px-2 py-1 bg-indigo-100 text-indigo-700 text-xs rounded-full">
+                          <span className="inline-flex items-center gap-1 mi-badge bg-indigo-100 text-indigo-700">
                             <Cpu className="w-3 h-3" /> {sequence.format}
                           </span>
                         )}
                         {sequence.frameRate && (
-                          <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
+                          <span className="inline-flex items-center gap-1 mi-badge bg-green-100 text-green-700">
                             <Gauge className="w-3 h-3" /> {sequence.frameRate}{' '}
                             fps
                           </span>
                         )}
                         {sequence.duration && (
-                          <span className="inline-flex items-center gap-1 px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded-full">
+                          <span className="inline-flex items-center gap-1 mi-badge bg-yellow-100 text-yellow-700">
                             <Clock className="w-3 h-3" /> {sequence.duration}s
                           </span>
                         )}
@@ -455,13 +463,13 @@ function SequencesContent() {
                     </div>
                   </div>
                 ))}
-              </div>
+              </section>
             ) : (
               <div className="space-y-4 mb-8">
                 {sequences.map(sequence => (
                   <div
                     key={sequence.id}
-                    className="mi-card bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer p-6 flex gap-6"
+                    className="mi-card mi-surface hover:shadow-md transition-shadow cursor-pointer p-6 flex gap-6 mi-fade-in"
                     onClick={() => handleSequenceClick(sequence.id)}
                   >
                     {/* Image */}
@@ -534,31 +542,31 @@ function SequencesContent() {
 
                       {/* Tags */}
                       <div className="flex flex-wrap gap-1">
-                        <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                        <span className="mi-badge bg-blue-100 text-blue-800">
                           {sequence.category}
                         </span>
                         {sequence.tags.map(tag => (
                           <span
                             key={tag}
-                            className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full"
+                            className="mi-badge bg-gray-100 text-gray-700"
                           >
                             {tag}
                           </span>
                         ))}
                         {/* Tech badges */}
                         {sequence.format && (
-                          <span className="inline-flex items-center gap-1 px-2 py-1 bg-indigo-100 text-indigo-700 text-xs rounded-full">
+                          <span className="inline-flex items-center gap-1 mi-badge bg-indigo-100 text-indigo-700">
                             <Cpu className="w-3 h-3" /> {sequence.format}
                           </span>
                         )}
                         {sequence.frameRate && (
-                          <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
+                          <span className="inline-flex items-center gap-1 mi-badge bg-green-100 text-green-700">
                             <Gauge className="w-3 h-3" /> {sequence.frameRate}{' '}
                             fps
                           </span>
                         )}
                         {sequence.duration && (
-                          <span className="inline-flex items-center gap-1 px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded-full">
+                          <span className="inline-flex items-center gap-1 mi-badge bg-yellow-100 text-yellow-700">
                             <Clock className="w-3 h-3" /> {sequence.duration}s
                           </span>
                         )}
@@ -631,7 +639,7 @@ function SequencesContent() {
                 setSortBy('newest')
                 setCurrentPage(1)
               }}
-              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+              className="mi-cta bg-blue-500 text-white"
             >
               Clear Filters
             </button>

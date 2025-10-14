@@ -45,17 +45,34 @@ export const db = {
     async findMany(
       filters: { category?: string; status?: string; sellerId?: string } = {}
     ) {
-      let query = supabaseAdmin
-        .from('sequences')
-        .select(
-          `
+      // Standard query with relations. Note: On some deployments the
+      // PostgREST relationship between sequences and categories/profiles
+      // may not exist. Use findManySimple if relationships are unavailable.
+      let query = supabaseAdmin.from('sequences').select(
+        `
           *,
           category:categories(name),
           seller:profiles!seller_id(username, full_name)
         `
-        )
-        .eq('is_active', true)
-        .eq('is_approved', true)
+      )
+
+      if (filters.category) {
+        query = query.eq('category_id', filters.category)
+      }
+      if (filters.sellerId) {
+        query = query.eq('seller_id', filters.sellerId)
+      }
+
+      const { data, error } = await query
+      if (error) throw error
+      return data || []
+    },
+
+    async findManySimple(
+      filters: { category?: string; status?: string; sellerId?: string } = {}
+    ) {
+      // Relationship-free query for environments without FK relationships.
+      let query = supabaseAdmin.from('sequences').select('*')
 
       if (filters.category) {
         query = query.eq('category_id', filters.category)
@@ -97,8 +114,6 @@ export const db = {
         `
         )
         .in('id', ids)
-        .eq('is_active', true)
-        .eq('is_approved', true)
 
       if (error) throw error
       return data || []

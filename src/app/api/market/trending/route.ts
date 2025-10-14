@@ -3,8 +3,19 @@ import { db } from '@/lib/supabase-db'
 
 export async function GET() {
   try {
-    // Fetch all published/active/approved sequences (no mock fallback)
-    const sequences: any[] = await db.sequences.findMany({})
+    // Fetch sequences using relationship-free query to avoid FK dependency
+    const sequences: any[] = await db.sequences.findManySimple({})
+
+    // Load categories for id->name mapping (graceful if table missing)
+    const categoryMap = new Map<string, string>()
+    try {
+      const categories = await db.categories.findMany()
+      categories.forEach((c: any) => {
+        if (c?.id) categoryMap.set(String(c.id), c.name || 'Uncategorized')
+      })
+    } catch {
+      // If categories table/relationship is unavailable, fall back to 'Uncategorized'
+    }
 
     // Aggregate categories
     const categoryCounts: Record<string, number> = {}
@@ -17,7 +28,9 @@ export async function GET() {
       const price = s.price || 0
       const revenue = Math.round(downloads * price)
 
-      const categoryName = s?.category?.name || 'Uncategorized'
+      const categoryId = s?.category_id ? String(s.category_id) : ''
+      const categoryName =
+        (categoryId && categoryMap.get(categoryId)) || 'Uncategorized'
       categoryCounts[categoryName] = (categoryCounts[categoryName] || 0) + 1
 
       const tags: string[] = Array.isArray(s.tags) ? s.tags : []
@@ -38,8 +51,8 @@ export async function GET() {
         previewUrl: s.preview_url || s.thumbnail_url || null,
         thumbnailUrl: s.thumbnail_url || null,
         seller: {
-          username: s.seller?.username || 'Unknown',
-          displayName: s.seller?.full_name || s.seller?.username || 'Unknown',
+          username: 'Unknown',
+          displayName: 'Unknown',
         },
         createdAt: s.created_at,
       }
