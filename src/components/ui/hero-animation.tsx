@@ -39,11 +39,15 @@ export function HeroAnimation({ className }: HeroAnimationProps) {
       const width = parent?.clientWidth || window.innerWidth
       const height =
         parent?.clientHeight || Math.max(420, window.innerHeight * 0.6)
-      canvas.style.width = width + 'px'
-      canvas.style.height = height + 'px'
-      canvas.width = Math.floor(width * dpr)
-      canvas.height = Math.floor(height * dpr)
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+      
+      // Only update if dimensions actually changed to avoid layout thrashing
+      if (canvas.width !== Math.floor(width * dpr) || canvas.height !== Math.floor(height * dpr)) {
+        canvas.style.width = width + 'px'
+        canvas.style.height = height + 'px'
+        canvas.width = Math.floor(width * dpr)
+        canvas.height = Math.floor(height * dpr)
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+      }
     }
     resize()
     window.addEventListener('resize', resize)

@@ -1,33 +1,22 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Search, ArrowRight, TrendingUp, Star } from 'lucide-react'
 import { HeroAnimation } from './hero-animation'
+import { MarketInsights } from '@/lib/market-service'
 
-type TrendingSequence = {
-  id: string
-  title: string
-  price: number
-  downloads: number
-  rating: number
-  previewUrl?: string | null
-  thumbnailUrl?: string | null
-  seller?: { username: string; displayName: string }
+interface MarketplaceHomeProps {
+  initialInsights: MarketInsights
 }
 
-type MarketInsights = {
-  topByDownloads: TrendingSequence[]
-  topCategories: { name: string; count: number }[]
-  totalSequences: number
-}
-
-export function MarketplaceHome() {
+export function MarketplaceHome({ initialInsights }: MarketplaceHomeProps) {
   const router = useRouter()
   const [query, setQuery] = useState('')
-  const [insights, setInsights] = useState<MarketInsights | null>(null)
-  const [loading, setLoading] = useState(true)
+  const insights = initialInsights
+  const loading = false // Data is now passed from server
   const defaultCats = [
     'Holiday & Seasonal',
     'Music Sync',
@@ -37,26 +26,7 @@ export function MarketplaceHome() {
     'Props & Elements',
   ]
 
-  useEffect(() => {
-    let isMounted = true
-    async function load() {
-      try {
-        const res = await fetch('/api/market/trending')
-        const data = await res.json()
-        if (isMounted) {
-          setInsights(data)
-        }
-      } catch (e) {
-        console.warn('Failed to load market insights', e)
-      } finally {
-        if (isMounted) setLoading(false)
-      }
-    }
-    load()
-    return () => {
-      isMounted = false
-    }
-  }, [])
+  // removed useEffect fetch
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -246,11 +216,13 @@ export function MarketplaceHome() {
                 >
                   <div className="relative h-40 bg-gray-200">
                     {seq.previewUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
+                      <Image
                         src={seq.previewUrl}
                         alt={seq.title}
+                        width={400}
+                        height={225}
                         className="w-full h-full object-cover"
+                        unoptimized={seq.previewUrl.startsWith('data:')}
                       />
                     ) : (
                       <div className="w-full h-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
@@ -319,11 +291,13 @@ export function MarketplaceHome() {
                   >
                     <div className="relative h-40 bg-gray-200">
                       {seq.previewUrl ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
+                        <Image
                           src={seq.previewUrl}
                           alt={seq.title}
+                          width={400}
+                          height={225}
                           className="w-full h-full object-cover"
+                          unoptimized={seq.previewUrl.startsWith('data:')}
                         />
                       ) : (
                         <div className="w-full h-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center">
