@@ -57,6 +57,31 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // STRENGTHEN: Validate sequence exists, is published, and is not owned by the buyer
+    const { data: sequence, error: seqErr } = await supabase
+      .from('sequences')
+      .select('id, seller_id, status, title')
+      .eq('id', sequenceId)
+      .single()
+
+    if (seqErr || !sequence) {
+      return NextResponse.json({ error: 'Sequence not found' }, { status: 404 })
+    }
+
+    if (sequence.status !== 'published') {
+      return NextResponse.json(
+        { error: 'This sequence is not currently available for purchase' },
+        { status: 400 }
+      )
+    }
+
+    if (sequence.seller_id === user.id) {
+      return NextResponse.json(
+        { error: 'You cannot purchase your own sequence' },
+        { status: 400 }
+      )
+    }
+
     const { data: item, error: insErr } = await supabase
       .from('cart_items')
       .insert({ user_id: user.id, sequence_id: sequenceId, quantity: 1 })
@@ -71,7 +96,8 @@ export async function POST(request: NextRequest) {
         message.includes('unique') ||
         code === '23505'
       ) {
-        return NextResponse.json({ ok: true })
+        // Item already in cart, just return success
+        return NextResponse.json({ ok: true, alreadyInCart: true })
       }
       throw insErr
     }

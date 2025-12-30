@@ -37,14 +37,37 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (
-    !user &&
-    !request.nextUrl.pathname.startsWith('/auth') &&
-    !request.nextUrl.pathname.startsWith('/api/auth')
-  ) {
-    // no user, potentially respond by redirecting the user to the login page
+  const path = request.nextUrl.pathname
+
+  // Public paths that don't require authentication
+  const isPublicPath =
+    path === '/' ||
+    path.startsWith('/auth') ||
+    path.startsWith('/api/auth') ||
+    path.startsWith('/search') ||
+    path.startsWith('/sequences') ||
+    path.startsWith('/sequence/') || // details page
+    path.startsWith('/categories') ||
+    path.startsWith('/creator-guide') ||
+    path.startsWith('/help') ||
+    path.startsWith('/terms') ||
+    path.startsWith('/privacy') ||
+    path.startsWith('/licensing') ||
+    path.startsWith('/guidelines') ||
+    path.startsWith('/contact') ||
+    path.startsWith('/api/sequences') || // Public GET APIs
+    path.startsWith('/api/categories') ||
+    path.startsWith('/api/market') ||
+    path.startsWith('/api/currency') ||
+    // Allow static assets just in case regex in middleware.ts misses some
+    path.includes('.')
+
+  // Block access to protected pages if not logged in
+  if (!user && !isPublicPath) {
+    // Redirect to signin for protected routes
     const url = request.nextUrl.clone()
     url.pathname = '/auth/signin'
+    url.searchParams.set('next', path) // Add return URL
     return NextResponse.redirect(url)
   }
 
@@ -53,10 +76,9 @@ export async function updateSession(request: NextRequest) {
     const userRole = user.user_metadata?.role
     const isSellerRole = userRole === 'SELLER'
     const isAdminRole = userRole === 'ADMIN'
-    const isSellerArea = request.nextUrl.pathname.startsWith('/seller')
-    const isAdminArea = request.nextUrl.pathname.startsWith('/admin')
-    const isOnboardingPage =
-      request.nextUrl.pathname.startsWith('/seller/onboarding')
+    const isSellerArea = path.startsWith('/seller')
+    const isAdminArea = path.startsWith('/admin')
+    const isOnboardingPage = path.startsWith('/seller/onboarding')
 
     // Admin area protection
     if (isAdminArea && !isAdminRole) {
