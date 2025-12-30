@@ -3,8 +3,9 @@ import { supabaseAdmin } from '@/lib/supabase-db'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  props: { params: Promise<{ id: string }> }
 ) {
+  const params = await props.params
   try {
     const sequenceId = params.id
 

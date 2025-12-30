@@ -5,7 +5,12 @@ import Image from 'next/image'
 // Removed page-level Navigation; global header renders in layout
 import { Search, Grid, List } from 'lucide-react'
 
-type Category = { id: string; name: string; description?: string | null }
+type Category = {
+  id: string
+  name: string
+  description?: string | null
+  count?: number
+}
 
 export default function CategoriesPage() {
   const [searchTerm, setSearchTerm] = useState('')
@@ -51,7 +56,7 @@ export default function CategoriesPage() {
       case 'name':
         return a.name.localeCompare(b.name)
       case 'count':
-        return b.count - a.count
+        return (b.count || 0) - (a.count || 0)
       default:
         return 0
     }

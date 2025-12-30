@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 // Removed page-level Navigation; global header renders in layout
@@ -14,7 +14,7 @@ type SessionInfo = {
   orderId?: string | null
 }
 
-export default function CheckoutSuccessPage() {
+function CheckoutSuccessContent() {
   const params = useSearchParams()
   const sessionId = params.get('session_id')
   const [loading, setLoading] = useState(!!sessionId)
@@ -220,5 +220,13 @@ export default function CheckoutSuccessPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function CheckoutSuccessPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <CheckoutSuccessContent />
+    </Suspense>
   )
 }

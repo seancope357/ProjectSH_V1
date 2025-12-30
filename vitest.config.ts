@@ -4,7 +4,7 @@ import path from 'path'
 export default defineConfig({
   // Avoid loading PostCSS config during tests
   css: {
-    postcss: null,
+    postcss: {},
   },
   test: {
     environment: 'jsdom',
