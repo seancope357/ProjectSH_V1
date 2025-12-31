@@ -90,8 +90,9 @@ function SignInPageContent() {
         setError(error.message)
       } else if (data.user) {
         const role = data.user.user_metadata?.role
+        // Explicitly force seller dashboard for SELLER/ADMIN roles
         if (role === 'SELLER' || role === 'ADMIN') {
-          router.push('/seller/dashboard')
+          router.replace('/seller/dashboard')
         } else {
           router.push(callbackUrl)
         }

@@ -24,6 +24,7 @@ function AuthCallbackContent() {
         if (user) {
           const callbackUrl = searchParams.get('callbackUrl') || '/'
           const role = user.user_metadata?.role
+          // Force redirect to seller dashboard if user is a seller or admin
           const target =
             role === 'SELLER' || role === 'ADMIN'
               ? '/seller/dashboard'

@@ -53,12 +53,19 @@ export default function RegisterPage() {
         setError(error.message)
       } else {
         // Registration successful
+        // If they registered as a seller, we want to guide them to onboarding after email verification
+        // But since email verification stops the flow, we just show the message.
+        // If auto-confirm is on (dev), we could redirect.
+        
         const base = '/auth/signin'
         const message = encodeURIComponent(
           'Registration successful! Please check your email to verify your account.'
         )
-        // Direct new users to profile creation after sign-in
-        const callback = encodeURIComponent('/profile/create')
+        // For sellers, ensure they land on onboarding/dashboard after first sign-in
+        const callback = formData.role === 'seller' 
+          ? encodeURIComponent('/seller/dashboard') 
+          : encodeURIComponent('/profile/create')
+          
         router.push(`${base}?message=${message}&callbackUrl=${callback}`)
       }
     } catch (error) {
