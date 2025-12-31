@@ -17,11 +17,9 @@ export function PrimaryNav() {
 
   // Role-specific navigation items
   const getBuyerNavItems = () => [
-    { href: '/dashboard', label: 'Dashboard' },
     { href: '/sequences', label: 'Browse Sequences' },
     { href: '/categories', label: 'Categories' },
     { href: '/licensing', label: 'Licensing' },
-    { href: '/help', label: 'Help' },
   ]
 
   const getSellerNavItems = () => [
