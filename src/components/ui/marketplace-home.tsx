@@ -5,7 +5,6 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { Search, ArrowRight, TrendingUp, Star } from 'lucide-react'
-import { HeroAnimation } from './hero-animation'
 import { MarketInsights } from '@/lib/market-service'
 
 interface MarketplaceHomeProps {
@@ -36,42 +35,41 @@ export function MarketplaceHome({ initialInsights }: MarketplaceHomeProps) {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <main className="min-h-screen bg-gray-50">
       {/* Hero */}
       <section
-        className="relative isolate overflow-hidden"
+        className="relative isolate overflow-hidden bg-white border-b border-gray-200"
         aria-label="Marketplace Hero"
       >
-        {/* Animated xLights-style preview */}
-        <HeroAnimation className="absolute inset-0 -z-10 w-full h-full" />
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-700/70 via-purple-700/60 to-indigo-900/70" />
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(45rem_50rem_at_top,theme(colors.blue.100),white)] opacity-20" />
+        <div className="absolute inset-y-0 right-1/2 -z-10 mr-16 w-[200%] origin-bottom-left skew-x-[-30deg] bg-white shadow-xl shadow-blue-600/10 ring-1 ring-blue-50 sm:mr-28 lg:mr-0 xl:mr-16 xl:origin-center" />
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-24">
-          <header className="text-center">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-blue-100 text-xs mb-4">
-              <span className="font-semibold">SequenceHUB</span>
-              <span>Curated by top creators</span>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-32">
+          <header className="text-center max-w-4xl mx-auto">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-medium mb-6 border border-blue-100">
+              <span className="font-bold">New</span>
+              <span>SequenceHUB Marketplace is live</span>
             </div>
 
-            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 drop-shadow-lg">
-              Create show‑stopping xLights displays
+            <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-8 tracking-tight">
+              Create show‑stopping <span className="text-blue-600">xLights</span> displays
             </h1>
-            <p className="text-lg md:text-xl text-blue-100 mb-8 max-w-3xl mx-auto drop-shadow-md">
+            <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
               Shop high‑quality, ready‑to‑run sequences from verified creators.
               Instant downloads, fair pricing, and commercial‑ready options.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
               <Link
                 href="/sequences?sort=popular"
-                className="mi-cta bg-white text-blue-700 px-6 py-3"
+                className="inline-flex items-center justify-center px-8 py-4 text-base font-semibold text-white transition-all duration-200 bg-blue-600 rounded-lg hover:bg-blue-700 hover:shadow-lg hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600"
               >
                 Shop sequences
-                <ArrowRight className="ml-2 h-4 w-4" />
+                <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
               <Link
                 href="/seller/onboarding"
-                className="mi-cta-secondary border border-white/30 text-white px-6 py-3"
+                className="inline-flex items-center justify-center px-8 py-4 text-base font-semibold text-gray-700 transition-all duration-200 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200"
               >
                 Become a seller
               </Link>
@@ -79,28 +77,33 @@ export function MarketplaceHome({ initialInsights }: MarketplaceHomeProps) {
 
             <form
               onSubmit={handleSearch}
-              className="max-w-2xl mx-auto flex gap-3"
+              className="max-w-2xl mx-auto relative group"
             >
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <Search className="h-5 w-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
+              </div>
               <input
                 aria-label="Search sequences"
                 placeholder="Search sequences, tags, effects…"
                 value={query}
                 onChange={e => setQuery(e.target.value)}
-                className="mi-input flex-1 bg-white/95"
+                className="block w-full pl-11 pr-4 py-4 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow text-lg"
               />
-              <button type="submit" className="mi-cta bg-white text-blue-700">
-                <Search className="h-4 w-4" />
-                Search
-              </button>
             </form>
 
-            <div className="mt-6 text-blue-100 text-sm">
-              <span className="inline-flex items-center gap-2">
-                <TrendingUp className="h-4 w-4" />
-                {loading
-                  ? 'Loading insights…'
-                  : `${insights?.totalSequences || 0} sequences indexed`}
-              </span>
+            <div className="mt-8 flex items-center justify-center gap-6 text-sm text-gray-500">
+              <div className="flex items-center gap-2">
+                <TrendingUp className="h-4 w-4 text-green-500" />
+                <span className="font-medium text-gray-700">
+                  {loading
+                    ? 'Loading...'
+                    : `${insights?.totalSequences || 0} sequences`}
+                </span>
+              </div>
+              <div className="w-1 h-1 bg-gray-300 rounded-full" />
+              <div>Verified Creators</div>
+              <div className="w-1 h-1 bg-gray-300 rounded-full" />
+              <div>Instant Delivery</div>
             </div>
           </header>
         </div>
