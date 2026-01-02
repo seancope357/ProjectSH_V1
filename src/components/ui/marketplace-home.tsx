@@ -31,7 +31,7 @@ export function MarketplaceHome({ initialInsights }: MarketplaceHomeProps) {
     e.preventDefault()
     const q = query.trim()
     if (!q) return
-    router.push(`/search?q=${encodeURIComponent(q)}&sort=newest`)
+    router.push(`/sequences?q=${encodeURIComponent(q)}&sort=newest`)
   }
 
   return (
@@ -61,7 +61,7 @@ export function MarketplaceHome({ initialInsights }: MarketplaceHomeProps) {
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
               <Link
-                href="/sequences?sort=popular"
+                href="/sequences"
                 className="inline-flex items-center justify-center px-8 py-4 text-base font-bold text-white transition-all duration-200 bg-blue-600 rounded-full hover:bg-blue-700 hover:shadow-lg hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 shadow-blue-500/30 shadow-md"
               >
                 Browse All Sequences
