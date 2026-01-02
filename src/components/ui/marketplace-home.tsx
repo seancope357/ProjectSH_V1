@@ -46,11 +46,6 @@ export function MarketplaceHome({ initialInsights }: MarketplaceHomeProps) {
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-32">
           <header className="text-center max-w-4xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-medium mb-6 border border-blue-100">
-              <span className="font-bold">New</span>
-              <span>SequenceHUB Marketplace is live</span>
-            </div>
-
             <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-8 tracking-tight">
               Create show‑stopping <span className="text-blue-600">xLights</span> displays
             </h1>
