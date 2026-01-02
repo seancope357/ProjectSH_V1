@@ -332,6 +332,64 @@ export function MarketplaceHome({ initialInsights }: MarketplaceHomeProps) {
         </div>
       </section>
 
+      {/* Seller Acquisition */}
+      <section
+        className="py-20 relative overflow-hidden bg-gray-900 text-white"
+        aria-label="Sell on SequenceHUB"
+      >
+        <div className="absolute inset-0 opacity-20 bg-[url('/images/sequence-preview-default.jpg')] bg-cover bg-center mix-blend-overlay" />
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-900/90 to-purple-900/90" />
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl md:text-5xl font-bold mb-6">
+            Turn Your Light Shows Into Income
+          </h2>
+          <p className="text-xl text-blue-100 mb-10 max-w-3xl mx-auto">
+            Join the fastest-growing marketplace for xLights creators. Earn 85%
+            commissions, get paid instantly, and reach thousands of display
+            enthusiasts worldwide.
+          </p>
+
+          <div className="grid md:grid-cols-3 gap-8 mb-12 text-left max-w-5xl mx-auto">
+            <div className="bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/10">
+              <div className="text-3xl mb-3">💰</div>
+              <h3 className="font-bold text-lg mb-2">High Commissions</h3>
+              <p className="text-blue-100 text-sm">
+                Keep 85% of every sale. We handle the hosting, payments, and
+                delivery so you can focus on sequencing.
+              </p>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/10">
+              <div className="text-3xl mb-3">🚀</div>
+              <h3 className="font-bold text-lg mb-2">Instant Exposure</h3>
+              <p className="text-blue-100 text-sm">
+                Your sequences are instantly searchable and indexable. Get
+                featured in our "Editors' Picks" and newsletters.
+              </p>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/10">
+              <div className="text-3xl mb-3">🛡️</div>
+              <h3 className="font-bold text-lg mb-2">Secure & Simple</h3>
+              <p className="text-blue-100 text-sm">
+                Automated file delivery and secure Stripe payouts. Dashboard analytics
+                track your sales in real-time.
+              </p>
+            </div>
+          </div>
+
+          <Link
+            href="/seller/onboarding"
+            className="inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-blue-900 transition-all duration-200 bg-white rounded-full hover:bg-blue-50 hover:shadow-lg hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white"
+          >
+            Start Selling Today
+            <ArrowRight className="ml-2 h-5 w-5" />
+          </Link>
+          <p className="mt-4 text-sm text-blue-200">
+            No listing fees. No monthly costs.
+          </p>
+        </div>
+      </section>
+
       {/* Licensing & Quality Callout */}
       <section className="py-6" aria-label="Quality and Licensing">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
