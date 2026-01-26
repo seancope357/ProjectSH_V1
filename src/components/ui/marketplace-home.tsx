@@ -4,7 +4,20 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { Search, ArrowRight, TrendingUp, Star } from 'lucide-react'
+import {
+  Search,
+  ArrowRight,
+  TrendingUp,
+  Star,
+  Music,
+  Calendar,
+  TreePine,
+  Home,
+  Sparkles,
+  Box,
+  User,
+  Play
+} from 'lucide-react'
 import { MarketInsights } from '@/lib/market-service'
 
 interface MarketplaceHomeProps {
@@ -15,17 +28,7 @@ export function MarketplaceHome({ initialInsights }: MarketplaceHomeProps) {
   const router = useRouter()
   const [query, setQuery] = useState('')
   const insights = initialInsights
-  const loading = false // Data is now passed from server
-  const defaultCats = [
-    'Holiday & Seasonal',
-    'Music Sync',
-    'Mega Tree',
-    'House Outline',
-    'RGB Effects',
-    'Props & Elements',
-  ]
-
-  // removed useEffect fetch
+  const loading = false 
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -34,118 +37,289 @@ export function MarketplaceHome({ initialInsights }: MarketplaceHomeProps) {
     router.push(`/sequences?q=${encodeURIComponent(q)}&sort=newest`)
   }
 
+  // Map category names to icons/colors
+  const getCategoryMeta = (name: string) => {
+    const map: Record<string, { icon: any, color: string }> = {
+      'Holiday & Seasonal': { icon: Calendar, color: 'bg-red-500' },
+      'Music Sync': { icon: Music, color: 'bg-blue-500' },
+      'Mega Tree': { icon: TreePine, color: 'bg-green-500' },
+      'House Outline': { icon: Home, color: 'bg-orange-500' },
+      'RGB Effects': { icon: Sparkles, color: 'bg-purple-500' },
+      'Props & Elements': { icon: Box, color: 'bg-pink-500' },
+    }
+    return map[name] || { icon: Box, color: 'bg-gray-500' }
+  }
+
   return (
     <main className="min-h-screen bg-gray-50">
-      {/* Hero */}
-      <section
-        className="relative isolate overflow-hidden bg-white border-b border-gray-200"
-        aria-label="Marketplace Hero"
-      >
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(45rem_50rem_at_top,theme(colors.blue.100),white)] opacity-20" />
-        <div className="absolute inset-y-0 right-1/2 -z-10 mr-16 w-[200%] origin-bottom-left skew-x-[-30deg] bg-white shadow-xl shadow-blue-600/10 ring-1 ring-blue-50 sm:mr-28 lg:mr-0 xl:mr-16 xl:origin-center" />
-
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-32">
-          <header className="text-center max-w-4xl mx-auto">
-            <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-8 tracking-tight">
-              Create show‑stopping <span className="text-blue-600">xLights</span> displays
-            </h1>
-            <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
-              Shop high‑quality, ready‑to‑run sequences from verified creators.
-              Instant downloads, fair pricing, and commercial‑ready options.
-            </p>
-
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
-              <Link
-                href="/sequences"
-                className="inline-flex items-center justify-center px-8 py-4 text-base font-bold text-white transition-all duration-200 bg-blue-600 rounded-full hover:bg-blue-700 hover:shadow-lg hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 shadow-blue-500/30 shadow-md"
-              >
-                Browse All Sequences
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-              <Link
-                href="/seller/onboarding"
-                className="inline-flex items-center justify-center px-8 py-4 text-base font-semibold text-gray-700 transition-all duration-200 bg-white border border-gray-200 rounded-full hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 shadow-sm"
-              >
-                Sell Your Work
-              </Link>
-            </div>
-
-            <form
-              onSubmit={handleSearch}
-              className="max-w-2xl mx-auto relative group"
-            >
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <Search className="h-5 w-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
-              </div>
-              <input
-                aria-label="Search sequences"
-                placeholder="Search sequences, tags, effects…"
-                value={query}
-                onChange={e => setQuery(e.target.value)}
-                className="block w-full pl-11 pr-4 py-4 bg-white border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow text-lg"
-              />
-            </form>
-
-            <div className="mt-8 flex items-center justify-center gap-6 text-sm text-gray-500">
-              <div className="flex items-center gap-2">
-                <TrendingUp className="h-4 w-4 text-green-500" />
-                <span className="font-medium text-gray-700">
-                  {loading
-                    ? 'Loading...'
-                    : `${insights?.totalSequences || 0} sequences`}
-                </span>
-              </div>
-              <div className="w-1 h-1 bg-gray-300 rounded-full" />
-              <div>Verified Creators</div>
-              <div className="w-1 h-1 bg-gray-300 rounded-full" />
-              <div>Instant Delivery</div>
-            </div>
-          </header>
+      
+      {/* 1. Night Mode Hero */}
+      <section className="relative overflow-hidden bg-slate-950 text-white pb-20 pt-24">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 z-0">
+           <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-600/20 rounded-full blur-[100px] animate-pulse" />
+           <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-600/20 rounded-full blur-[100px] animate-pulse delay-1000" />
+           <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-10" />
         </div>
-      </section>
 
-      {/* Shop by Category (chips) */}
-      <section className="py-6" aria-label="Shop by Category">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl md:text-2xl font-bold text-gray-900">
-              Shop by Category
-            </h2>
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs font-medium mb-8 backdrop-blur-sm">
+             <Sparkles className="w-3 h-3" />
+             <span>The #1 Marketplace for xLights Creators</span>
+          </div>
+
+          <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6 text-transparent bg-clip-text bg-gradient-to-b from-white to-blue-200 drop-shadow-lg">
+             Sell your <span className="text-blue-500">xLights</span> sequences.<br/>
+             Earn 85% per sale.
+          </h1>
+          
+          <p className="text-xl text-blue-200/80 mb-10 max-w-2xl mx-auto leading-relaxed">
+             Join SequenceHUB to monetize your work or shop pro‑grade shows from verified creators.
+             Instant downloads, clear licensing, and a creator‑first marketplace.
+          </p>
+
+          {/* Search Bar - Glassmorphism */}
+          <form onSubmit={handleSearch} className="max-w-2xl mx-auto mb-12 relative group">
+            <div className="absolute inset-0 bg-white/5 rounded-2xl blur-xl group-hover:bg-blue-500/20 transition-all duration-500" />
+            <div className="relative flex items-center bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-2 shadow-2xl">
+               <Search className="w-6 h-6 text-blue-300 ml-4" />
+               <input 
+                 value={query}
+                 onChange={(e) => setQuery(e.target.value)}
+                 placeholder="Search for songs, props, or effects..."
+                 className="w-full bg-transparent border-none text-white placeholder-blue-200/50 focus:ring-0 text-lg px-4 h-12"
+               />
+               <button type="submit" className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-xl font-bold transition-all shadow-lg hover:shadow-blue-500/50">
+                 Search
+               </button>
+            </div>
+          </form>
+
+          {/* CTAs */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
             <Link
-              href="/categories"
-              className="text-blue-700 hover:underline text-sm"
+              href="/seller/onboarding"
+              className="inline-flex items-center justify-center px-8 py-4 text-base font-bold text-slate-900 transition-all duration-200 bg-white rounded-full hover:bg-blue-50 hover:scale-105 shadow-[0_0_20px_rgba(255,255,255,0.3)]"
             >
-              See all
+              Start Selling
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Link>
+            <Link
+              href="/sequences"
+              className="inline-flex items-center justify-center px-8 py-4 text-base font-bold text-white transition-all duration-200 bg-white/10 border border-white/20 rounded-full hover:bg-white/20 hover:scale-105 backdrop-blur-sm"
+            >
+              Browse Sequences
             </Link>
           </div>
-          <div className="flex gap-3 overflow-x-auto pb-2">
-            {(loading
-              ? defaultCats
-              : insights?.topCategories?.map(c => c.name) || defaultCats
-            )
-              .slice(0, 12)
-              .map(name => (
-                <Link
-                  key={name}
-                  href={`/search?category=${encodeURIComponent(name)}&sort=popular`}
-                  className="mi-surface rounded-full px-4 py-2 whitespace-nowrap hover:shadow-sm"
-                >
-                  {name}
-                </Link>
-              ))}
+
+          {/* Trust Metrics */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto text-sm font-medium text-blue-200/80 border-t border-white/10 pt-8">
+             <div className="flex flex-col items-center gap-1">
+                <span className="text-2xl font-bold text-white">85%</span>
+                <span>Creator Payouts</span>
+             </div>
+             <div className="flex flex-col items-center gap-1">
+                <span className="text-2xl font-bold text-white">100+</span>
+                <span>Verified Creators</span>
+             </div>
+             <div className="flex flex-col items-center gap-1">
+                <span className="text-2xl font-bold text-white">Instant</span>
+                <span>Digital Delivery</span>
+             </div>
           </div>
         </div>
       </section>
 
-      {/* Featured Categories */}
-      <section className="py-12" aria-label="Featured Categories">
+      {/* 2. Visual Categories */}
+      <section className="py-16 bg-white relative -mt-8 rounded-t-3xl z-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
-              Featured Categories
-            </h2>
+          <div className="flex items-center justify-between mb-8">
+             <h2 className="text-2xl font-bold text-slate-900">Explore by Prop</h2>
+             <Link href="/categories" className="text-blue-600 font-medium hover:text-blue-700 flex items-center gap-1">
+               View All <ArrowRight className="w-4 h-4" />
+             </Link>
+          </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+             {(insights?.topCategories || []).slice(0, 6).map((cat) => {
+               const meta = getCategoryMeta(cat.name)
+               const Icon = meta.icon
+               return (
+                 <Link 
+                   key={cat.name} 
+                   href={`/sequences?category=${encodeURIComponent(cat.name)}`}
+                   className="group relative flex flex-col items-center justify-center p-6 rounded-2xl bg-slate-50 border border-slate-100 hover:border-blue-100 hover:shadow-xl hover:shadow-blue-500/10 transition-all duration-300 hover:-translate-y-1"
+                 >
+                   <div className={`w-12 h-12 rounded-xl ${meta.color} flex items-center justify-center text-white mb-4 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                      <Icon className="w-6 h-6" />
+                   </div>
+                   <h3 className="font-bold text-slate-900 text-center text-sm group-hover:text-blue-600 transition-colors">{cat.name}</h3>
+                   <span className="text-xs text-slate-500 mt-1">{cat.count} sequences</span>
+                 </Link>
+               )
+             })}
+          </div>
+        </div>
+      </section>
+
+      {/* 3. Horizontal Scroll Trending */}
+      <section className="py-12 bg-slate-50 border-y border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between mb-8">
+             <div>
+               <h2 className="text-3xl font-bold text-slate-900">Trending Now</h2>
+               <p className="text-slate-600 mt-1">Most downloaded sequences this week</p>
+             </div>
+             <div className="flex gap-2">
+                <button className="w-10 h-10 rounded-full border border-slate-300 flex items-center justify-center hover:bg-white transition-colors">
+                   <ArrowRight className="w-5 h-5 rotate-180" />
+                </button>
+                <button className="w-10 h-10 rounded-full bg-slate-900 text-white flex items-center justify-center hover:bg-slate-800 transition-colors">
+                   <ArrowRight className="w-5 h-5" />
+                </button>
+             </div>
+          </div>
+
+          <div className="flex gap-6 overflow-x-auto pb-8 snap-x scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
+             {(insights?.topByDownloads || []).slice(0, 8).map((seq) => (
+               <Link 
+                 key={seq.id}
+                 href={`/sequence/${seq.id}`}
+                 className="flex-none w-72 snap-center group bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-200 hover:shadow-xl hover:shadow-blue-500/10 transition-all duration-300 hover:-translate-y-1"
+               >
+                 <div className="relative aspect-video bg-slate-100">
+                    {seq.previewUrl ? (
+                      <Image
+                        src={seq.previewUrl}
+                        alt={seq.title}
+                        fill
+                        className="object-cover"
+                        unoptimized={seq.previewUrl.startsWith('data:')}
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-slate-400">
+                        <Search className="w-8 h-8" />
+                      </div>
+                    )}
+                    {/* Hover Overlay */}
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
+                       <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-lg transform scale-50 group-hover:scale-100 transition-transform duration-300">
+                          <Play className="w-5 h-5 text-slate-900 fill-slate-900 ml-1" />
+                       </div>
+                    </div>
+                 </div>
+                 <div className="p-4">
+                    <div className="flex justify-between items-start mb-2">
+                       <h3 className="font-bold text-slate-900 line-clamp-1 group-hover:text-blue-600 transition-colors">{seq.title}</h3>
+                       <span className="font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-lg text-xs">
+                         ${seq.price?.toFixed(2)}
+                       </span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-slate-500 mb-3">
+                       <User className="w-3 h-3" />
+                       <span className="line-clamp-1">{seq.seller?.displayName || 'Unknown Creator'}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs font-medium text-slate-400 border-t border-slate-100 pt-3">
+                       <div className="flex items-center gap-1 text-yellow-500">
+                          <Star className="w-3 h-3 fill-current" />
+                          <span>{seq.rating.toFixed(1)}</span>
+                       </div>
+                       <div className="flex items-center gap-1">
+                          <TrendingUp className="w-3 h-3" />
+                          <span>{seq.downloads} sold</span>
+                       </div>
+                    </div>
+                 </div>
+               </Link>
+             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 4. Creator Spotlight (Social Proof) */}
+      <section className="py-20 bg-slate-900 text-white relative overflow-hidden">
+         <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-5" />
+         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+               <div>
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-yellow-500/10 text-yellow-400 text-xs font-bold mb-6 border border-yellow-500/20">
+                     <Star className="w-3 h-3 fill-current" />
+                     <span>Creator Spotlight</span>
+                  </div>
+                  <h2 className="text-4xl font-bold mb-4">Meet the Pros Behind the Shows</h2>
+                  <p className="text-slate-400 text-lg mb-8">
+                     Our marketplace features verified creators who live and breathe xLights. 
+                     Get access to professional sequencing that would take hours to create yourself.
+                  </p>
+                  
+                  <div className="flex flex-col gap-4">
+                     <div className="flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 flex items-center justify-center font-bold text-lg">
+                           JD
+                        </div>
+                        <div>
+                           <h4 className="font-bold">John Doe Lighting</h4>
+                           <p className="text-sm text-slate-400">Specializes in Singing Faces & Mega Trees</p>
+                        </div>
+                        <button className="ml-auto px-4 py-2 rounded-lg bg-white/10 hover:bg-white text-sm font-bold hover:text-slate-900 transition-all">
+                           View Profile
+                        </button>
+                     </div>
+                     <div className="flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-orange-500 to-red-500 flex items-center justify-center font-bold text-lg">
+                           SL
+                        </div>
+                        <div>
+                           <h4 className="font-bold">Sarah's Lights</h4>
+                           <p className="text-sm text-slate-400">Expert in House Outlines & HD Props</p>
+                        </div>
+                        <button className="ml-auto px-4 py-2 rounded-lg bg-white/10 hover:bg-white text-sm font-bold hover:text-slate-900 transition-all">
+                           View Profile
+                        </button>
+                     </div>
+                  </div>
+               </div>
+               
+               <div className="relative">
+                  <div className="absolute -inset-4 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl blur-2xl opacity-30 animate-pulse" />
+                  <div className="relative bg-slate-800 rounded-2xl p-8 border border-slate-700">
+                     <h3 className="text-2xl font-bold mb-6">Live Activity</h3>
+                     <div className="space-y-6">
+                        {[
+                           { action: 'purchased', item: 'Wizards in Winter', time: '2m ago', user: 'Mike T.' },
+                           { action: 'reviewed', item: 'Christmas Canon', time: '15m ago', user: 'Sarah L.' },
+                           { action: 'uploaded', item: 'Taylor Swift Mix', time: '1h ago', user: 'ProLights' },
+                           { action: 'purchased', item: 'Mega Tree 360', time: '1h ago', user: 'Dave C.' },
+                        ].map((activity, i) => (
+                           <div key={i} className="flex items-center gap-4 text-sm">
+                              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                              <p className="text-slate-300">
+                                 <span className="font-bold text-white">{activity.user}</span>
+                                 {' '}{activity.action}{' '}
+                                 <span className="text-blue-400">{activity.item}</span>
+                              </p>
+                              <span className="ml-auto text-slate-500 text-xs">{activity.time}</span>
+                           </div>
+                        ))}
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </section>
+
+      {/* 5. Editors' Picks Grid */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between mb-10">
+            <div>
+               <h2 className="text-3xl font-bold text-slate-900">Editors' Picks</h2>
+               <p className="text-slate-600 mt-1">Hand-picked quality sequences</p>
+            </div>
             <Link
-              href="/categories"
+              href="/sequences?sort=rating"
               className="mi-cta-secondary border px-4 py-2"
             >
               View All
@@ -153,264 +327,68 @@ export function MarketplaceHome({ initialInsights }: MarketplaceHomeProps) {
             </Link>
           </div>
 
-          {loading ? (
-            <div className="text-gray-600">Loading…</div>
-          ) : (insights?.topCategories?.length || 0) === 0 ? (
-            <div className="text-gray-600">No categories available.</div>
-          ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-              {insights!.topCategories.slice(0, 6).map(cat => (
-                <Link
-                  key={cat.name}
-                  href={`/search?category=${encodeURIComponent(cat.name)}&sort=downloads`}
-                  className="mi-card mi-surface p-4 text-center hover:shadow-md"
-                >
-                  <div className="text-sm font-semibold text-gray-900">
-                    {cat.name}
-                  </div>
-                  <div className="text-xs text-gray-600">
-                    {cat.count} sequences
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* Trending Sequences */}
-      <section className="py-6" aria-label="Trending Sequences">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
-              Trending Now
-            </h2>
-            <Link
-              href="/sequences"
-              className="mi-cta-secondary border px-4 py-2"
-            >
-              Browse All
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
-          </div>
-
-          {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {Array.from({ length: 8 }).map((_, i) => (
-                <div key={i} className="mi-card mi-surface h-64" />
-              ))}
-            </div>
-          ) : (insights?.topByDownloads?.length || 0) === 0 ? (
-            <div className="text-gray-600">
-              No trending sequences available.
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {insights!.topByDownloads.slice(0, 8).map(seq => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+             {(insights?.topByDownloads || []).slice(0, 8).map((seq) => (
                 <Link
                   key={seq.id}
                   href={`/sequence/${seq.id}`}
-                  className="mi-card mi-surface overflow-hidden hover:shadow-md transition-shadow"
+                  className="group block"
                 >
-                  <div className="relative h-40 bg-gray-200">
-                    {seq.previewUrl ? (
-                      <Image
-                        src={seq.previewUrl}
-                        alt={seq.title}
-                        width={400}
-                        height={225}
-                        className="w-full h-full object-cover"
-                        unoptimized={seq.previewUrl.startsWith('data:')}
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
-                        <Search className="w-8 h-8 text-white" />
-                      </div>
-                    )}
-                  </div>
-                  <div className="p-4">
-                    <div className="flex items-start justify-between gap-3 mb-2">
-                      <h3 className="font-semibold text-gray-900 line-clamp-1">
-                        {seq.title}
-                      </h3>
-                      <span className="text-blue-700 font-bold">
-                        ${seq.price?.toFixed?.(2) || seq.price}
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between text-sm text-gray-600">
-                      <span className="inline-flex items-center gap-1">
-                        <Star className="h-4 w-4 text-yellow-500" />
-                        {seq.rating || 0}
-                      </span>
-                      <span>{seq.downloads} downloads</span>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* Editors' Picks */}
-      <section className="py-6" aria-label="Editors' Picks">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
-              Editors' Picks
-            </h2>
-            <Link
-              href="/sequences?sort=rating"
-              className="mi-cta-secondary border px-4 py-2"
-            >
-              Top Rated
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
-          </div>
-
-          {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {Array.from({ length: 8 }).map((_, i) => (
-                <div key={i} className="mi-card mi-surface h-64" />
-              ))}
-            </div>
-          ) : (insights?.topByDownloads?.length || 0) === 0 ? (
-            <div className="text-gray-600">No picks available.</div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[...insights!.topByDownloads]
-                .sort((a, b) => (b.rating || 0) - (a.rating || 0))
-                .slice(0, 8)
-                .map(seq => (
-                  <Link
-                    key={seq.id}
-                    href={`/sequence/${seq.id}`}
-                    className="mi-card mi-surface overflow-hidden hover:shadow-md transition-shadow"
-                  >
-                    <div className="relative h-40 bg-gray-200">
+                   <div className="relative aspect-[4/3] rounded-2xl overflow-hidden mb-4 shadow-sm group-hover:shadow-xl transition-all duration-300">
                       {seq.previewUrl ? (
                         <Image
                           src={seq.previewUrl}
                           alt={seq.title}
-                          width={400}
-                          height={225}
-                          className="w-full h-full object-cover"
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-500"
                           unoptimized={seq.previewUrl.startsWith('data:')}
                         />
                       ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center">
-                          <Search className="w-8 h-8 text-white" />
+                        <div className="w-full h-full bg-slate-100 flex items-center justify-center">
+                          <Search className="w-8 h-8 text-slate-300" />
                         </div>
                       )}
-                    </div>
-                    <div className="p-4">
-                      <div className="flex items-start justify-between gap-3 mb-2">
-                        <h3 className="font-semibold text-gray-900 line-clamp-1">
-                          {seq.title}
-                        </h3>
-                        <span className="text-blue-700 font-bold">
-                          ${seq.price?.toFixed?.(2) || seq.price}
-                        </span>
+                      <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-lg text-xs font-bold text-slate-900 shadow-sm">
+                         ${seq.price?.toFixed(2)}
                       </div>
-                      <div className="flex items-center justify-between text-sm text-gray-600">
-                        <span className="inline-flex items-center gap-1">
-                          <Star className="h-4 w-4 text-yellow-500" />
-                          {seq.rating || 0}
-                        </span>
-                        <span>{seq.downloads} downloads</span>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-            </div>
-          )}
+                   </div>
+                   <h3 className="font-bold text-lg text-slate-900 mb-1 group-hover:text-blue-600 transition-colors">{seq.title}</h3>
+                   <div className="flex items-center gap-2 text-sm text-slate-500">
+                      <Star className="w-4 h-4 text-yellow-500 fill-current" />
+                      <span>{seq.rating.toFixed(1)}</span>
+                      <span>•</span>
+                      <span>{seq.downloads} downloads</span>
+                   </div>
+                </Link>
+             ))}
+          </div>
         </div>
       </section>
 
-      {/* Seller Acquisition */}
-      <section
-        className="py-20 relative overflow-hidden bg-gray-900 text-white"
-        aria-label="Sell on SequenceHUB"
-      >
-        <div className="absolute inset-0 opacity-20 bg-[url('/images/sequence-preview-default.jpg')] bg-cover bg-center mix-blend-overlay" />
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-900/90 to-purple-900/90" />
-
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl md:text-5xl font-bold mb-6">
-            Turn Your Light Shows Into Income
-          </h2>
-          <p className="text-xl text-blue-100 mb-10 max-w-3xl mx-auto">
-            Join the fastest-growing marketplace for xLights creators. Earn 85%
-            commissions, get paid instantly, and reach thousands of display
-            enthusiasts worldwide.
-          </p>
-
-          <div className="grid md:grid-cols-3 gap-8 mb-12 text-left max-w-5xl mx-auto">
-            <div className="bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/10">
-              <div className="text-3xl mb-3">💰</div>
-              <h3 className="font-bold text-lg mb-2">High Commissions</h3>
-              <p className="text-blue-100 text-sm">
-                Keep 85% of every sale. We handle the hosting, payments, and
-                delivery so you can focus on sequencing.
-              </p>
+      {/* Footer CTA */}
+      <section className="py-16 bg-blue-600 text-white relative overflow-hidden">
+         <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-10" />
+         <div className="relative z-10 max-w-4xl mx-auto text-center px-4">
+            <h2 className="text-3xl md:text-4xl font-bold mb-6">Ready to light up the neighborhood?</h2>
+            <p className="text-blue-100 text-lg mb-10">
+               Whether you're buying your first sequence or selling your masterpiece,
+               SequenceHUB is your community.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+               <Link 
+                 href="/sequences" 
+                 className="px-8 py-4 bg-white text-blue-600 rounded-full font-bold hover:bg-blue-50 transition-colors shadow-lg"
+               >
+                 Shop Sequences
+               </Link>
+               <Link 
+                 href="/seller/onboarding" 
+                 className="px-8 py-4 bg-blue-700 text-white border border-blue-500 rounded-full font-bold hover:bg-blue-800 transition-colors"
+               >
+                 Become a Seller
+               </Link>
             </div>
-            <div className="bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/10">
-              <div className="text-3xl mb-3">🚀</div>
-              <h3 className="font-bold text-lg mb-2">Instant Exposure</h3>
-              <p className="text-blue-100 text-sm">
-                Your sequences are instantly searchable and indexable. Get
-                featured in our "Editors' Picks" and newsletters.
-              </p>
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm p-6 rounded-xl border border-white/10">
-              <div className="text-3xl mb-3">🛡️</div>
-              <h3 className="font-bold text-lg mb-2">Secure & Simple</h3>
-              <p className="text-blue-100 text-sm">
-                Automated file delivery and secure Stripe payouts. Dashboard analytics
-                track your sales in real-time.
-              </p>
-            </div>
-          </div>
-
-          <Link
-            href="/seller/onboarding"
-            className="inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-blue-900 transition-all duration-200 bg-white rounded-full hover:bg-blue-50 hover:shadow-lg hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white"
-          >
-            Start Selling Today
-            <ArrowRight className="ml-2 h-5 w-5" />
-          </Link>
-          <p className="mt-4 text-sm text-blue-200">
-            No listing fees. No monthly costs.
-          </p>
-        </div>
-      </section>
-
-      {/* Licensing & Quality Callout */}
-      <section className="py-6" aria-label="Quality and Licensing">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mi-card mi-surface p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-4">
-            <div>
-              <h3 className="text-xl font-semibold text-gray-900">
-                Curated Quality & Clear Licensing
-              </h3>
-              <p className="text-gray-600 mt-2">
-                Every sequence is reviewed for compatibility and visual quality.
-                Learn how licensing works to use music and assets correctly.
-              </p>
-            </div>
-            <div className="flex gap-3">
-              <Link href="/licensing" className="mi-cta bg-blue-600 text-white">
-                Licensing Guide
-              </Link>
-              <Link
-                href="/creator"
-                className="mi-cta-secondary border px-4 py-2"
-              >
-                Meet Creators
-              </Link>
-            </div>
-          </div>
-        </div>
+         </div>
       </section>
     </main>
   )
