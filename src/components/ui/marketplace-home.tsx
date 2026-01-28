@@ -117,15 +117,15 @@ export function MarketplaceHome({ initialInsights }: MarketplaceHomeProps) {
           {/* Trust Metrics */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto text-sm font-medium text-blue-200/80 border-t border-white/10 pt-8">
              <div className="flex flex-col items-center gap-1">
-                <span className="text-2xl font-bold text-white">85%</span>
+                <span className="text-2xl font-bold text-white font-mono">85%</span>
                 <span>Creator Payouts</span>
              </div>
              <div className="flex flex-col items-center gap-1">
-                <span className="text-2xl font-bold text-white">100+</span>
+                <span className="text-2xl font-bold text-white font-mono">100+</span>
                 <span>Verified Creators</span>
              </div>
              <div className="flex flex-col items-center gap-1">
-                <span className="text-2xl font-bold text-white">Instant</span>
+                <span className="text-2xl font-bold text-white font-mono">Instant</span>
                 <span>Digital Delivery</span>
              </div>
           </div>
