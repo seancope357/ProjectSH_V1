@@ -22,7 +22,36 @@ interface ToolbarItem {
 export function VerticalToolbar() {
   const { currentRole } = useNavigation()
 
-  const items: ToolbarItem[] = [
+  const sellerItems: ToolbarItem[] = [
+    { href: '/seller/dashboard', label: 'Dashboard', icon: <Home className="h-5 w-5" /> },
+    {
+      href: '/seller/sequences',
+      label: 'My Sequences',
+      icon: <Layers className="h-5 w-5" />,
+    },
+    {
+      href: '/seller/upload',
+      label: 'Upload Sequence',
+      icon: <FileCheck className="h-5 w-5" />,
+    },
+    {
+      href: '/seller/orders',
+      label: 'Orders',
+      icon: <Package className="h-5 w-5" />,
+    },
+    {
+      href: '/seller/payouts',
+      label: 'Payouts',
+      icon: <ShoppingCart className="h-5 w-5" />,
+    },
+    {
+      href: '/seller/onboarding',
+      label: 'Onboarding',
+      icon: <HelpCircle className="h-5 w-5" />,
+    },
+  ]
+
+  const buyerItems: ToolbarItem[] = [
     { href: '/dashboard', label: 'Home', icon: <Home className="h-5 w-5" /> },
     {
       href: '/sequences',
@@ -50,11 +79,12 @@ export function VerticalToolbar() {
       icon: <FileCheck className="h-5 w-5" />,
     },
     { href: '/help', label: 'Help', icon: <HelpCircle className="h-5 w-5" /> },
-    { href: '/profile', label: 'Profile', icon: <User className="h-5 w-5" /> },
   ]
 
+  const items = currentRole === 'SELLER' ? sellerItems : buyerItems
+
   return (
-    <aside className="w-64 shrink-0 border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
+    <aside className="w-64 shrink-0 border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hidden lg:block">
       <div className="p-4">
         <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
           {currentRole === 'SELLER' ? 'Seller' : 'Buyer'} Navigation

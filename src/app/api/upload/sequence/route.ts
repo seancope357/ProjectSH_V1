@@ -19,6 +19,8 @@ export async function POST(request: NextRequest) {
     const form = await request.formData()
 
     const file = form.get('file') as File | null
+    const thumbnail = form.get('thumbnail') as File | null
+    const preview = form.get('preview') as File | null
     const bundle = form.get('bundle') as File | null
     const title = (form.get('title') as string) || ''
     const description = (form.get('description') as string) || ''
@@ -88,6 +90,38 @@ export async function POST(request: NextRequest) {
         )
       }
     }
+
+    if (thumbnail) {
+      const allowed = ['image/jpeg', 'image/png', 'image/webp']
+      if (!allowed.includes(thumbnail.type)) {
+        return NextResponse.json(
+          { error: 'Thumbnail must be JPG, PNG, or WebP' },
+          { status: 400 }
+        )
+      }
+      if (thumbnail.size > 5 * 1024 * 1024) {
+        return NextResponse.json(
+          { error: 'Thumbnail max 5MB' },
+          { status: 400 }
+        )
+      }
+    }
+
+    if (preview) {
+      if (preview.type !== 'video/mp4') {
+        return NextResponse.json(
+          { error: 'Preview video must be MP4' },
+          { status: 400 }
+        )
+      }
+      if (preview.size > 50 * 1024 * 1024) {
+        return NextResponse.json(
+          { error: 'Preview video max 50MB' },
+          { status: 400 }
+        )
+      }
+    }
+
     // Light validation for licensed audio
     if (audio_license_type === 'licensed' && !audio_license_url.trim()) {
       return NextResponse.json(
@@ -125,6 +159,49 @@ export async function POST(request: NextRequest) {
       .getPublicUrl(key)
     const fileUrl = pub?.publicUrl || null
 
+    // Thumbnail upload
+    let thumbnailUrl: string | null = null
+    if (thumbnail) {
+      try {
+        const thumbBuf = Buffer.from(await thumbnail.arrayBuffer())
+        const thumbExt = thumbnail.type.split('/')[1] || 'jpg'
+        const thumbKey = `${user.id}/thumbnails/${crypto.randomUUID()}.${thumbExt}`
+        const { error: thumbErr } = await supabaseAdmin.storage
+          .from('sequences')
+          .upload(thumbKey, thumbBuf, { contentType: thumbnail.type })
+
+        if (!thumbErr) {
+          const { data: pub } = supabaseAdmin.storage
+            .from('sequences')
+            .getPublicUrl(thumbKey)
+          thumbnailUrl = pub?.publicUrl || null
+        }
+      } catch (e) {
+        console.error('Thumbnail upload error:', e)
+      }
+    }
+
+    // Preview upload
+    let previewUrl: string | null = null
+    if (preview) {
+      try {
+        const prevBuf = Buffer.from(await preview.arrayBuffer())
+        const prevKey = `${user.id}/previews/${crypto.randomUUID()}.mp4`
+        const { error: prevErr } = await supabaseAdmin.storage
+          .from('sequences')
+          .upload(prevKey, prevBuf, { contentType: 'video/mp4' })
+
+        if (!prevErr) {
+          const { data: pub } = supabaseAdmin.storage
+            .from('sequences')
+            .getPublicUrl(prevKey)
+          previewUrl = pub?.publicUrl || null
+        }
+      } catch (e) {
+        console.error('Preview upload error:', e)
+      }
+    }
+
     // Optional bundle upload
     let bundleUrl: string | null = null
     if (bundle) {
@@ -161,6 +238,8 @@ export async function POST(request: NextRequest) {
       seller_id: user.id,
       category_id: categoryId || null,
       file_url: fileUrl,
+      thumbnail_url: thumbnailUrl,
+      video_url: previewUrl,
       file_size: file.size,
       tags,
       status: 'draft',

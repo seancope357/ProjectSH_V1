@@ -12,8 +12,7 @@ export default function SellerLayout({
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <SecondaryNav />
       <div className="flex-1 flex">
-        {/* Optional: Add a vertical toolbar for sellers if desired */}
-        {/* <VerticalToolbar /> */}
+        <VerticalToolbar />
         <main className="flex-1 w-full">{children}</main>
       </div>
     </div>

@@ -33,7 +33,12 @@ function SignInPageContent() {
         if (role === 'SELLER' || role === 'ADMIN') {
           router.push('/seller/dashboard')
         } else {
-          router.push(callbackUrl)
+          // If callbackUrl is root, redirect to buyer dashboard
+          if (!callbackUrl || callbackUrl === '/') {
+            router.push('/dashboard')
+          } else {
+            router.push(callbackUrl)
+          }
         }
       }
     }
@@ -94,7 +99,12 @@ function SignInPageContent() {
         if (role === 'SELLER' || role === 'ADMIN') {
           router.replace('/seller/dashboard')
         } else {
-          router.push(callbackUrl)
+          // If callbackUrl is root, redirect to buyer dashboard
+          if (!callbackUrl || callbackUrl === '/') {
+            router.push('/dashboard')
+          } else {
+            router.push(callbackUrl)
+          }
         }
       }
     } catch (error) {

@@ -24,11 +24,16 @@ function AuthCallbackContent() {
         if (user) {
           const callbackUrl = searchParams.get('callbackUrl') || '/'
           const role = user.user_metadata?.role
-          // Force redirect to seller dashboard if user is a seller or admin
-          const target =
-            role === 'SELLER' || role === 'ADMIN'
-              ? '/seller/dashboard'
-              : callbackUrl
+          
+          let target = callbackUrl
+          
+          if (role === 'SELLER' || role === 'ADMIN') {
+            target = '/seller/dashboard'
+          } else if (!callbackUrl || callbackUrl === '/') {
+            // Default to buyer dashboard if no specific callbackUrl
+            target = '/dashboard'
+          }
+          
           router.replace(target)
         } else {
           // If user is not present after redirect, guide to sign in

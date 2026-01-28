@@ -12,6 +12,8 @@ export default function SellerUploadPage() {
   const { user } = useAuth()
   const router = useRouter()
   const [file, setFile] = useState<File | null>(null)
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null)
+  const [previewFile, setPreviewFile] = useState<File | null>(null)
   const [bundleFile, setBundleFile] = useState<File | null>(null)
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
@@ -25,6 +27,8 @@ export default function SellerUploadPage() {
   const [progress, setProgress] = useState<number>(0)
   const inputRef = useRef<HTMLInputElement | null>(null)
   const bundleInputRef = useRef<HTMLInputElement | null>(null)
+  const thumbnailInputRef = useRef<HTMLInputElement | null>(null)
+  const previewInputRef = useRef<HTMLInputElement | null>(null)
 
   // Audio license capture
   const [audioLicenseType, setAudioLicenseType] = useState<
@@ -64,13 +68,27 @@ export default function SellerUploadPage() {
     setBundleFile(f)
   }, [])
 
+  const onSelectThumbnail = useCallback((files: FileList | null) => {
+    if (!files || files.length === 0) return
+    const f = files[0]
+    setError(null)
+    setThumbnailFile(f)
+  }, [])
+
+  const onSelectPreview = useCallback((files: FileList | null) => {
+    if (!files || files.length === 0) return
+    const f = files[0]
+    setError(null)
+    setPreviewFile(f)
+  }, [])
+
   const onDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
     onSelectFile(e.dataTransfer.files)
   }
 
   const validate = (): string | null => {
-    if (!file) return 'Please select a file to upload.'
+    if (!file) return 'Please select a sequence file to upload.'
     if (!title.trim() || !description.trim())
       return 'Title and description are required.'
     const allowed = [
@@ -84,6 +102,22 @@ export default function SellerUploadPage() {
     const maxMB = 200
     if (file.size / (1024 * 1024) > maxMB)
       return `File too large. Max ${maxMB}MB.`
+
+    if (thumbnailFile) {
+      const thumbAllowed = ['image/jpeg', 'image/png', 'image/webp']
+      if (!thumbAllowed.includes(thumbnailFile.type))
+        return 'Thumbnail must be JPG, PNG, or WebP.'
+      if (thumbnailFile.size / (1024 * 1024) > 5)
+        return 'Thumbnail too large. Max 5MB.'
+    }
+
+    if (previewFile) {
+      if (previewFile.type !== 'video/mp4')
+        return 'Preview video must be MP4.'
+      if (previewFile.size / (1024 * 1024) > 50)
+        return 'Preview video too large. Max 50MB.'
+    }
+
     const p = parseFloat(price)
     if (Number.isNaN(p) || p < 0) return 'Price must be a non-negative number.'
     if (bundleFile) {
@@ -179,6 +213,8 @@ export default function SellerUploadPage() {
 
     const form = new FormData()
     if (file) form.append('file', file)
+    if (thumbnailFile) form.append('thumbnail', thumbnailFile)
+    if (previewFile) form.append('preview', previewFile)
     if (bundleFile) form.append('bundle', bundleFile)
     form.append('title', title)
     form.append('description', description)
@@ -313,6 +349,64 @@ export default function SellerUploadPage() {
               {(bundleFile.size / (1024 * 1024)).toFixed(1)} MB)
             </div>
           )}
+        </div>
+
+        {/* Media Assets: Thumbnail & Preview */}
+        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Thumbnail */}
+          <div className="border rounded-lg p-4 bg-white">
+            <div className="flex items-center justify-between gap-4 mb-2">
+              <div className="font-medium text-gray-900">Thumbnail Image</div>
+              <button
+                className="px-3 py-2 bg-gray-100 text-gray-800 rounded hover:bg-gray-200 text-sm"
+                onClick={() => thumbnailInputRef.current?.click()}
+              >
+                {thumbnailFile ? 'Change' : 'Upload'}
+              </button>
+            </div>
+            <div className="text-sm text-gray-600 mb-2">
+              JPG, PNG, WebP (Max 5MB)
+            </div>
+            <input
+              ref={thumbnailInputRef}
+              type="file"
+              accept=".jpg,.jpeg,.png,.webp"
+              className="hidden"
+              onChange={e => onSelectThumbnail(e.target.files)}
+            />
+            {thumbnailFile && (
+              <div className="text-sm text-gray-700">
+                Selected:{' '}
+                <span className="font-medium">{thumbnailFile.name}</span>
+              </div>
+            )}
+          </div>
+
+          {/* Preview Video */}
+          <div className="border rounded-lg p-4 bg-white">
+            <div className="flex items-center justify-between gap-4 mb-2">
+              <div className="font-medium text-gray-900">Preview Video</div>
+              <button
+                className="px-3 py-2 bg-gray-100 text-gray-800 rounded hover:bg-gray-200 text-sm"
+                onClick={() => previewInputRef.current?.click()}
+              >
+                {previewFile ? 'Change' : 'Upload'}
+              </button>
+            </div>
+            <div className="text-sm text-gray-600 mb-2">MP4 (Max 50MB)</div>
+            <input
+              ref={previewInputRef}
+              type="file"
+              accept=".mp4"
+              className="hidden"
+              onChange={e => onSelectPreview(e.target.files)}
+            />
+            {previewFile && (
+              <div className="text-sm text-gray-700">
+                Selected: <span className="font-medium">{previewFile.name}</span>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Details form */}
