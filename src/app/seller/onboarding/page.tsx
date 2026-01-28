@@ -96,8 +96,9 @@ export default function SellerOnboardingPage() {
       }
       const url = json?.avatarUrl || ''
       setProfile(prev => ({ ...prev, avatar_url: url }))
-    } catch {
-      alert('Failed to upload avatar')
+      // cleanup() is removed because it is undefined and unused
+    } catch (err: unknown) {
+      // ignore
     } finally {
       setAvatarUploading(false)
       if (fileInputRef.current) fileInputRef.current.value = ''

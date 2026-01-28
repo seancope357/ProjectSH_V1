@@ -217,8 +217,6 @@ export default function SellerOnboardingPage() {
       setIsLoading(false);
       setRetryCount(0); // Reset retry count on success
     } catch (err: unknown) {
-      cleanup();
-
       // Don't update state if unmounted
       if (!isMountedRef.current) return;
 
@@ -304,8 +302,8 @@ export default function SellerOnboardingPage() {
         // Clear any saved draft
         clearDraft();
       } catch (err: unknown) {
-        cleanup();
-
+        // cleanup() removed
+        
         if (!isMountedRef.current) return;
 
         if (err instanceof Error && err.name === 'AbortError') {
@@ -385,7 +383,7 @@ export default function SellerOnboardingPage() {
       // Navigate to dashboard
       router.push('/seller-dashboard');
     } catch (err: unknown) {
-      cleanup();
+      // cleanup() removed
 
       if (!isMountedRef.current) return;
 

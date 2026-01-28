@@ -157,7 +157,7 @@ export const GuidelinesStep: React.FC<GuidelinesStepProps> = ({
       setRetryCount(0);
       setUsingFallback(false);
     } catch (err: unknown) {
-      cleanup();
+      // cleanup() removed
 
       if (!isMountedRef.current) return;
 

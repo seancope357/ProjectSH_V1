@@ -399,7 +399,7 @@ export function createAppError(
     action = 'retry';
   } else if (errorType === 'authentication') {
     action = 'redirect';
-  } else if (errorType === 'unknown' || (errorType === 'server' && statusCode === 500)) {
+  } else if (errorType === 'unknown') {
     action = 'contact_support';
   }
 

@@ -174,7 +174,7 @@ export const PayoutStep: React.FC<PayoutStepProps> = ({
         throw new Error('Invalid Stripe Connect URL received');
       }
     } catch (err: unknown) {
-      cleanup();
+      // cleanup() removed
 
       if (!isMountedRef.current) return;
 
@@ -238,7 +238,7 @@ export const PayoutStep: React.FC<PayoutStepProps> = ({
       setIsCheckingStatus(false);
       setRetryCount(0);
     } catch (err: unknown) {
-      cleanup();
+      // cleanup() removed
 
       if (!isMountedRef.current) return;
 

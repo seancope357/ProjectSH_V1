@@ -190,7 +190,7 @@ export const ProfileStep: React.FC<ProfileStepProps> = ({
       setUploadRetryCount(0);
       setUploadError(null);
     } catch (error: unknown) {
-      cleanup();
+      // cleanup() removed
 
       // Handle abort
       if (error instanceof Error && error.name === 'AbortError') {

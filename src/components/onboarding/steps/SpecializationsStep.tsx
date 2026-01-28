@@ -142,7 +142,7 @@ export const SpecializationsStep: React.FC<SpecializationsStepProps> = ({
       setRetryCount(0);
       setUsingFallback(false);
     } catch (err: unknown) {
-      cleanup();
+      // cleanup() removed
 
       if (!isMountedRef.current) return;
 
