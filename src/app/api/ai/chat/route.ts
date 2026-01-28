@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
       system: getSystemPrompt(context),
     });
 
-    return result.toDataStreamResponse();
+    return result.toUIMessageStreamResponse();
   } catch (error: any) {
     console.error('Lumina Chat Error:', error);
     return NextResponse.json({ error: 'Failed to process chat' }, { status: 500 });

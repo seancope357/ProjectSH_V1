@@ -2,28 +2,37 @@
 'use client'
 
 import React, { useState, useRef, useEffect } from 'react';
-import { useChat } from 'ai/react';
+import { useChat } from '@ai-sdk/react';
 import { MessageSquare, X, Send, Sparkles, User, Bot, Loader2, ChevronDown } from 'lucide-react';
 import { useNavigation } from '@/components/providers/navigation-provider';
 import { cn } from '@/lib/utils';
+import { DefaultChatTransport } from 'ai';
 
 export function LuminaChat() {
   const { currentRole, user } = useNavigation();
   const [isOpen, setIsOpen] = useState(false);
+  const [input, setInput] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
   
-  const { messages, input, handleInputChange, handleSubmit, isLoading, error } = useChat({
-    api: '/api/ai/chat',
-    initialMessages: [
+  const { messages, sendMessage, status, error } = useChat({
+    transport: new DefaultChatTransport({ api: '/api/ai/chat' }),
+    messages: [
       {
         id: 'welcome',
         role: 'assistant',
-        content: currentRole === 'SELLER' 
-          ? "Hi! I'm Lumina, your AI Sequence Specialist. ✨ I'm here to help you optimize your sequences, write great descriptions, and help you grow your sales. How can I assist you today?"
-          : "Welcome to SequenceHUB! I'm Lumina. ✨ Looking for the perfect LED sequence for your display? I can help you find what you need or answer any questions you have about our marketplace!"
+        parts: [
+          {
+            type: 'text',
+            text: currentRole === 'SELLER' 
+              ? "Hi! I'm Lumina, your AI Sequence Specialist. ✨ I'm here to help you optimize your sequences, write great descriptions, and help you grow your sales. How can I assist you today?"
+              : "Welcome to SequenceHUB! I'm Lumina. ✨ Looking for the perfect LED sequence for your display? I can help you find what you need or answer any questions you have about our marketplace!"
+          }
+        ]
       }
     ]
   });
+
+  const isLoading = status === 'submitted' || status === 'streaming';
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -32,6 +41,19 @@ export function LuminaChat() {
   }, [messages]);
 
   const toggleChat = () => setIsOpen(!isOpen);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim() || isLoading) return;
+    
+    const text = input;
+    setInput('');
+    await sendMessage({ text });
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInput(e.target.value);
+  };
 
   return (
     <div className="fixed bottom-6 right-6 z-[100] flex flex-col items-end">
@@ -67,24 +89,27 @@ export function LuminaChat() {
                 key={m.id} 
                 className={cn(
                   "flex gap-3 max-w-[85%]",
-                  m.role === 'user' ? "ml-auto flex-row-reverse" : "mr-auto"
+                  (m.role as string) === 'user' ? "ml-auto flex-row-reverse" : "mr-auto"
                 )}
               >
                 <div className={cn(
                   "w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-sm",
-                  m.role === 'user' 
+                  (m.role as string) === 'user' 
                     ? "bg-blue-600 text-white" 
                     : "bg-gradient-to-br from-purple-500 to-blue-500 text-white"
                 )}>
-                  {m.role === 'user' ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
+                  {(m.role as string) === 'user' ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
                 </div>
                 <div className={cn(
                   "p-3 rounded-2xl text-sm shadow-sm",
-                  m.role === 'user' 
+                  (m.role as string) === 'user' 
                     ? "bg-blue-600 text-white rounded-tr-none" 
                     : "bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-tl-none border border-gray-100 dark:border-gray-700"
                 )}>
-                  {m.content}
+                  {m.parts.map((part, i) => {
+                    if (part.type === 'text') return <span key={i}>{part.text}</span>;
+                    return null;
+                  })}
                 </div>
               </div>
             ))}
@@ -113,13 +138,13 @@ export function LuminaChat() {
           {isOpen && currentRole === 'SELLER' && messages.length < 3 && (
             <div className="px-4 py-2 flex flex-wrap gap-2 bg-gray-50 dark:bg-gray-950 border-t border-gray-100 dark:border-gray-800">
               <button 
-                onClick={() => handleInputChange({ target: { value: "Help me write a description for my new sequence" } } as any)}
+                onClick={() => sendMessage({ text: "Help me write a description for my new sequence" })}
                 className="text-[10px] px-2 py-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors"
               >
                 Write Description 📝
               </button>
               <button 
-                onClick={() => handleInputChange({ target: { value: "Give me some SEO tags for Christmas sequences" } } as any)}
+                onClick={() => sendMessage({ text: "Give me some SEO tags for Christmas sequences" })}
                 className="text-[10px] px-2 py-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors"
               >
                 SEO Tags 🏷️
