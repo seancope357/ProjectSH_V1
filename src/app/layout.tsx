@@ -5,6 +5,7 @@ import { ThemeProvider } from '@/components/providers/theme-provider'
 import { FeatureFlagsProvider } from '@/components/providers/feature-flags'
 import { NavigationProvider } from '@/components/providers/navigation-provider'
 import { PrimaryNav } from '@/components/ui/primary-nav'
+import { LuminaChat } from '@/components/ui/lumina-chat'
 import './globals.css'
 
 const geistSans = Geist({
@@ -40,6 +41,7 @@ export default function RootLayout({
                 <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors">
                   <PrimaryNav />
                   <main className="flex-1">{children}</main>
+                  <LuminaChat />
                 </div>
               </NavigationProvider>
             </FeatureFlagsProvider>
