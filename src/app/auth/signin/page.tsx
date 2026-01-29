@@ -18,7 +18,7 @@ function SignInPageContent() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const callbackUrl = searchParams.get('callbackUrl') || '/'
+  const callbackUrl = searchParams.get('callbackUrl') || '/dashboard'
   const errorParam = searchParams.get('error')
 
   useEffect(() => {
@@ -28,18 +28,18 @@ function SignInPageContent() {
         data: { user },
       } = await supabase.auth.getUser()
       if (user) {
-        // If we have a specific callbackUrl (that isn't root), respect it
-        if (callbackUrl && callbackUrl !== '/') {
-          router.push(callbackUrl)
+        // If we have a specific callbackUrl (that isn't root or default dashboard), respect it
+        if (callbackUrl && callbackUrl !== '/' && callbackUrl !== '/dashboard') {
+          router.replace(callbackUrl)
           return
         }
 
         // Otherwise, default redirects based on role
         const role = user.user_metadata?.role
         if (role === 'SELLER' || role === 'ADMIN') {
-          router.push('/seller/dashboard')
+          router.replace('/seller/dashboard')
         } else {
-          router.push('/dashboard')
+          router.replace('/dashboard')
         }
       }
     }
@@ -95,8 +95,8 @@ function SignInPageContent() {
       if (error) {
         setError(error.message)
       } else if (data.user) {
-        // If we have a specific callbackUrl (that isn't root), respect it
-        if (callbackUrl && callbackUrl !== '/') {
+        // If we have a specific callbackUrl (that isn't root or default dashboard), respect it
+        if (callbackUrl && callbackUrl !== '/' && callbackUrl !== '/dashboard') {
           router.replace(callbackUrl)
           return
         }
@@ -122,7 +122,7 @@ function SignInPageContent() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${window.location.origin}${callbackUrl}`,
+          redirectTo: `${window.location.origin}/auth/callback?callbackUrl=${encodeURIComponent(callbackUrl)}`,
         },
       })
 

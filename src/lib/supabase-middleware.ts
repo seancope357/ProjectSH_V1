@@ -39,6 +39,14 @@ export async function updateSession(request: NextRequest) {
 
   const path = request.nextUrl.pathname
 
+  // Redirect logged-in users away from auth pages
+  if (user && (path.startsWith('/auth/signin') || path.startsWith('/auth/signup') || path.startsWith('/auth/register'))) {
+    const userRole = user.user_metadata?.role
+    const url = request.nextUrl.clone()
+    url.pathname = (userRole === 'SELLER' || userRole === 'ADMIN') ? '/seller/dashboard' : '/dashboard'
+    return NextResponse.redirect(url)
+  }
+
   // Public paths that don't require authentication
   const isPublicPath =
     path === '/' ||
