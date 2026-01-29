@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import Button from '@/components/ui/Button'
 import { Card, CardContent, CardHeader, CardFooter } from '@/components/ui/Card'
@@ -21,7 +21,7 @@ export default function Login() {
   const [mode, setMode] = useState<'signin' | 'signup'>('signin')
   const [userType, setUserType] = useState<'buyer' | 'seller'>('buyer')
   const router = useRouter()
-  const supabase = createClientComponentClient()
+  const supabase = createClient()
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault()
