@@ -25,9 +25,17 @@ function SignInPageContent() {
     // Check if user is already signed in
     const checkUser = async () => {
       const {
-        data: { user },
-      } = await supabase.auth.getUser()
+        data: { session },
+      } = await supabase.auth.getSession()
+      
+      const user = session?.user
+
       if (user) {
+        // If we have a user on the client but we're on the signin page, 
+        // it's likely the middleware didn't see the session cookies.
+        // We'll refresh the session to ensure cookies are synced.
+        await supabase.auth.refreshSession()
+        
         // If we have a specific callbackUrl (that isn't root or default dashboard), respect it
         if (callbackUrl && callbackUrl !== '/' && callbackUrl !== '/dashboard') {
           router.replace(callbackUrl)

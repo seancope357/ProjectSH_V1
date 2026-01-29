@@ -102,14 +102,15 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
   useEffect(() => {
     const initializeNavigation = async () => {
       const {
-        data: { user },
-      } = await supabase.auth.getUser()
+        data: { session },
+      } = await supabase.auth.getSession()
+      const user = session?.user
       const prefs = loadPreferences()
       const currentRole = getRoleFromPath(pathname)
 
       setState(prev => ({
         ...prev,
-        user,
+        user: user ?? null,
         currentRole,
         loading: false,
         ...prefs,

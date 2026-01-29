@@ -22,16 +22,16 @@ function AuthCallbackContent() {
           return
         }
         if (user) {
-          const callbackUrl = searchParams.get('callbackUrl') || '/'
+          const callbackUrl = searchParams.get('callbackUrl')
           const role = user.user_metadata?.role
           
-          let target = callbackUrl
-          
-          if (role === 'SELLER' || role === 'ADMIN') {
+          let target = '/dashboard' // Default
+
+          if (callbackUrl && callbackUrl !== '/') {
+            // If we have a specific destination, go there
+            target = callbackUrl
+          } else if (role === 'SELLER' || role === 'ADMIN') {
             target = '/seller/dashboard'
-          } else if (!callbackUrl || callbackUrl === '/') {
-            // Default to buyer dashboard if no specific callbackUrl
-            target = '/dashboard'
           }
           
           router.replace(target)

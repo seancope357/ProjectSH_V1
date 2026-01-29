@@ -42,8 +42,16 @@ export async function updateSession(request: NextRequest) {
   // Redirect logged-in users away from auth pages
   if (user && (path.startsWith('/auth/signin') || path.startsWith('/auth/signup') || path.startsWith('/auth/register'))) {
     const userRole = user.user_metadata?.role
+    const callbackUrl = request.nextUrl.searchParams.get('callbackUrl')
     const url = request.nextUrl.clone()
-    url.pathname = (userRole === 'SELLER' || userRole === 'ADMIN') ? '/seller/dashboard' : '/dashboard'
+    
+    if (callbackUrl && callbackUrl !== '/') {
+      url.pathname = callbackUrl
+      url.search = '' // Clear search params to avoid loops
+    } else {
+      url.pathname = (userRole === 'SELLER' || userRole === 'ADMIN') ? '/seller/dashboard' : '/dashboard'
+    }
+    
     return NextResponse.redirect(url)
   }
 
