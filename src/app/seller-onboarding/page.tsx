@@ -1,623 +1,656 @@
-/**
- * Seller Onboarding Page - Main Orchestrator
- *
- * Production-grade error handling with:
- * - Specific error messages for different failure types
- * - Automatic retry with exponential backoff
- * - Race condition prevention
- * - Proper cleanup on unmount
- * - Navigation guards
- * - Draft saving on errors
- * - Offline detection
- * - Error boundaries
- */
+'use client'
 
-'use client';
-
-import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
-import {
-  AppError,
-  createAppError,
-  logError,
-  withRetry,
-  isOnline,
-  waitForOnline,
-  createAbortController,
-} from '@/lib/error-handling';
-import { ErrorAlert } from '@/components/ui/ErrorAlert';
-import { ProfileStep } from '@/components/onboarding/steps/ProfileStep';
-import { SpecializationsStep } from '@/components/onboarding/steps/SpecializationsStep';
-import { PayoutStep } from '@/components/onboarding/steps/PayoutStep';
-import { GuidelinesStep } from '@/components/onboarding/steps/GuidelinesStep';
-
-// ============================================================================
-// Types
-// ============================================================================
-
-interface OnboardingProgress {
-  current_step: number;
-  is_completed: boolean;
-  profile_complete: boolean;
-  specializations_complete: boolean;
-  payout_complete: boolean;
-  guidelines_complete: boolean;
-  seller_name?: string;
-  bio?: string;
-  profile_picture_url?: string;
-  specializations?: string[];
-  stripe_account_id?: string;
-  terms_accepted?: boolean;
-}
+import React, { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { useAuth } from '@/components/auth/AuthProvider'
+import { createClient } from '@/lib/supabase/client'
+import ProgressIndicator from '@/components/onboarding/ProgressIndicator'
+import StepWrapper from '@/components/onboarding/StepWrapper'
+import WelcomeStep from '@/components/onboarding/steps/WelcomeStep'
+import ProfileStep from '@/components/onboarding/steps/ProfileStep'
+import SpecializationsStep from '@/components/onboarding/steps/SpecializationsStep'
+import PayoutStep from '@/components/onboarding/steps/PayoutStep'
+import GuidelinesStep from '@/components/onboarding/steps/GuidelinesStep'
+import CompletionStep from '@/components/onboarding/steps/CompletionStep'
 
 interface OnboardingData {
-  userId: string;
-  progress: OnboardingProgress;
+  // Profile
+  sellerName: string
+  sellerBio: string
+  sellerTagline: string
+  profilePictureUrl: string
+  websiteUrl: string
+  facebookUrl: string
+  instagramUrl: string
+  youtubeUrl: string
+
+  // Specializations
+  specializations: string[]
+  expertiseLevel: string
+  yearsExperience: number
+
+  // Payout
+  stripeAccountId: string
+  stripeAccountStatus: string
+
+  // Guidelines
+  acceptedTerms: boolean
+  acceptedQualityStandards: boolean
+  acceptedCommunityGuidelines: boolean
+  marketingConsent: boolean
+  newsletterConsent: boolean
 }
 
-type OnboardingStep = 'profile' | 'specializations' | 'payout' | 'guidelines';
-
-const STEPS: OnboardingStep[] = ['profile', 'specializations', 'payout', 'guidelines'];
-
-// ============================================================================
-// Main Component
-// ============================================================================
+const steps = [
+  {
+    id: 1,
+    name: 'Welcome',
+    description: 'Get started',
+    required: true,
+  },
+  {
+    id: 2,
+    name: 'Profile',
+    description: 'Your seller identity',
+    required: true,
+  },
+  {
+    id: 3,
+    name: 'Specializations',
+    description: 'What you create',
+    required: true,
+  },
+  {
+    id: 4,
+    name: 'Payout Setup',
+    description: 'Get paid',
+    required: false,
+  },
+  {
+    id: 5,
+    name: 'Guidelines',
+    description: 'Rules & standards',
+    required: true,
+  },
+  {
+    id: 6,
+    name: 'Complete',
+    description: 'You are ready!',
+    required: true,
+  },
+]
 
 export default function SellerOnboardingPage() {
-  const router = useRouter();
+  const { user } = useAuth()
+  const router = useRouter()
+  const supabase = createClient()
 
-  // State
-  const [currentStep, setCurrentStep] = useState<number>(0);
-  const [progress, setProgress] = useState<OnboardingProgress | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
-  const [error, setError] = useState<AppError | null>(null);
-  const [retryCount, setRetryCount] = useState(0);
-  const [isOffline, setIsOffline] = useState(false);
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [currentStep, setCurrentStep] = useState(1)
+  const [completedSteps, setCompletedSteps] = useState<number[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [isSaving, setIsSaving] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
+  const [error, setError] = useState<string>('')
 
-  // Refs for cleanup
-  const isMountedRef = useRef(true);
-  const abortControllerRef = useRef<AbortController | null>(null);
-  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [formData, setFormData] = useState<OnboardingData>({
+    sellerName: '',
+    sellerBio: '',
+    sellerTagline: '',
+    profilePictureUrl: '',
+    websiteUrl: '',
+    facebookUrl: '',
+    instagramUrl: '',
+    youtubeUrl: '',
+    specializations: [],
+    expertiseLevel: '',
+    yearsExperience: 0,
+    stripeAccountId: '',
+    stripeAccountStatus: 'not_started',
+    acceptedTerms: false,
+    acceptedQualityStandards: false,
+    acceptedCommunityGuidelines: false,
+    marketingConsent: false,
+    newsletterConsent: false,
+  })
 
-  // ============================================================================
-  // Lifecycle & Cleanup
-  // ============================================================================
-
+  // Load existing data on mount
   useEffect(() => {
-    isMountedRef.current = true;
-
-    // Load initial data
-    loadOnboardingData();
-
-    // Online/offline detection
-    const handleOnline = () => {
-      setIsOffline(false);
-      setError(null);
-      // Retry failed operations when back online
-      if (error?.type === 'network') {
-        loadOnboardingData();
-      }
-    };
-
-    const handleOffline = () => {
-      setIsOffline(true);
-      setError(
-        createAppError(new Error('You are currently offline'), {
-          operation: 'network_check',
-        })
-      );
-    };
-
-    // Set initial offline state
-    if (!isOnline()) {
-      handleOffline();
+    if (!user) {
+      router.push('/login?redirect=/seller-onboarding')
+      return
     }
 
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
+    loadOnboardingData()
+  }, [user])
 
-    // Cleanup on unmount
-    return () => {
-      isMountedRef.current = false;
-
-      // Cancel ongoing requests
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
-
-      // Clear timers
-      if (saveTimeoutRef.current) {
-        clearTimeout(saveTimeoutRef.current);
-      }
-
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-    };
-  }, []);
-
-  // Warn about unsaved changes
+  // Handle Stripe Connect callback redirect
   useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (hasUnsavedChanges) {
-        e.preventDefault();
-        e.returnValue = '';
-      }
-    };
+    const params = new URLSearchParams(window.location.search)
+    const stripeStatus = params.get('stripe')
+    const stripeError = params.get('error')
+    const stripeMessage = params.get('message')
+    const accountStatus = params.get('status')
 
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [hasUnsavedChanges]);
+    if (stripeStatus === 'connected' && accountStatus) {
+      // Successfully connected Stripe account
+      setFormData((prev) => ({
+        ...prev,
+        stripeAccountStatus: accountStatus,
+      }))
 
-  // ============================================================================
-  // Data Loading
-  // ============================================================================
+      // Clear the URL parameters
+      window.history.replaceState({}, '', '/seller-onboarding')
 
-  const loadOnboardingData = useCallback(async () => {
-    // Don't proceed if offline
-    if (!isOnline()) {
-      setIsOffline(true);
-      setError(
-        createAppError(
-          new Error('Cannot load onboarding data while offline'),
-          { operation: 'load_data' }
-        )
-      );
-      setIsLoading(false);
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-      setError(null);
-
-      // Create abort controller for this request
-      const { controller, cleanup } = createAbortController(30000);
-      abortControllerRef.current = controller;
-
-      // Fetch with retry logic
-      const data = await withRetry(
-        async () => {
-          const response = await fetch('/api/seller-onboarding/progress', {
-            signal: controller.signal,
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          });
-
-          if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            throw Object.assign(new Error(errorData.message || 'Failed to load onboarding data'), {
-              statusCode: response.status,
-              status: response.status,
-              data: errorData,
-            });
-          }
-
-          return response.json();
-        },
-        { maxAttempts: 3 }
-      );
-
-      cleanup();
-
-      // Check if component is still mounted
-      if (!isMountedRef.current) return;
-
-      // Handle completed onboarding - navigate away
-      if (data.progress.is_completed) {
-        // Use replace to prevent back navigation
-        router.replace('/seller-dashboard');
-        return;
-      }
-
-      setProgress(data.progress);
-      setCurrentStep(data.progress.current_step || 0);
-      setIsLoading(false);
-      setRetryCount(0); // Reset retry count on success
-    } catch (err: unknown) {
-      // Don't update state if unmounted
-      if (!isMountedRef.current) return;
-
-      // Handle abort errors gracefully
-      if (err instanceof Error && err.name === 'AbortError') {
-        console.log('Request aborted');
-        return;
-      }
-
-      const appError = createAppError(err, { operation: 'load_onboarding_data' });
-      setError(appError);
-      setIsLoading(false);
-      logError(appError, { route: '/seller-onboarding' });
-    }
-  }, [router]);
-
-  // ============================================================================
-  // Save Progress
-  // ============================================================================
-
-  const saveProgress = useCallback(
-    async (stepData: Partial<OnboardingProgress>, stepName: string) => {
-      // Check if offline
-      if (!isOnline()) {
-        // Save to local storage as draft
-        saveDraft(stepData);
-        setError(
-          createAppError(
-            new Error('Changes saved locally and will sync when you are back online'),
-            { operation: 'save_progress' }
-          )
-        );
-        return;
-      }
-
-      try {
-        setIsSaving(true);
-        setError(null);
-        setHasUnsavedChanges(false);
-
-        const { controller, cleanup } = createAbortController(30000);
-        abortControllerRef.current = controller;
-
-        const response = await withRetry(
-          async () => {
-            const res = await fetch('/api/seller-onboarding/progress', {
-              method: 'PATCH',
-              signal: controller.signal,
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                ...stepData,
-                step_name: stepName,
-              }),
-            });
-
-            if (!res.ok) {
-              const errorData = await res.json().catch(() => ({}));
-              throw Object.assign(
-                new Error(errorData.message || `Failed to save ${stepName} step`),
-                {
-                  statusCode: res.status,
-                  status: res.status,
-                  data: errorData,
-                }
-              );
-            }
-
-            return res.json();
-          },
-          { maxAttempts: 3 }
-        );
-
-        cleanup();
-
-        if (!isMountedRef.current) return;
-
-        setProgress(response.progress);
-        setIsSaving(false);
-        setRetryCount(0);
-
-        // Clear any saved draft
-        clearDraft();
-      } catch (err: unknown) {
-        // cleanup() removed
-        
-        if (!isMountedRef.current) return;
-
-        if (err instanceof Error && err.name === 'AbortError') {
-          return;
+      // Show success message based on status
+      if (accountStatus === 'active') {
+        setError('')
+        // Account is fully active, move to step 4 if not already there
+        if (currentStep < 4) {
+          setCurrentStep(4)
         }
-
-        // Save as draft on error
-        saveDraft(stepData);
-
-        const appError = createAppError(err, {
-          operation: 'save_progress',
-          fieldName: stepName,
-        });
-        setError(appError);
-        setIsSaving(false);
-        logError(appError, { step: stepName });
+      } else if (accountStatus === 'pending') {
+        setError('')
       }
-    },
-    []
-  );
-
-  // ============================================================================
-  // Complete Onboarding
-  // ============================================================================
-
-  const completeOnboarding = useCallback(async () => {
-    if (!isOnline()) {
-      setError(
-        createAppError(
-          new Error('Cannot complete onboarding while offline'),
-          { operation: 'complete_onboarding' }
-        )
-      );
-      return;
+    } else if (stripeStatus === 'error' && stripeError) {
+      // Handle Stripe connection error
+      setError(stripeError)
+      window.history.replaceState({}, '', '/seller-onboarding')
+    } else if (stripeStatus === 'cancelled' && stripeMessage) {
+      // User cancelled the connection
+      setError(stripeMessage)
+      window.history.replaceState({}, '', '/seller-onboarding')
     }
+  }, [])
 
+  const loadOnboardingData = async () => {
     try {
-      setIsSaving(true);
-      setError(null);
+      setIsLoading(true)
 
-      const { controller, cleanup } = createAbortController(30000);
-      abortControllerRef.current = controller;
+      // Initialize seller onboarding if needed
+      const { error: initError } = await supabase.rpc('initialize_seller_onboarding')
+      if (initError) throw initError
 
-      const response = await withRetry(
-        async () => {
-          const res = await fetch('/api/seller-onboarding/complete', {
-            method: 'POST',
-            signal: controller.signal,
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          });
+      // Load seller profile
+      const { data: sellerProfile, error: profileError } = await supabase
+        .from('seller_profiles')
+        .select('*')
+        .eq('id', user?.id)
+        .single()
 
-          if (!res.ok) {
-            const errorData = await res.json().catch(() => ({}));
-            throw Object.assign(
-              new Error(errorData.message || 'Failed to complete onboarding'),
-              {
-                statusCode: res.status,
-                status: res.status,
-                data: errorData,
-              }
-            );
-          }
-
-          return res.json();
-        },
-        { maxAttempts: 3 }
-      );
-
-      cleanup();
-
-      if (!isMountedRef.current) return;
-
-      setIsSaving(false);
-
-      // Navigate to dashboard
-      router.push('/seller-dashboard');
-    } catch (err: unknown) {
-      // cleanup() removed
-
-      if (!isMountedRef.current) return;
-
-      if (err instanceof Error && err.name === 'AbortError') {
-        return;
+      if (profileError && profileError.code !== 'PGRST116') {
+        throw profileError
       }
 
-      const appError = createAppError(err, { operation: 'complete_onboarding' });
-      setError(appError);
-      setIsSaving(false);
-      logError(appError);
-    }
-  }, [router]);
+      // Load onboarding progress
+      const { data: progress, error: progressError } = await supabase
+        .from('seller_onboarding_progress')
+        .select('*')
+        .eq('id', user?.id)
+        .single()
 
-  // ============================================================================
-  // Draft Management (Local Storage)
-  // ============================================================================
-
-  const saveDraft = (data: Partial<OnboardingProgress>) => {
-    try {
-      const draft = {
-        ...data,
-        timestamp: Date.now(),
-      };
-      localStorage.setItem('onboarding_draft', JSON.stringify(draft));
-      setHasUnsavedChanges(true);
-    } catch (error) {
-      console.error('Failed to save draft:', error);
-    }
-  };
-
-  const loadDraft = (): Partial<OnboardingProgress> | null => {
-    try {
-      const draft = localStorage.getItem('onboarding_draft');
-      if (!draft) return null;
-
-      const parsed = JSON.parse(draft);
-
-      // Check if draft is older than 24 hours
-      const age = Date.now() - (parsed.timestamp || 0);
-      if (age > 24 * 60 * 60 * 1000) {
-        clearDraft();
-        return null;
+      if (progressError && progressError.code !== 'PGRST116') {
+        throw progressError
       }
 
-      return parsed;
-    } catch (error) {
-      console.error('Failed to load draft:', error);
-      return null;
-    }
-  };
+      // Populate form data
+      if (sellerProfile) {
+        setFormData((prev) => ({
+          ...prev,
+          sellerName: sellerProfile.seller_name || '',
+          sellerBio: sellerProfile.seller_bio || '',
+          sellerTagline: sellerProfile.seller_tagline || '',
+          profilePictureUrl: sellerProfile.profile_picture_url || '',
+          websiteUrl: sellerProfile.website_url || '',
+          facebookUrl: sellerProfile.facebook_url || '',
+          instagramUrl: sellerProfile.instagram_url || '',
+          youtubeUrl: sellerProfile.youtube_url || '',
+          specializations: sellerProfile.specializations || [],
+          expertiseLevel: sellerProfile.expertise_level || '',
+          yearsExperience: sellerProfile.years_experience || 0,
+          stripeAccountId: sellerProfile.stripe_account_id || '',
+          stripeAccountStatus: sellerProfile.stripe_account_status || 'not_started',
+          marketingConsent: sellerProfile.marketing_consent || false,
+          newsletterConsent: sellerProfile.newsletter_consent || false,
+        }))
+      }
 
-  const clearDraft = () => {
+      // Set current step and completed steps from progress
+      if (progress) {
+        setCurrentStep(progress.current_step || 1)
+
+        const completed: number[] = []
+        if (progress.step_welcome_completed) completed.push(1)
+        if (progress.step_profile_completed) completed.push(2)
+        if (progress.step_specializations_completed) completed.push(3)
+        if (progress.step_payout_completed) completed.push(4)
+        if (progress.step_guidelines_completed) completed.push(5)
+        if (progress.is_completed) completed.push(6)
+
+        setCompletedSteps(completed)
+
+        // If already completed, redirect to dashboard
+        if (progress.is_completed) {
+          router.push('/seller-dashboard')
+          return
+        }
+      }
+    } catch (err) {
+      console.error('Error loading onboarding data:', err)
+      setError('Failed to load onboarding data. Please refresh the page.')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleFieldChange = (field: string, value: any) => {
+    setFormData((prev) => ({ ...prev, [field]: value }))
+  }
+
+  const handleUploadProfilePicture = async (file: File) => {
+    if (!user) return
+
     try {
-      localStorage.removeItem('onboarding_draft');
-      setHasUnsavedChanges(false);
-    } catch (error) {
-      console.error('Failed to clear draft:', error);
+      setIsUploading(true)
+
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${user.id}-${Date.now()}.${fileExt}`
+      const filePath = `profile-pictures/${fileName}`
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file, { upsert: true })
+
+      if (uploadError) throw uploadError
+
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from('avatars').getPublicUrl(filePath)
+
+      handleFieldChange('profilePictureUrl', publicUrl)
+
+      // Save to database immediately
+      await supabase
+        .from('seller_profiles')
+        .update({ profile_picture_url: publicUrl })
+        .eq('id', user.id)
+    } catch (err) {
+      console.error('Error uploading profile picture:', err)
+      throw err
+    } finally {
+      setIsUploading(false)
     }
-  };
+  }
 
-  // ============================================================================
-  // Error Recovery
-  // ============================================================================
+  const saveProgress = async (stepId: number) => {
+    if (!user) return
 
-  const handleRetry = async () => {
-    setRetryCount((prev) => prev + 1);
-    setError(null);
+    try {
+      setIsSaving(true)
 
-    if (isLoading) {
-      await loadOnboardingData();
-    } else {
-      // Retry the last failed operation
-      // This would be determined by the error context
-      await loadOnboardingData();
+      // Update seller profile
+      const { error: profileError } = await supabase
+        .from('seller_profiles')
+        .update({
+          seller_name: formData.sellerName,
+          seller_bio: formData.sellerBio,
+          seller_tagline: formData.sellerTagline,
+          profile_picture_url: formData.profilePictureUrl,
+          website_url: formData.websiteUrl,
+          facebook_url: formData.facebookUrl,
+          instagram_url: formData.instagramUrl,
+          youtube_url: formData.youtubeUrl,
+          specializations: formData.specializations,
+          expertise_level: formData.expertiseLevel,
+          years_experience: formData.yearsExperience,
+          marketing_consent: formData.marketingConsent,
+          newsletter_consent: formData.newsletterConsent,
+        })
+        .eq('id', user.id)
+
+      if (profileError) throw profileError
+
+      // Update onboarding progress
+      const progressUpdate: any = {
+        current_step: stepId,
+        last_active_step: stepId,
+      }
+
+      if (stepId === 1) progressUpdate.step_welcome_completed = true
+      if (stepId === 2) progressUpdate.step_profile_completed = true
+      if (stepId === 3) progressUpdate.step_specializations_completed = true
+      if (stepId === 4) progressUpdate.step_payout_completed = true
+      if (stepId === 5) progressUpdate.step_guidelines_completed = true
+
+      const { error: progressError } = await supabase
+        .from('seller_onboarding_progress')
+        .update(progressUpdate)
+        .eq('id', user.id)
+
+      if (progressError) throw progressError
+
+      // Mark step as completed
+      if (!completedSteps.includes(stepId)) {
+        setCompletedSteps([...completedSteps, stepId])
+      }
+    } catch (err) {
+      console.error('Error saving progress:', err)
+      throw err
+    } finally {
+      setIsSaving(false)
     }
-  };
+  }
 
-  const handleDismissError = () => {
-    setError(null);
-    setRetryCount(0);
-  };
+  const handleNext = async () => {
+    try {
+      setError('')
 
-  // ============================================================================
-  // Step Navigation
-  // ============================================================================
+      // Validate current step
+      if (!validateCurrentStep()) {
+        return
+      }
 
-  const handleNextStep = async (stepData: Partial<OnboardingProgress>) => {
-    const stepName = STEPS[currentStep];
-    await saveProgress(stepData, stepName);
+      // Save progress
+      await saveProgress(currentStep)
 
-    if (currentStep < STEPS.length - 1) {
-      setCurrentStep((prev) => prev + 1);
-    } else {
-      await completeOnboarding();
+      // Move to next step
+      if (currentStep < steps.length) {
+        setCurrentStep(currentStep + 1)
+      }
+    } catch (err) {
+      setError('Failed to save progress. Please try again.')
     }
-  };
+  }
 
-  const handlePreviousStep = () => {
-    if (currentStep > 0) {
-      setCurrentStep((prev) => prev - 1);
-      setError(null);
+  const handleBack = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1)
     }
-  };
+  }
 
-  // ============================================================================
-  // Render Step Content
-  // ============================================================================
+  const handleSkip = async () => {
+    try {
+      // Only step 4 (Payout) is skippable
+      if (currentStep === 4) {
+        await saveProgress(currentStep)
+        setCurrentStep(currentStep + 1)
+      }
+    } catch (err) {
+      setError('Failed to skip step. Please try again.')
+    }
+  }
 
-  const renderStep = () => {
-    const stepName = STEPS[currentStep];
+  const handleComplete = async () => {
+    if (!user) return
 
-    const commonProps = {
-      progress,
-      onNext: handleNextStep,
-      onPrevious: handlePreviousStep,
-      isSaving,
-    };
+    try {
+      setIsSaving(true)
 
-    switch (stepName) {
-      case 'profile':
-        return <ProfileStep {...commonProps} />;
-      case 'specializations':
-        return <SpecializationsStep {...commonProps} />;
-      case 'payout':
-        return <PayoutStep {...commonProps} />;
-      case 'guidelines':
-        return <GuidelinesStep {...commonProps} />;
+      // Complete onboarding
+      const { error } = await supabase.rpc('complete_seller_onboarding')
+      if (error) throw error
+
+      // Redirect to dashboard
+      router.push('/seller-dashboard')
+    } catch (err) {
+      console.error('Error completing onboarding:', err)
+      setError('Failed to complete onboarding. Please try again.')
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  const validateCurrentStep = (): boolean => {
+    switch (currentStep) {
+      case 1:
+        return true // Welcome step has no validation
+
+      case 2:
+        if (!formData.sellerName.trim()) {
+          setError('Please enter your seller name')
+          return false
+        }
+        return true
+
+      case 3:
+        if (formData.specializations.length === 0) {
+          setError('Please select at least one specialization')
+          return false
+        }
+        if (!formData.expertiseLevel) {
+          setError('Please select your expertise level')
+          return false
+        }
+        return true
+
+      case 4:
+        // Payout is optional, always valid
+        return true
+
+      case 5:
+        if (
+          !formData.acceptedTerms ||
+          !formData.acceptedQualityStandards ||
+          !formData.acceptedCommunityGuidelines
+        ) {
+          setError('Please accept all required agreements to continue')
+          return false
+        }
+        return true
+
       default:
-        return null;
+        return true
     }
-  };
+  }
 
-  // ============================================================================
-  // Render Loading State
-  // ============================================================================
+  const handleConnectStripe = async () => {
+    try {
+      setError('')
+      setIsSaving(true)
+
+      // Call our API to initiate Stripe Connect OAuth flow
+      const response = await fetch('/api/stripe/connect', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to initiate Stripe connection')
+      }
+
+      // Redirect to Stripe Connect OAuth page
+      if (data.url) {
+        window.location.href = data.url
+      } else {
+        throw new Error('No authorization URL received from server')
+      }
+    } catch (err: any) {
+      console.error('Error connecting to Stripe:', err)
+      setError(err.message || 'Failed to connect to Stripe. Please try again.')
+      setIsSaving(false)
+    }
+  }
+
+  const handleRefreshStripeStatus = async () => {
+    try {
+      const response = await fetch('/api/stripe/connect/status', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to fetch Stripe status')
+      }
+
+      // Update form data with new status
+      setFormData((prev) => ({
+        ...prev,
+        stripeAccountStatus: data.status,
+      }))
+
+      // Update seller profile in database
+      await supabase
+        .from('seller_profiles')
+        .update({
+          stripe_account_status: data.status,
+          stripe_charges_enabled: data.chargesEnabled,
+          stripe_payouts_enabled: data.payoutsEnabled,
+        })
+        .eq('id', user?.id)
+
+      return data
+    } catch (err: any) {
+      console.error('Error refreshing Stripe status:', err)
+      throw err
+    }
+  }
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4" />
-          <p className="text-gray-600">Loading your onboarding progress...</p>
+          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-primary/30 border-t-primary mb-4" />
+          <p className="text-white/70">Loading your seller profile...</p>
         </div>
       </div>
-    );
+    )
   }
 
-  // ============================================================================
-  // Render Main UI
-  // ============================================================================
-
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-3xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Seller Onboarding</h1>
-          <p className="mt-2 text-gray-600">
-            Complete these steps to start selling on SequenceHub
-          </p>
-        </div>
+    <div className="min-h-screen bg-background py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto">
+        {/* Progress Indicator */}
+        <ProgressIndicator
+          steps={steps}
+          currentStep={currentStep}
+          completedSteps={completedSteps}
+        />
 
-        {/* Progress Bar */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-2">
-            {STEPS.map((step, index) => (
-              <div
-                key={step}
-                className={`flex-1 ${index < STEPS.length - 1 ? 'mr-2' : ''}`}
-              >
-                <div
-                  className={`h-2 rounded-full transition-colors duration-300 ${
-                    index <= currentStep ? 'bg-blue-600' : 'bg-gray-200'
-                  }`}
-                />
-              </div>
-            ))}
-          </div>
-          <div className="text-sm text-gray-600 text-center">
-            Step {currentStep + 1} of {STEPS.length}
-          </div>
-        </div>
-
-        {/* Offline Warning */}
-        {isOffline && (
-          <div className="mb-6">
-            <div className="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-4">
-              <div className="flex items-center">
-                <svg
-                  className="w-5 h-5 text-yellow-500 mr-3"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                <p className="text-sm text-yellow-800">
-                  You are currently offline. Changes will be saved locally and synced when
-                  you reconnect.
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Error Alert */}
-        {error && !isOffline && (
-          <div className="mb-6">
-            <ErrorAlert
-              error={error}
-              onRetry={error.canRetry ? handleRetry : undefined}
-              onDismiss={handleDismissError}
-              retryCount={retryCount}
-              maxRetries={3}
-            />
+        {/* Error Display */}
+        {error && (
+          <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/30">
+            <p className="text-sm text-red-400">{error}</p>
           </div>
         )}
 
         {/* Step Content */}
-        <div className="bg-white rounded-lg shadow-sm p-8">
-          {renderStep()}
-        </div>
+        {currentStep === 1 && (
+          <StepWrapper
+            title="Welcome to SequenceHUB"
+            description="Let's get you set up as a seller in just a few minutes"
+            currentStep={currentStep}
+            totalSteps={steps.length}
+            onNext={handleNext}
+            isNextLoading={isSaving}
+            nextLabel="Let's Get Started"
+          >
+            <WelcomeStep />
+          </StepWrapper>
+        )}
 
-        {/* Unsaved Changes Warning */}
-        {hasUnsavedChanges && (
-          <div className="mt-4 text-sm text-gray-600 text-center">
-            You have unsaved changes saved locally
-          </div>
+        {currentStep === 2 && (
+          <StepWrapper
+            title="Create Your Seller Profile"
+            description="Tell buyers who you are and what makes your sequences special"
+            currentStep={currentStep}
+            totalSteps={steps.length}
+            onNext={handleNext}
+            onBack={handleBack}
+            isNextDisabled={!formData.sellerName.trim()}
+            isNextLoading={isSaving}
+          >
+            <ProfileStep
+              formData={formData}
+              onChange={handleFieldChange}
+              onUploadProfilePicture={handleUploadProfilePicture}
+              isUploading={isUploading}
+            />
+          </StepWrapper>
+        )}
+
+        {currentStep === 3 && (
+          <StepWrapper
+            title="Your Specializations"
+            description="Help buyers discover your sequences"
+            currentStep={currentStep}
+            totalSteps={steps.length}
+            onNext={handleNext}
+            onBack={handleBack}
+            isNextDisabled={
+              formData.specializations.length === 0 || !formData.expertiseLevel
+            }
+            isNextLoading={isSaving}
+          >
+            <SpecializationsStep formData={formData} onChange={handleFieldChange} />
+          </StepWrapper>
+        )}
+
+        {currentStep === 4 && (
+          <StepWrapper
+            title="Set Up Payouts"
+            description="Connect your payment account to receive earnings"
+            currentStep={currentStep}
+            totalSteps={steps.length}
+            onNext={handleNext}
+            onBack={handleBack}
+            onSkip={handleSkip}
+            showSkip={formData.stripeAccountStatus !== 'active'}
+            isNextLoading={isSaving}
+            nextLabel={
+              formData.stripeAccountStatus === 'active' ? 'Continue' : 'Skip for Now'
+            }
+          >
+            <PayoutStep
+              stripeAccountStatus={formData.stripeAccountStatus}
+              onConnectStripe={handleConnectStripe}
+              isConnecting={isSaving}
+              onStatusRefresh={handleRefreshStripeStatus}
+            />
+          </StepWrapper>
+        )}
+
+        {currentStep === 5 && (
+          <StepWrapper
+            title="Community Guidelines"
+            description="Review and accept our standards for sellers"
+            currentStep={currentStep}
+            totalSteps={steps.length}
+            onNext={handleNext}
+            onBack={handleBack}
+            isNextDisabled={
+              !formData.acceptedTerms ||
+              !formData.acceptedQualityStandards ||
+              !formData.acceptedCommunityGuidelines
+            }
+            isNextLoading={isSaving}
+            nextLabel="Complete Setup"
+          >
+            <GuidelinesStep formData={formData} onChange={handleFieldChange} />
+          </StepWrapper>
+        )}
+
+        {currentStep === 6 && (
+          <StepWrapper
+            title="Setup Complete!"
+            description="You are ready to start selling on SequenceHUB"
+            currentStep={currentStep}
+            totalSteps={steps.length}
+            onBack={handleBack}
+          >
+            <CompletionStep
+              sellerName={formData.sellerName}
+              onGoToDashboard={handleComplete}
+            />
+          </StepWrapper>
         )}
       </div>
     </div>
-  );
+  )
 }

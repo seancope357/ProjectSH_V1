@@ -1,0 +1,169 @@
+import { uploadImage } from '@/lib/supabase/storage';
+import { useState } from 'react';
+import Button from '@/components/ui/Button'; // Assuming you have a Button component
+import Input from '@/components/ui/Input';   // Assuming you have an Input component
+
+export default function SellerDashboard() {
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [sequenceTitle, setSequenceTitle] = useState('');
+  const [sequencePrice, setSequencePrice] = useState('');
+  const [sequenceDescription, setSequenceDescription] = useState('');
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files.length > 0) {
+      setSelectedFile(event.target.files[0]);
+    } else {
+      setSelectedFile(null);
+    }
+  };
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    if (!selectedFile) {
+      alert('Please select an image file for your sequence.');
+      return;
+    }
+    if (!sequenceTitle || !sequencePrice || !sequenceDescription) {
+      alert('Please fill in all sequence details.');
+      return;
+    }
+
+    setUploading(true);
+    const bucketName = 'sequences'; // Your Supabase storage bucket name, as you mentioned
+    const filePath = `sequence-thumbnails/${Date.now()}-${selectedFile.name}`; // Unique file path for thumbnail
+
+    const publicUrl = await uploadImage(selectedFile, bucketName, filePath);
+
+    if (publicUrl) {
+      setImageUrl(publicUrl);
+      alert('Image uploaded successfully!');
+
+      // Now, you would typically save the sequence details (title, price, description, and publicUrl)
+      // to your Supabase database table (e.g., 'sequences' table).
+      // This would involve using the Supabase client to insert data.
+
+      console.log('Sequence Data to Save:', {
+        title: sequenceTitle,
+        price: parseFloat(sequencePrice),
+        description: sequenceDescription,
+        thumbnail_url: publicUrl, // Storing the image URL in your database
+        // Add other fields like seller_id, created_at, etc.
+      });
+
+      // Example of how you might insert into Supabase (requires Supabase client import and setup)
+      /*
+      const { data, error } = await supabase
+        .from('sequences')
+        .insert([
+          {
+            title: sequenceTitle,
+            price: parseFloat(sequencePrice),
+            description: sequenceDescription,
+            thumbnail_url: publicUrl,
+            // ... other fields
+          },
+        ]);
+
+      if (error) {
+        console.error('Error saving sequence to database:', error);
+        alert('Error saving sequence details.');
+      } else {
+        alert('Sequence details saved successfully!');
+        // Clear form or redirect
+      }
+      */
+
+    } else {
+      alert('Image upload failed. Please check console for details.');
+    }
+    setUploading(false);
+  };
+
+  return (
+    <div className="max-w-2xl mx-auto p-8 bg-surface rounded-lg shadow-lg mt-10">
+      <h1 className="text-3xl font-bold text-white mb-6">Create New Sequence</h1>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div>
+          <label htmlFor="title" className="block text-gray-300 text-sm font-bold mb-2">
+            Sequence Title:
+          </label>
+          <Input
+            id="title"
+            type="text"
+            value={sequenceTitle}
+            onChange={(e) => setSequenceTitle(e.target.value)}
+            placeholder="Enter sequence title"
+            className="w-full bg-background border-primary/30 focus:border-accent transition-colors text-white px-4 py-2 rounded-md"
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="price" className="block text-gray-300 text-sm font-bold mb-2">
+            Price:
+          </label>
+          <Input
+            id="price"
+            type="number"
+            step="0.01"
+            value={sequencePrice}
+            onChange={(e) => setSequencePrice(e.target.value)}
+            placeholder="e.g., 29.99"
+            className="w-full bg-background border-primary/30 focus:border-accent transition-colors text-white px-4 py-2 rounded-md"
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="description" className="block text-gray-300 text-sm font-bold mb-2">
+            Description:
+          </label>
+          <textarea
+            id="description"
+            value={sequenceDescription}
+            onChange={(e) => setSequenceDescription(e.target.value)}
+            placeholder="Describe your sequence"
+            rows={4}
+            className="w-full bg-background border-primary/30 focus:border-accent transition-colors text-white px-4 py-2 rounded-md"
+            required
+          ></textarea>
+        </div>
+        <div>
+          <label htmlFor="image" className="block text-gray-300 text-sm font-bold mb-2">
+            Sequence Thumbnail Image:
+          </label>
+          <input
+            id="image"
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+            className="block w-full text-sm text-gray-400
+              file:mr-4 file:py-2 file:px-4
+              file:rounded-md file:border-0
+              file:text-sm file:font-semibold
+              file:bg-primary file:text-white
+              hover:file:bg-primary/80"
+            required
+          />
+        </div>
+        <Button
+          type="submit"
+          accent="primary"
+          className="w-full px-8 py-3 text-lg shadow-lg hover:shadow-primary/50 transition-all duration-300"
+          disabled={uploading}
+        >
+          {uploading ? 'Uploading & Saving...' : 'Create Sequence'}
+        </Button>
+      </form>
+
+      {imageUrl && (
+        <div className="mt-8 text-center">
+          <p className="text-gray-300 mb-4">Uploaded Image Preview:</p>
+          <img src={imageUrl} alt="Uploaded Thumbnail" className="max-w-full h-auto mx-auto rounded-md shadow-md" />
+          <p className="text-gray-400 text-sm mt-2">URL: {imageUrl}</p>
+        </div>
+      )}
+    </div>
+  );
+}

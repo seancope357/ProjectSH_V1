@@ -1,285 +1,136 @@
-/**
- * ErrorAlert Component
- *
- * Professional, accessible error display component with:
- * - Multiple severity levels (error, warning, info)
- * - Retry functionality
- * - Dismiss capability
- * - Auto-dismiss option
- * - ARIA live regions for accessibility
- * - Icon indicators
- * - Animated entry/exit
- */
+'use client'
 
-import React, { useEffect, useState } from 'react';
-import { AppError } from '@/lib/error-handling';
+import React, { useEffect } from 'react'
+import { AlertCircle, X, RefreshCw } from 'lucide-react'
+import { ErrorInfo } from '@/lib/error-handling'
 
 export interface ErrorAlertProps {
-  error: AppError | null;
-  onRetry?: () => void;
-  onDismiss?: () => void;
-  autoDismiss?: boolean;
-  autoDismissDelay?: number;
-  showRetryCount?: boolean;
-  retryCount?: number;
-  maxRetries?: number;
-  className?: string;
+  error: ErrorInfo | string | null
+  onRetry?: () => void
+  onDismiss?: () => void
+  className?: string
+  autoDismiss?: boolean
+  autoDismissDelay?: number
+  severity?: 'error' | 'warning' | 'info'
 }
 
-export const ErrorAlert: React.FC<ErrorAlertProps> = ({
+export function ErrorAlert({
   error,
   onRetry,
   onDismiss,
+  className = '',
   autoDismiss = false,
   autoDismissDelay = 5000,
-  showRetryCount = true,
-  retryCount = 0,
-  maxRetries = 3,
-  className = '',
-}) => {
-  const [isVisible, setIsVisible] = useState(false);
-
+  severity = 'error',
+}: ErrorAlertProps) {
+  // Auto dismiss functionality
   useEffect(() => {
-    if (error) {
-      setIsVisible(true);
+    if (autoDismiss && error && onDismiss) {
+      const timer = setTimeout(() => {
+        onDismiss()
+      }, autoDismissDelay)
 
-      // Auto-dismiss for non-critical errors
-      if (autoDismiss && error.severity !== 'error') {
-        const timer = setTimeout(() => {
-          handleDismiss();
-        }, autoDismissDelay);
-
-        return () => clearTimeout(timer);
-      }
-    } else {
-      setIsVisible(false);
+      return () => clearTimeout(timer)
     }
-  }, [error, autoDismiss, autoDismissDelay]);
+  }, [autoDismiss, error, onDismiss, autoDismissDelay])
 
-  const handleDismiss = () => {
-    setIsVisible(false);
-    setTimeout(() => {
-      onDismiss?.();
-    }, 300); // Wait for animation
-  };
-
-  if (!error || !isVisible) {
-    return null;
+  if (!error) {
+    return null
   }
 
-  const severityStyles = {
+  // Extract error information
+  const errorInfo: ErrorInfo = typeof error === 'string'
+    ? {
+        type: 'unknown',
+        message: error,
+        userMessage: error,
+        canRetry: false,
+      }
+    : error
+
+  // Determine colors based on severity
+  const severityColors = {
     error: {
-      container: 'bg-red-50 border-red-200',
-      icon: 'text-red-500',
-      text: 'text-red-800',
-      button: 'text-red-600 hover:text-red-800',
+      bg: 'bg-red-500/10',
+      border: 'border-red-500/30',
+      text: 'text-red-400',
+      icon: 'text-red-400',
     },
     warning: {
-      container: 'bg-yellow-50 border-yellow-200',
-      icon: 'text-yellow-500',
-      text: 'text-yellow-800',
-      button: 'text-yellow-600 hover:text-yellow-800',
+      bg: 'bg-amber-500/10',
+      border: 'border-amber-500/30',
+      text: 'text-amber-400',
+      icon: 'text-amber-400',
     },
     info: {
-      container: 'bg-blue-50 border-blue-200',
-      icon: 'text-blue-500',
-      text: 'text-blue-800',
-      button: 'text-blue-600 hover:text-blue-800',
+      bg: 'bg-blue-500/10',
+      border: 'border-blue-500/30',
+      text: 'text-blue-400',
+      icon: 'text-blue-400',
     },
-  };
+  }
 
-  const styles = severityStyles[error.severity];
-
-  const getIcon = () => {
-    switch (error.severity) {
-      case 'error':
-        return (
-          <svg
-            className="w-5 h-5"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-            aria-hidden="true"
-          >
-            <path
-              fillRule="evenodd"
-              d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-              clipRule="evenodd"
-            />
-          </svg>
-        );
-      case 'warning':
-        return (
-          <svg
-            className="w-5 h-5"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-            aria-hidden="true"
-          >
-            <path
-              fillRule="evenodd"
-              d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-              clipRule="evenodd"
-            />
-          </svg>
-        );
-      case 'info':
-        return (
-          <svg
-            className="w-5 h-5"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-            aria-hidden="true"
-          >
-            <path
-              fillRule="evenodd"
-              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-              clipRule="evenodd"
-            />
-          </svg>
-        );
-    }
-  };
+  const colors = severityColors[severity]
 
   return (
     <div
+      className={`p-4 rounded-lg border ${colors.bg} ${colors.border} ${className}`}
       role="alert"
       aria-live="assertive"
       aria-atomic="true"
-      className={`
-        rounded-lg border-2 p-4 shadow-sm
-        transition-all duration-300 ease-in-out
-        ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'}
-        ${styles.container}
-        ${className}
-      `}
     >
-      <div className="flex items-start">
-        <div className={`flex-shrink-0 ${styles.icon}`}>
-          {getIcon()}
+      <div className="flex items-start gap-3">
+        {/* Icon */}
+        <div className="flex-shrink-0 mt-0.5">
+          <AlertCircle className={`h-5 w-5 ${colors.icon}`} aria-hidden="true" />
         </div>
 
-        <div className="ml-3 flex-1">
-          <p className={`text-sm font-medium ${styles.text}`}>
-            {error.userMessage}
+        {/* Content */}
+        <div className="flex-1 min-w-0">
+          <p className={`text-sm font-medium ${colors.text}`}>
+            {errorInfo.userMessage}
           </p>
-
+          
           {/* Action buttons */}
-          <div className="mt-3 flex items-center gap-3">
-            {error.canRetry && onRetry && retryCount < maxRetries && (
-              <button
-                type="button"
-                onClick={onRetry}
-                className={`
-                  inline-flex items-center gap-1.5 text-sm font-medium
-                  transition-colors duration-200
-                  ${styles.button}
-                  focus:outline-none focus:ring-2 focus:ring-offset-2
-                  focus:ring-offset-white focus:ring-blue-500
-                  rounded px-2 py-1
-                `}
-                aria-label={`Retry ${error.type} operation`}
-              >
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
+          {(errorInfo.canRetry || onRetry || onDismiss) && (
+            <div className="mt-3 flex items-center gap-3">
+              {errorInfo.canRetry && onRetry && (
+                <button
+                  onClick={onRetry}
+                  className={`inline-flex items-center gap-1.5 text-sm font-medium ${colors.text} hover:opacity-80 transition-opacity focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background focus:ring-primary rounded px-2 py-1`}
+                  aria-label="Retry action"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                  />
-                </svg>
-                Retry
-                {showRetryCount && retryCount > 0 && (
-                  <span className="text-xs opacity-75">
-                    ({retryCount}/{maxRetries})
-                  </span>
-                )}
-              </button>
-            )}
-
-            {retryCount >= maxRetries && (
-              <span className={`text-xs ${styles.text} opacity-75`}>
-                Maximum retry attempts reached. Please refresh the page or contact support.
-              </span>
-            )}
-
-            {error.action === 'contact_support' && (
-              <a
-                href="/support"
-                className={`
-                  inline-flex items-center gap-1.5 text-sm font-medium
-                  transition-colors duration-200
-                  ${styles.button}
-                  focus:outline-none focus:ring-2 focus:ring-offset-2
-                  focus:ring-offset-white focus:ring-blue-500
-                  rounded px-2 py-1
-                `}
-              >
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
+                  <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" />
+                  Try Again
+                </button>
+              )}
+              
+              {onDismiss && (
+                <button
+                  onClick={onDismiss}
+                  className="text-sm font-medium text-white/70 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background focus:ring-primary rounded px-2 py-1"
+                  aria-label="Dismiss error"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"
-                  />
-                </svg>
-                Contact Support
-              </a>
-            )}
-          </div>
+                  Dismiss
+                </button>
+              )}
+            </div>
+          )}
         </div>
 
+        {/* Dismiss button (X) */}
         {onDismiss && (
-          <div className="ml-auto pl-3">
-            <button
-              type="button"
-              onClick={handleDismiss}
-              className={`
-                inline-flex rounded-md p-1.5
-                transition-colors duration-200
-                ${styles.button}
-                hover:bg-white/50
-                focus:outline-none focus:ring-2 focus:ring-offset-2
-                focus:ring-offset-white focus:ring-blue-500
-              `}
-              aria-label="Dismiss error"
-            >
-              <svg
-                className="w-4 h-4"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                aria-hidden="true"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </button>
-          </div>
+          <button
+            onClick={onDismiss}
+            className={`flex-shrink-0 ${colors.text} hover:opacity-80 transition-opacity focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background focus:ring-primary rounded p-0.5`}
+            aria-label="Close error message"
+          >
+            <X className="h-4 w-4" aria-hidden="true" />
+          </button>
         )}
       </div>
-
-      {/* Additional context for rate limiting */}
-      {error.type === 'rate_limit' && error.retryAfter && (
-        <div className={`mt-2 text-xs ${styles.text} opacity-75`}>
-          Please wait {Math.ceil(error.retryAfter / 1000)} seconds before trying again.
-        </div>
-      )}
     </div>
-  );
-};
+  )
+}
 
-export default ErrorAlert;
+export default ErrorAlert
