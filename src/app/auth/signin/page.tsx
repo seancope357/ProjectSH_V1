@@ -28,17 +28,18 @@ function SignInPageContent() {
         data: { user },
       } = await supabase.auth.getUser()
       if (user) {
-        // Redirect sellers/admins to seller dashboard
+        // If we have a specific callbackUrl (that isn't root), respect it
+        if (callbackUrl && callbackUrl !== '/') {
+          router.push(callbackUrl)
+          return
+        }
+
+        // Otherwise, default redirects based on role
         const role = user.user_metadata?.role
         if (role === 'SELLER' || role === 'ADMIN') {
           router.push('/seller/dashboard')
         } else {
-          // If callbackUrl is root, redirect to buyer dashboard
-          if (!callbackUrl || callbackUrl === '/') {
-            router.push('/dashboard')
-          } else {
-            router.push(callbackUrl)
-          }
+          router.push('/dashboard')
         }
       }
     }
@@ -94,17 +95,18 @@ function SignInPageContent() {
       if (error) {
         setError(error.message)
       } else if (data.user) {
+        // If we have a specific callbackUrl (that isn't root), respect it
+        if (callbackUrl && callbackUrl !== '/') {
+          router.replace(callbackUrl)
+          return
+        }
+
+        // Otherwise, default redirects based on role
         const role = data.user.user_metadata?.role
-        // Explicitly force seller dashboard for SELLER/ADMIN roles
         if (role === 'SELLER' || role === 'ADMIN') {
           router.replace('/seller/dashboard')
         } else {
-          // If callbackUrl is root, redirect to buyer dashboard
-          if (!callbackUrl || callbackUrl === '/') {
-            router.push('/dashboard')
-          } else {
-            router.push(callbackUrl)
-          }
+          router.replace('/dashboard')
         }
       }
     } catch (error) {

@@ -67,7 +67,7 @@ export async function updateSession(request: NextRequest) {
     // Redirect to signin for protected routes
     const url = request.nextUrl.clone()
     url.pathname = '/auth/signin'
-    url.searchParams.set('next', path) // Add return URL
+    url.searchParams.set('callbackUrl', path) // Use callbackUrl for consistency
     return NextResponse.redirect(url)
   }
 
